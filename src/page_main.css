@@ -1,0 +1,42 @@
+body.app_page_main .page_main
+{
+    display: block;
+}
+
+body.app_page_main
+{
+    overflow: hidden;
+}
+
+.page_main
+{
+    left: -10%;
+    width: 120%;
+}
+
+.main-emoji
+{
+    display: block;
+    margin: 5px;
+    float: left;
+    transition: opacity 1s;
+    color: white;
+    opacity: 0;
+}
+
+.main-bg
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.main-start
+{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Double emojis</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./src/app.css" />
+    <link rel="stylesheet" href="./src/btn.css" />
+    <link rel="stylesheet" href="./src/page_main.css" />
+    <link rel="stylesheet" href="./src/page_select-level.css" />
+    <link rel="stylesheet" href="./src/page_field.css" />
+    <script src="./src/lib.js"></script>
+    <script src="./src/app.js"></script>
+    <script src="./src/levels.js"></script>
+    <script src="./src/page_main.js"></script>
+    <script src="./src/page_select-level.js"></script>
+    <script src="./src/page_field.js"></script>
+</head>
+<body class="app_page_main">
+    <div class="page page_main">
+        <div class="main-bg"></div>
+        <div class="main-start"><div class="btn btn_red">Start game</div></div>
+    </div>
+    <div class="page page_select-level">
+        <ul class="select-level__list"></ul>
+        <div class="select-level__exit exit">×</div>
+    </div>
+    <div class="page page_field">
+        <div class="field">
+            <div class="field__cages"></div>
+            <div class="info">
+                <span class="info__clicks">Clicks: <span class="info__clicks-num"></span></span>
+                <span class="info__cages">Cages: <span class="info__cages-num"></span></span>
+            </div>
+        </div>
+        <div class="field__exit exit">×</div>
+    </div>
+</body>
+</html>
