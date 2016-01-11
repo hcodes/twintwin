@@ -51,6 +51,8 @@ body.app_page_field .page_field
     transform-style: preserve-3d;
     transition: 0.2s transform;
     transform: rotateY(180deg);
+    user-select: none;
+    -moz-user-select: none;
 }
 
 .cage_opened

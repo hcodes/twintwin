@@ -48,7 +48,7 @@ var PageMain = {
             for (var i = 0; i < elems.length; i++) {
                 elems[i].style.opacity = threshold + Math.random() * 0.4;
             }
-        }, 500);
+        }, 1000);
     },
     hide: function() {
         this._timer && clearInterval(this._timer);

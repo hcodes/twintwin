@@ -3,15 +3,9 @@ body.app_page_main .page_main
     display: block;
 }
 
-body.app_page_main
-{
-    overflow: hidden;
-}
-
 .page_main
 {
-    left: -10%;
-    width: 120%;
+    overflow: hidden;
 }
 
 .main-emoji
@@ -19,7 +13,7 @@ body.app_page_main
     display: block;
     margin: 5px;
     float: left;
-    transition: opacity 1s;
+    transition: opacity 1.5s;
     color: white;
     opacity: 0;
 }
@@ -27,9 +21,9 @@ body.app_page_main
 .main-bg
 {
     position: absolute;
-    left: 0;
+    left: -10%;
     top: 0;
-    width: 100%;
+    width: 120%;
     height: 100%;
 }
 

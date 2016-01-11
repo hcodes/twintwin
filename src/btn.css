@@ -1,4 +1,4 @@
-.btn 
+.btn
 {
     border-radius: 5px;
     padding: 15px 25px;
@@ -20,7 +20,7 @@
     box-shadow: 0 1px 0 0;
 }
 
-.btn_red 
+.btn_red
 {
     background-color: #e74c3c;
     box-shadow: 0 5px 0 0 #CE3323;
@@ -31,7 +31,8 @@
     background-color: #FF6656;
 }
 
-.btn_small {
+.btn_small
+{
       border-radius: 3px;
       padding: 2px 6px;
       font-size: 16px;
@@ -39,7 +40,7 @@
       color: #fff;
 }
 
-.btn_small.btn_red 
+.btn_small.btn_red
 {
     box-shadow: 0 2px 0 0 #CE3323;
 }
