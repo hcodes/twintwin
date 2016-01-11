@@ -53,6 +53,7 @@ body.app_page_field .page_field
     transform: rotateY(180deg);
     user-select: none;
     -moz-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .cage_opened

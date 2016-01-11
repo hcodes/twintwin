@@ -50,6 +50,7 @@ html, body
     vertical-align: middle;
     user-select: none;
     -moz-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .exit:hover

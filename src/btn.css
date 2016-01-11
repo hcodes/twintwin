@@ -12,6 +12,7 @@
     white-space: nowrap;
     user-select: none;
     -moz-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn:active
