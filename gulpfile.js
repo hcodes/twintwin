@@ -16,13 +16,14 @@ var fs = require('fs'),
 
 var paths = {
     css: [
-        'src/*.css'
+        'src/**/*.less'
     ],
     js: [
-        'src/lib.js',
+        'src/lib/*.js',
         'src/app.js',
         'src/levels.js',
-        'src/page_*.js'
+        'src/pages/*.js',
+        'src/components/*.js'
     ]
 };
 
@@ -41,7 +42,7 @@ gulp.task('css', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch('src/*', ['css', 'js']);
+    gulp.watch('src/**/*', ['css', 'js']);
 });
 
 gulp.task('default', ['css', 'js']);

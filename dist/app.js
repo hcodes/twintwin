@@ -9,6 +9,18 @@ Array.prototype.shuffle = function () {
     return input;
 };
 
+function leadZero(num) {
+    return num < 10 ? '0' + num : num;
+}
+
+function formatTime(ms) {
+    var sec = Math.floor(ms / 1000),
+        min = Math.floor(sec / 60),
+        sec2 = sec - min * 60;
+
+    return min + ':' + leadZero(sec2);
+}
+
 var $ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
@@ -47,9 +59,28 @@ var setCSS = function(el, props) {
     });
 };
 
-var leadZero = function(num) {
-    return num < 10 ? '0' + num : num;
-};
+var hasSupportCss = (function() {
+    var div = document.createElement('div'),
+        vendors = 'Khtml ms O Moz Webkit'.split(' '),
+        len = vendors.length;
+
+    return function(prop) {
+
+        if (prop in div.style) return true;
+
+        prop = prop.replace(/^[a-z]/, function(val) {
+            return val.toUpperCase();
+        });
+
+        while(len--) {
+            if (vendors[len] + prop in div.style) {
+                return true;
+            } 
+        }
+
+        return false;
+    };
+})();
 
 // for iPad 1
 if(!Function.prototype.bind) {
@@ -76,9 +107,36 @@ if(!Function.prototype.bind) {
     };
 }
 
+var body = document.body;
 var App = {
     init: function() {
-        this.page.show('main');
+        body.classList.add('support_transform3d_' + hasSupportCss('perspective'));
+
+        $.on(document, 'mousemove', function() {
+            this.setInputType('mouse');
+        }.bind(this));
+
+        $.on(document, 'keydown', function() {
+            this.setInputType('keyboard');
+        }.bind(this));
+
+        $.on(document, 'touchstart', function() {
+            this.setInputType('touch');
+        }.bind(this));
+
+        this.setInputType('mouse');
+
+        this.page.show(
+            this.page.getNameByLocationHash(window.location.hash)
+        );
+    },
+    inputType: null,
+    setInputType: function(type) {
+        if (type !== this.inputType) {
+            body.classList.remove('input_' + this.inputType);
+            body.classList.add('input_' + type);
+            this.inputType = type;
+        }
     },
     levelTitle: function(level) {
         var levelObj = App.commonData.levels[level];
@@ -95,8 +153,8 @@ var App = {
                 pages.forEach(function(page) {
                     this._add(page);
                 }, this);
-            } else { 
-                this._add(page);
+            } else {
+                this._add(pages);
             }
         },
         _add: function(page) {
@@ -107,9 +165,11 @@ var App = {
         },
         show: function(name, data) {
             var oldName = null;
+
             if (this.current) {
                 this.current.hide();
                 oldName = this.current.name;
+                body.classList.remove('page_' + oldName);
             }
 
             var page = this.get(name);
@@ -119,16 +179,34 @@ var App = {
                 page._isInited = true;
             }
 
-            this.setCSSClass(page.name);
+            body.classList.add('page_' + name);
             page.show(data);
+
+            if (page.locationHash !== undefined) {
+                window.location.hash = page.locationHash;
+            }
 
             this.current = page;
         },
-        setCSSClass: function(name) {
-            document.body.className = 'app_page_' + name;
-        },
         hide: function(name) {
             this.get(name).hide();
+        },
+        getNameByLocationHash: function(hash) {
+            var name;
+            hash = (hash || '').replace(/#/, '');
+
+            Object.keys(this.buffer).some(function(key) {
+                var page = this.buffer[key];
+
+                if (page.locationHash === hash) {
+                    name = page.name;
+                    return true;
+                }
+
+                return false;
+            }, this);
+
+            return name || 'main';
         },
         current: null,
         buffer: {}
@@ -143,7 +221,7 @@ var App = {
                 this._load();
                 this._isLoaded = true;
             }
-            
+
             var value = this._buffer[name];
             return value === undefined ? defValue : value;
         },
@@ -162,18 +240,12 @@ var App = {
         _save: function() {
             try {
                 localStorage.setItem(this.lsName, JSON.stringify(this._buffer));
-            } catch(e) {} 
+            } catch(e) {}
         }
     }
 };
 
 $.on(document, 'DOMContentLoaded', function() {
-    App.page.add([
-        PageMain,
-        PageSelectLevel,
-        PageField
-    ]);
-
     App.init();
 });
 
@@ -476,8 +548,9 @@ App.commonData.levels = [
         ]
     }
 ];
-var PageField = {
+App.page.add({
     name: 'field',
+    locationHash: 'game',
     init: function(data) {
         this._el = $('.field__cages');
 
@@ -507,8 +580,8 @@ var PageField = {
         }.bind(this));
     },
     padding: 5,
-    cols: 3,
-    rows: 4,
+    cols: 6,
+    rows: 5,
     field: [],
     addCages: function() {
         for (var x = 0; x < this.cols; x++) {
@@ -661,19 +734,12 @@ var PageField = {
         }
     },
     info: {
-        formatTime: function(ms) {
-            var sec = Math.floor(ms / 1000),
-                min = Math.floor(sec / 60),
-                sec2 = sec - min * 60;
-
-            return min + ':' + leadZero(sec2);
-        },
         update: function() {
             this.currentTime = Date.now();
             $('.info__clicks-num', this._el).innerHTML = this.clicks;
             $('.info__cages-num', this._el).innerHTML = this.cages;
             $('.info__level-title', this._el).innerHTML = this.levelTitle;
-            $('.info__time-num', this._el).innerHTML = this.formatTime(this.currentTime - this.startTime);
+            $('.info__time-num', this._el).innerHTML = formatTime(this.currentTime - this.startTime);
         },
         start: function(level, cages) {
             this.stop();
@@ -718,10 +784,11 @@ var PageField = {
     hide: function() {
         this.info.stop();
     }
-};
+});
 
-var PageMain = {
+App.page.add({
     name: 'main',
+    locationHash: '',
     init: function() {
         this._bg = $('.main-bg');
         this._bg.innerHTML = this.getBackground();
@@ -736,7 +803,7 @@ var PageMain = {
             }
 
             App.page.show('select-level');
-        }.bind(this));
+        });
 
         $.on('.main-menu__new-game', 'mousedown', function(e) {
             App.settings.set('level', 1);
@@ -792,10 +859,11 @@ var PageMain = {
         this._timer && clearInterval(this._timer);
         this._timer = null;
     }
-};
+});
 
-var PageSelectLevel = {
+App.page.add({
     name: 'select-level',
+    locationHash: 'select-level',
     init: function(data) {
         var el = $('.select-level__list');
         el.innerHTML = this.getList();
@@ -837,8 +905,6 @@ var PageSelectLevel = {
         
         return html.join('');
     },
-    show: function() {
-    },
-    hide: function() {
-    }
-};
+    show: function() {},
+    hide: function() {}
+});

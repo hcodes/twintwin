@@ -1,0 +1,107 @@
+.cage
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    cursor: pointer;
+    overflow: hidden;
+    transition: 0.2s transform, 0.2s opacity;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+body.support_transform3d_true
+{
+    .cage
+    {
+        transform-style: preserve-3d;
+        transform: rotateY(180deg);
+    }
+
+    .cage_opened
+    {
+        transform: rotateY(0deg);
+    }
+
+    .cage__front,
+    .cage__back
+    {
+        backface-visibility: hidden;
+    }
+
+    .cage__front
+    {
+        transform: rotateY(0deg);
+    }
+
+    .cage__back
+    {
+        transform: rotateY(180deg);
+    }
+
+    .cage_opened .cage__back
+    {
+        transform: rotateY(0deg);
+    }
+
+    .cage_opened .cage__front
+    {
+        transform: rotateY(180deg);
+    }
+
+    .cage_removed
+    {
+        transform: rotateY(180deg) scale(0.01);
+    }
+}
+
+body.support_transform3d_false
+{
+    .cage_opened .cage__front
+    {
+        display: none;
+    }
+    
+    .cage_opened .cage__back
+    {
+        display: block;
+    }
+}
+
+.cage__front,
+.cage__back
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.cage__front
+{
+    z-index: 2;
+    background: #c0c0c0;
+    transition: 0.2s opacity;
+}
+
+.cage__back
+{
+    vertical-align: middle;
+    text-align: center;
+}
+
+.cage_opened .cage__back
+{
+    background: white;
+}
+
+body.input_mouse .cage__front:hover
+{
+    opacity: 0.8;
+}
+
+.cage_removed
+{
+    opacity: 0.6;
+}

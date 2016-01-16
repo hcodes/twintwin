@@ -1,5 +1,6 @@
-var PageMain = {
+App.page.add({
     name: 'main',
+    locationHash: '',
     init: function() {
         this._bg = $('.main-bg');
         this._bg.innerHTML = this.getBackground();
@@ -14,7 +15,7 @@ var PageMain = {
             }
 
             App.page.show('select-level');
-        }.bind(this));
+        });
 
         $.on('.main-menu__new-game', 'mousedown', function(e) {
             App.settings.set('level', 1);
@@ -70,4 +71,4 @@ var PageMain = {
         this._timer && clearInterval(this._timer);
         this._timer = null;
     }
-};
+});

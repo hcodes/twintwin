@@ -1,5 +1,6 @@
-var PageSelectLevel = {
+App.page.add({
     name: 'select-level',
+    locationHash: 'select-level',
     init: function(data) {
         var el = $('.select-level__list');
         el.innerHTML = this.getList();
@@ -41,8 +42,6 @@ var PageSelectLevel = {
         
         return html.join('');
     },
-    show: function() {
-    },
-    hide: function() {
-    }
-};
+    show: function() {},
+    hide: function() {}
+});

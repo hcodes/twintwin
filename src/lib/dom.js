@@ -1,0 +1,60 @@
+﻿var $ = function(el, context) {
+    return typeof el === 'string' ? (context || document).querySelector(el) : el;
+};
+
+$.on = function(el, type, callback) {
+    $(el).addEventListener(type, callback, false);
+
+    return $;
+};
+
+$.delegate = function(root, el, type, callback) {
+    $(root).addEventListener(type, function(e) {
+        var cls = el[0] === '.' ? el.substr(1) : el;
+        if (e.target.classList.contains(cls)) {
+            callback.call(e.target, e);
+        }
+    }, false);
+
+    return $;
+};
+
+$.off = function(el, type, callback) {
+    $(el).removeEventListener(type, callback, false);
+
+    return $;
+};
+
+var $$ = function(el, context) {
+    return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
+};
+
+var setCSS = function(el, props) {
+    var style = el.style;
+    Object.keys(props).forEach(function(key) {
+        style[key] = props[key];
+    });
+};
+
+var hasSupportCss = (function() {
+    var div = document.createElement('div'),
+        vendors = 'Khtml ms O Moz Webkit'.split(' '),
+        len = vendors.length;
+
+    return function(prop) {
+
+        if (prop in div.style) return true;
+
+        prop = prop.replace(/^[a-z]/, function(val) {
+            return val.toUpperCase();
+        });
+
+        while(len--) {
+            if (vendors[len] + prop in div.style) {
+                return true;
+            } 
+        }
+
+        return false;
+    };
+})();

@@ -1,5 +1,6 @@
-var PageField = {
+App.page.add({
     name: 'field',
+    locationHash: 'game',
     init: function(data) {
         this._el = $('.field__cages');
 
@@ -29,8 +30,8 @@ var PageField = {
         }.bind(this));
     },
     padding: 5,
-    cols: 3,
-    rows: 4,
+    cols: 6,
+    rows: 5,
     field: [],
     addCages: function() {
         for (var x = 0; x < this.cols; x++) {
@@ -183,19 +184,12 @@ var PageField = {
         }
     },
     info: {
-        formatTime: function(ms) {
-            var sec = Math.floor(ms / 1000),
-                min = Math.floor(sec / 60),
-                sec2 = sec - min * 60;
-
-            return min + ':' + leadZero(sec2);
-        },
         update: function() {
             this.currentTime = Date.now();
             $('.info__clicks-num', this._el).innerHTML = this.clicks;
             $('.info__cages-num', this._el).innerHTML = this.cages;
             $('.info__level-title', this._el).innerHTML = this.levelTitle;
-            $('.info__time-num', this._el).innerHTML = this.formatTime(this.currentTime - this.startTime);
+            $('.info__time-num', this._el).innerHTML = formatTime(this.currentTime - this.startTime);
         },
         start: function(level, cages) {
             this.stop();
@@ -240,4 +234,4 @@ var PageField = {
     hide: function() {
         this.info.stop();
     }
-};
+});
