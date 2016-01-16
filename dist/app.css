@@ -22,9 +22,6 @@ body {
   height: 100%;
   display: none;
 }
-.emoji {
-  font-family: "Apple Color Emoji", "Android Emoji", "Segoe UI Emoji", "NotoColorEmoji", "Segoe UI Symbol", "EmojiSymbols";
-}
 .exit {
   position: fixed;
   top: 5px;
@@ -65,6 +62,8 @@ body {
           user-select: none;
   -moz-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-transition: 0.2s transform;
+  transition: 0.2s transform;
 }
 .btn:active {
   -webkit-transform: translate(0px, 5px);
@@ -92,6 +91,13 @@ body {
   -webkit-box-shadow: 0 2px 0 0 #CE3323;
           box-shadow: 0 2px 0 0 #CE3323;
 }
+.btn_middle {
+  border-radius: 3px;
+  padding: 10px 10px;
+  font-size: 26px;
+  margin: 5px;
+  color: #fff;
+}
 .btn_disabled {
   background-color: #c0c0c0;
   -webkit-box-shadow: 0 5px 0 0 #c6c6c6;
@@ -109,15 +115,18 @@ body {
   -webkit-box-shadow: 0 5px 0 0 #c6c6c6;
           box-shadow: 0 5px 0 0 #c6c6c6;
 }
+.emoji {
+  font-family: "Apple Color Emoji", "Android Emoji", "Segoe UI Emoji", "NotoColorEmoji", "Segoe UI Symbol", "EmojiSymbols";
+}
 body.app_page_field .page_field {
   display: block;
 }
 .field {
   position: absolute;
-  left: 50px;
+  left: 30px;
   top: 30px;
   bottom: 30px;
-  right: 50px;
+  right: 30px;
   -webkit-user-select: none;
       -ms-user-select: none;
           user-select: none;
@@ -133,6 +142,7 @@ body.app_page_field .page_field {
       -ms-user-select: none;
           user-select: none;
   -moz-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .info {
   position: absolute;
@@ -143,7 +153,9 @@ body.app_page_field .page_field {
   white-space: nowrap;
   padding: 4px;
 }
-.info__cages {
+.info__cages,
+.info__time,
+.info__clicks {
   margin-left: 1em;
 }
 .cage {
@@ -205,8 +217,8 @@ body.app_page_field .page_field {
   opacity: 0.8;
 }
 .cage_removed {
-  -webkit-transform: rotateY(180deg) scale(0);
-          transform: rotateY(180deg) scale(0);
+  -webkit-transform: rotateY(180deg) scale(0.01);
+          transform: rotateY(180deg) scale(0.01);
 }
 body.app_page_main .page_main {
   display: block;
@@ -230,13 +242,23 @@ body.app_page_main .page_main {
   width: 120%;
   height: 100%;
 }
-.main-start {
+.main-menu {
   position: absolute;
   left: 50%;
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
       -ms-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0;
+}
+.main-menu li {
+  list-style: none;
+  margin: 5px 0;
+  padding: 0;
+}
+.main-menu .btn {
+  width: 7em;
 }
 body.app_page_select-level .page_select-level {
   display: block;

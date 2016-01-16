@@ -9,26 +9,34 @@ var PageSelectLevel = {
         });
         
         $.delegate(el, '.btn', 'click', function(e) {
-            var level = e.target.dataset['level'];
-            App.page.show('field', {
-                level: level
-            });
+            if (this.classList.contains('btn_disabled')) {
+                return;
+            }
+
+            var level = parseInt(e.target.dataset['level']);
+            App.settings.set('level', level);
+            App.page.show('field');
         });
 
         return this;
     },
     getList: function() {
-        var html = [];
+        var html = [],
+            maxLevel = App.settings.get('maxLevel');
 
         this.data.levels.forEach(function(level, i) {
-            var btnClass = ['btn', 'btn_red'];
-            if (i > 5) {
+            if (!i) {
+                return;
+            }
+
+            var btnClass = ['btn', 'btn_red', 'btn_middle'];
+            if (maxLevel < i) {
                 btnClass.push('btn_disabled');
             }
 
             html.push('<li class="select-level__item"><span data-level="' + i + '" class="' +
                 btnClass.join(' ') + '"><span class="select-level__emoji emoji">' +
-                level.symbols[0] + '</span>' + level.name + '</span></li>');
+                App.levelSymbol(i) + '</span>' + level.name + '</span></li>');
         }, this);
         
         return html.join('');

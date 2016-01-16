@@ -2,6 +2,14 @@ var App = {
     init: function() {
         this.page.show('main');
     },
+    levelTitle: function(level) {
+        var levelObj = App.commonData.levels[level];
+        return this.levelSymbol(level) + ' ' + levelObj.name;
+    },
+    levelSymbol: function(level) {
+        var levelObj = App.commonData.levels[level];
+        return levelObj.titleSymbol;
+    },
     commonData: {},
     page: {
         add: function(pages) {
@@ -9,7 +17,7 @@ var App = {
                 pages.forEach(function(page) {
                     this._add(page);
                 }, this);
-            } else {
+            } else { 
                 this._add(page);
             }
         },
@@ -46,6 +54,38 @@ var App = {
         },
         current: null,
         buffer: {}
+    },
+    settings: {
+        set: function(name, value) {
+            this._buffer[name] = value;
+            this._save();
+        },
+        get: function(name, defValue) {
+            if (!this._isLoaded) {
+                this._load();
+                this._isLoaded = true;
+            }
+            
+            var value = this._buffer[name];
+            return value === undefined ? defValue : value;
+        },
+        lsName: 'de',
+        _buffer: {},
+        _load: function() {
+            var buffer = {};
+            try {
+                buffer = JSON.parse(localStorage.getItem(this.lsName)) || {};
+            } catch(e) {}
+
+            buffer.level = buffer.level || 1;
+            buffer.maxLevel = buffer.maxLevel || 1;
+            this._buffer = buffer;
+        },
+        _save: function() {
+            try {
+                localStorage.setItem(this.lsName, JSON.stringify(this._buffer));
+            } catch(e) {} 
+        }
     }
 };
 

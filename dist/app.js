@@ -23,7 +23,7 @@ $.delegate = function(root, el, type, callback) {
     $(root).addEventListener(type, function(e) {
         var cls = el[0] === '.' ? el.substr(1) : el;
         if (e.target.classList.contains(cls)) {
-            callback.call(this, e);
+            callback.call(e.target, e);
         }
     }, false);
 
@@ -45,6 +45,10 @@ var setCSS = function(el, props) {
     Object.keys(props).forEach(function(key) {
         style[key] = props[key];
     });
+};
+
+var leadZero = function(num) {
+    return num < 10 ? '0' + num : num;
 };
 
 // for iPad 1
@@ -76,6 +80,14 @@ var App = {
     init: function() {
         this.page.show('main');
     },
+    levelTitle: function(level) {
+        var levelObj = App.commonData.levels[level];
+        return this.levelSymbol(level) + ' ' + levelObj.name;
+    },
+    levelSymbol: function(level) {
+        var levelObj = App.commonData.levels[level];
+        return levelObj.titleSymbol;
+    },
     commonData: {},
     page: {
         add: function(pages) {
@@ -83,7 +95,7 @@ var App = {
                 pages.forEach(function(page) {
                     this._add(page);
                 }, this);
-            } else {
+            } else { 
                 this._add(page);
             }
         },
@@ -120,6 +132,38 @@ var App = {
         },
         current: null,
         buffer: {}
+    },
+    settings: {
+        set: function(name, value) {
+            this._buffer[name] = value;
+            this._save();
+        },
+        get: function(name, defValue) {
+            if (!this._isLoaded) {
+                this._load();
+                this._isLoaded = true;
+            }
+            
+            var value = this._buffer[name];
+            return value === undefined ? defValue : value;
+        },
+        lsName: 'de',
+        _buffer: {},
+        _load: function() {
+            var buffer = {};
+            try {
+                buffer = JSON.parse(localStorage.getItem(this.lsName)) || {};
+            } catch(e) {}
+
+            buffer.level = buffer.level || 1;
+            buffer.maxLevel = buffer.maxLevel || 1;
+            this._buffer = buffer;
+        },
+        _save: function() {
+            try {
+                localStorage.setItem(this.lsName, JSON.stringify(this._buffer));
+            } catch(e) {} 
+        }
     }
 };
 
@@ -135,7 +179,12 @@ $.on(document, 'DOMContentLoaded', function() {
 
 App.commonData.levels = [
     {
+        name: '',
+        symbols: []
+    },
+    {
         name: 'Flowers and trees',
+        titleSymbol: '💐',
         symbols: [
             '💐',
             '🌸',
@@ -160,6 +209,7 @@ App.commonData.levels = [
     },
     {
         name: 'Fruits and vegetables',
+        titleSymbol: '🍏',
         symbols: [
             '🌰',
             '🌱',
@@ -184,6 +234,7 @@ App.commonData.levels = [
     },
     {
         name: 'Zodiac Signs',
+        titleSymbol: '♋',
         symbols: [
             '♈',
             '♉',
@@ -202,6 +253,7 @@ App.commonData.levels = [
     },
     {
         name: 'Accessories',
+        titleSymbol: '👛',
         symbols: [
             '👑',
             '💼',
@@ -216,6 +268,7 @@ App.commonData.levels = [
     },
     {
         name: 'Fashion',
+        titleSymbol: '👗',
         symbols: [
             '🎩',
             '👒',
@@ -236,6 +289,7 @@ App.commonData.levels = [
     },
     {
         name: 'Buildings',
+        titleSymbol: '🏢',
         symbols: [
             '🏠',
             '🏡',
@@ -273,6 +327,7 @@ App.commonData.levels = [
     },
     {
         name: 'Trains',
+        titleSymbol: '🚄',
         symbols: [
             '🚂',
             '🚊',
@@ -290,6 +345,7 @@ App.commonData.levels = [
     },
     {
         name: 'Hand Signs',
+        titleSymbol: '👌',
         bg: false,
         symbols: [
             '👍',
@@ -314,6 +370,7 @@ App.commonData.levels = [
     },
     {
         name: 'Arrows',
+        titleSymbol: '↗',
         bg: false,
         symbols: [
             '⬇',
@@ -347,6 +404,7 @@ App.commonData.levels = [
     },
     {
         name: 'Technology',
+        titleSymbol: '📀',
         symbols: [
             '🎥',
             '📷',
@@ -369,6 +427,7 @@ App.commonData.levels = [
     },
     {
         name: 'Sport',
+        titleSymbol: '🏀',
         symbols: [
             '🎯',
             '🏈',
@@ -394,6 +453,7 @@ App.commonData.levels = [
     },
     {
         name: 'Games and Hobbies',
+        titleSymbol: '🎨',
         symbols: [
             '🎨',
             '🎬',
@@ -421,7 +481,13 @@ var PageField = {
     init: function(data) {
         this._el = $('.field__cages');
 
-        $.on('.field__exit', 'click', function() {
+        this.setEvents();
+        this.info.parent = this;
+
+        return this;
+    },
+    setEvents: function() {
+        $.on('.field__exit', 'mousedown', function() {
             App.page.show('select-level');
         });
 
@@ -429,7 +495,7 @@ var PageField = {
             this.resizeCages();
         }.bind(this));
 
-        $.delegate(this._el, '.cage__front', 'click', function(e) {
+        $.delegate(this._el, '.cage__front', 'mousedown', function(e) {
             var cage = e.target.parentNode,
                 ds = cage.dataset;
 
@@ -439,11 +505,9 @@ var PageField = {
                 this.openCage(ds.x, ds.y);
             }
         }.bind(this));
-
-        return this;
     },
     padding: 5,
-    cols: 6,
+    cols: 3,
     rows: 4,
     field: [],
     addCages: function() {
@@ -475,7 +539,7 @@ var PageField = {
         }
     },
     getLevelSymbols: function() {
-        var level = this._showData.level,
+        var level = this._level,
             syms = this.data.levels[level].symbols,
             size = this.cols * this.rows,
             halfSize = size / 2,
@@ -564,9 +628,14 @@ var PageField = {
             cage.classList.add('cage_removed');
             this.info.cages--;
             this.info.update();
+
             setTimeout(function() {
                 this._el.removeChild(cage);
             }.bind(this), 200);
+
+            if (!this.info.cages) {
+                this.finish();
+            }
         }
     },
     closeCage: function(x, y) {
@@ -576,23 +645,7 @@ var PageField = {
             $('.cage__back', cage).innerHTML = '';
         }
     },
-    info: {
-        update: function() {
-            $('.info__clicks-num', this._el).innerHTML = this.clicks;
-            $('.info__cages-num', this._el).innerHTML = this.cages;
-        }
-    },
-    reset: function() {
-        this.info.clicks = 0;
-        this.info.cages = this.cols * this.rows;
-        this.info.update();
-
-        this._el.innerHTML = '';
-        this._openedCages = [];
-    },
-    show: function(showData) {
-        this._showData = showData || {};
-        this.reset();
+    initField: function() {
         var syms = this.getLevelSymbols(),
             s = 0;
 
@@ -606,7 +659,53 @@ var PageField = {
 
             this.field[y] = buf;
         }
+    },
+    info: {
+        formatTime: function(ms) {
+            var sec = Math.floor(ms / 1000),
+                min = Math.floor(sec / 60),
+                sec2 = sec - min * 60;
 
+            return min + ':' + leadZero(sec2);
+        },
+        update: function() {
+            this.currentTime = Date.now();
+            $('.info__clicks-num', this._el).innerHTML = this.clicks;
+            $('.info__cages-num', this._el).innerHTML = this.cages;
+            $('.info__level-title', this._el).innerHTML = this.levelTitle;
+            $('.info__time-num', this._el).innerHTML = this.formatTime(this.currentTime - this.startTime);
+        },
+        start: function(level, cages) {
+            this.stop();
+
+            this.clicks = 0;
+            this.cages = cages;
+            this.levelTitle = App.levelTitle(level);
+            this.startTime = Date.now();
+
+            this.update();
+            this._timer = setInterval(function() {
+                this.update();
+            }.bind(this), 500);
+        },
+        stop: function() {
+            this._timer && clearInterval(this._timer);
+            this._timer = null;
+        }
+    },
+    finish: function() {
+        var maxLevel = App.settings.get('maxLevel');
+        App.settings.set('maxLevel', Math.max(maxLevel, App.level + 1));
+
+        this.info.stop();
+    },
+    show: function() {
+        this._el.innerHTML = '';
+        this._openedCages = [];
+        this._level = App.settings.get('level');
+
+        this.info.start(this._level, this.cols * this.rows);
+        this.initField();
         this.addCages();
         this.resizeCages();
 
@@ -617,6 +716,7 @@ var PageField = {
         }*/
     },
     hide: function() {
+        this.info.stop();
     }
 };
 
@@ -630,7 +730,16 @@ var PageMain = {
             this.resizeEmoji();
         }.bind(this));
         
-        $.on('.main-start', 'click', function() {
+        $.on('.main-menu__continue', 'mousedown', function(e) {
+            if (this.classList.contains('btn_disabled')) {
+                return;
+            }
+
+            App.page.show('select-level');
+        }.bind(this));
+
+        $.on('.main-menu__new-game', 'mousedown', function(e) {
+            App.settings.set('level', 1);
             App.page.show('select-level');
         }.bind(this));
 
@@ -663,6 +772,13 @@ var PageMain = {
         bgStyle.lineHeight =  width + 'px';
     },
     show: function() {
+        var cont = $('.main-menu__continue');
+        if (App.settings.get('level')) {
+            cont.classList.remove('btn_disabled');
+        } else {
+            cont.classList.add('btn_disabled');
+        }
+
         this._timer = setInterval(function() {
             var elems = $$('.main-emoji'),
                 threshold = 0.1;
@@ -689,26 +805,34 @@ var PageSelectLevel = {
         });
         
         $.delegate(el, '.btn', 'click', function(e) {
-            var level = e.target.dataset['level'];
-            App.page.show('field', {
-                level: level
-            });
+            if (this.classList.contains('btn_disabled')) {
+                return;
+            }
+
+            var level = parseInt(e.target.dataset['level']);
+            App.settings.set('level', level);
+            App.page.show('field');
         });
 
         return this;
     },
     getList: function() {
-        var html = [];
+        var html = [],
+            maxLevel = App.settings.get('maxLevel');
 
         this.data.levels.forEach(function(level, i) {
-            var btnClass = ['btn', 'btn_red'];
-            if (i > 5) {
+            if (!i) {
+                return;
+            }
+
+            var btnClass = ['btn', 'btn_red', 'btn_middle'];
+            if (maxLevel < i) {
                 btnClass.push('btn_disabled');
             }
 
             html.push('<li class="select-level__item"><span data-level="' + i + '" class="' +
                 btnClass.join(' ') + '"><span class="select-level__emoji emoji">' +
-                level.symbols[0] + '</span>' + level.name + '</span></li>');
+                App.levelSymbol(i) + '</span>' + level.name + '</span></li>');
         }, this);
         
         return html.join('');

@@ -8,7 +8,16 @@ var PageMain = {
             this.resizeEmoji();
         }.bind(this));
         
-        $.on('.main-start', 'click', function() {
+        $.on('.main-menu__continue', 'mousedown', function(e) {
+            if (this.classList.contains('btn_disabled')) {
+                return;
+            }
+
+            App.page.show('select-level');
+        }.bind(this));
+
+        $.on('.main-menu__new-game', 'mousedown', function(e) {
+            App.settings.set('level', 1);
             App.page.show('select-level');
         }.bind(this));
 
@@ -41,6 +50,13 @@ var PageMain = {
         bgStyle.lineHeight =  width + 'px';
     },
     show: function() {
+        var cont = $('.main-menu__continue');
+        if (App.settings.get('level')) {
+            cont.classList.remove('btn_disabled');
+        } else {
+            cont.classList.add('btn_disabled');
+        }
+
         this._timer = setInterval(function() {
             var elems = $$('.main-emoji'),
                 threshold = 0.1;

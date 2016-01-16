@@ -6,10 +6,10 @@ body.app_page_field .page_field
 .field
 {
     position: absolute;
-    left: 50px;
+    left: 30px;
     top: 30px;
     bottom: 30px;
-    right: 50px;
+    right: 30px;
     user-select: none;
     -moz-user-select: none;
 }
@@ -23,6 +23,7 @@ body.app_page_field .page_field
     bottom: 0;
     user-select: none;
     -moz-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .info
@@ -36,7 +37,9 @@ body.app_page_field .page_field
     padding: 4px;
 }
 
-.info__cages
+.info__cages,
+.info__time,
+.info__clicks
 {
     margin-left: 1em;
 }
@@ -105,5 +108,5 @@ body.app_page_field .page_field
 
 .cage_removed
 {
-    transform: rotateY(180deg) scale(0);
+    transform: rotateY(180deg) scale(0.01);
 }

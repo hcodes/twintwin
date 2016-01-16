@@ -40,4 +40,8 @@ gulp.task('css', function() {
         .pipe(gulp.dest(destDir));
 });
 
+gulp.task('watch', function() {
+    gulp.watch('src/*', ['css', 'js']);
+});
+
 gulp.task('default', ['css', 'js']);

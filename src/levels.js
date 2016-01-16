@@ -1,6 +1,11 @@
 ﻿App.commonData.levels = [
     {
+        name: '',
+        symbols: []
+    },
+    {
         name: 'Flowers and trees',
+        titleSymbol: '💐',
         symbols: [
             '💐',
             '🌸',
@@ -25,6 +30,7 @@
     },
     {
         name: 'Fruits and vegetables',
+        titleSymbol: '🍏',
         symbols: [
             '🌰',
             '🌱',
@@ -49,6 +55,7 @@
     },
     {
         name: 'Zodiac Signs',
+        titleSymbol: '♋',
         symbols: [
             '♈',
             '♉',
@@ -67,6 +74,7 @@
     },
     {
         name: 'Accessories',
+        titleSymbol: '👛',
         symbols: [
             '👑',
             '💼',
@@ -81,6 +89,7 @@
     },
     {
         name: 'Fashion',
+        titleSymbol: '👗',
         symbols: [
             '🎩',
             '👒',
@@ -101,6 +110,7 @@
     },
     {
         name: 'Buildings',
+        titleSymbol: '🏢',
         symbols: [
             '🏠',
             '🏡',
@@ -138,6 +148,7 @@
     },
     {
         name: 'Trains',
+        titleSymbol: '🚄',
         symbols: [
             '🚂',
             '🚊',
@@ -155,6 +166,7 @@
     },
     {
         name: 'Hand Signs',
+        titleSymbol: '👌',
         bg: false,
         symbols: [
             '👍',
@@ -179,6 +191,7 @@
     },
     {
         name: 'Arrows',
+        titleSymbol: '↗',
         bg: false,
         symbols: [
             '⬇',
@@ -212,6 +225,7 @@
     },
     {
         name: 'Technology',
+        titleSymbol: '📀',
         symbols: [
             '🎥',
             '📷',
@@ -234,6 +248,7 @@
     },
     {
         name: 'Sport',
+        titleSymbol: '🏀',
         symbols: [
             '🎯',
             '🏈',
@@ -259,6 +274,7 @@
     },
     {
         name: 'Games and Hobbies',
+        titleSymbol: '🎨',
         symbols: [
             '🎨',
             '🎬',

@@ -13,6 +13,7 @@
     user-select: none;
     -moz-user-select: none;
     -webkit-tap-highlight-color: transparent;
+    transition: 0.2s transform;
 }
 
 .btn:active
@@ -44,6 +45,15 @@
 .btn_small.btn_red
 {
     box-shadow: 0 2px 0 0 #CE3323;
+}
+
+.btn_middle
+{
+    border-radius: 3px;
+    padding: 10px 10px;
+    font-size: 26px;
+    margin: 5px;
+    color: #fff;
 }
 
 .btn_disabled

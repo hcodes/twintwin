@@ -23,7 +23,7 @@ $.delegate = function(root, el, type, callback) {
     $(root).addEventListener(type, function(e) {
         var cls = el[0] === '.' ? el.substr(1) : el;
         if (e.target.classList.contains(cls)) {
-            callback.call(this, e);
+            callback.call(e.target, e);
         }
     }, false);
 
@@ -45,6 +45,10 @@ var setCSS = function(el, props) {
     Object.keys(props).forEach(function(key) {
         style[key] = props[key];
     });
+};
+
+var leadZero = function(num) {
+    return num < 10 ? '0' + num : num;
 };
 
 // for iPad 1

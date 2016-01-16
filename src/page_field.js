@@ -3,7 +3,13 @@ var PageField = {
     init: function(data) {
         this._el = $('.field__cages');
 
-        $.on('.field__exit', 'click', function() {
+        this.setEvents();
+        this.info.parent = this;
+
+        return this;
+    },
+    setEvents: function() {
+        $.on('.field__exit', 'mousedown', function() {
             App.page.show('select-level');
         });
 
@@ -11,7 +17,7 @@ var PageField = {
             this.resizeCages();
         }.bind(this));
 
-        $.delegate(this._el, '.cage__front', 'click', function(e) {
+        $.delegate(this._el, '.cage__front', 'mousedown', function(e) {
             var cage = e.target.parentNode,
                 ds = cage.dataset;
 
@@ -21,11 +27,9 @@ var PageField = {
                 this.openCage(ds.x, ds.y);
             }
         }.bind(this));
-
-        return this;
     },
     padding: 5,
-    cols: 6,
+    cols: 3,
     rows: 4,
     field: [],
     addCages: function() {
@@ -57,7 +61,7 @@ var PageField = {
         }
     },
     getLevelSymbols: function() {
-        var level = this._showData.level,
+        var level = this._level,
             syms = this.data.levels[level].symbols,
             size = this.cols * this.rows,
             halfSize = size / 2,
@@ -146,9 +150,14 @@ var PageField = {
             cage.classList.add('cage_removed');
             this.info.cages--;
             this.info.update();
+
             setTimeout(function() {
                 this._el.removeChild(cage);
             }.bind(this), 200);
+
+            if (!this.info.cages) {
+                this.finish();
+            }
         }
     },
     closeCage: function(x, y) {
@@ -158,23 +167,7 @@ var PageField = {
             $('.cage__back', cage).innerHTML = '';
         }
     },
-    info: {
-        update: function() {
-            $('.info__clicks-num', this._el).innerHTML = this.clicks;
-            $('.info__cages-num', this._el).innerHTML = this.cages;
-        }
-    },
-    reset: function() {
-        this.info.clicks = 0;
-        this.info.cages = this.cols * this.rows;
-        this.info.update();
-
-        this._el.innerHTML = '';
-        this._openedCages = [];
-    },
-    show: function(showData) {
-        this._showData = showData || {};
-        this.reset();
+    initField: function() {
         var syms = this.getLevelSymbols(),
             s = 0;
 
@@ -188,7 +181,53 @@ var PageField = {
 
             this.field[y] = buf;
         }
+    },
+    info: {
+        formatTime: function(ms) {
+            var sec = Math.floor(ms / 1000),
+                min = Math.floor(sec / 60),
+                sec2 = sec - min * 60;
 
+            return min + ':' + leadZero(sec2);
+        },
+        update: function() {
+            this.currentTime = Date.now();
+            $('.info__clicks-num', this._el).innerHTML = this.clicks;
+            $('.info__cages-num', this._el).innerHTML = this.cages;
+            $('.info__level-title', this._el).innerHTML = this.levelTitle;
+            $('.info__time-num', this._el).innerHTML = this.formatTime(this.currentTime - this.startTime);
+        },
+        start: function(level, cages) {
+            this.stop();
+
+            this.clicks = 0;
+            this.cages = cages;
+            this.levelTitle = App.levelTitle(level);
+            this.startTime = Date.now();
+
+            this.update();
+            this._timer = setInterval(function() {
+                this.update();
+            }.bind(this), 500);
+        },
+        stop: function() {
+            this._timer && clearInterval(this._timer);
+            this._timer = null;
+        }
+    },
+    finish: function() {
+        var maxLevel = App.settings.get('maxLevel');
+        App.settings.set('maxLevel', Math.max(maxLevel, App.level + 1));
+
+        this.info.stop();
+    },
+    show: function() {
+        this._el.innerHTML = '';
+        this._openedCages = [];
+        this._level = App.settings.get('level');
+
+        this.info.start(this._level, this.cols * this.rows);
+        this.initField();
         this.addCages();
         this.resizeCages();
 
@@ -199,5 +238,6 @@ var PageField = {
         }*/
     },
     hide: function() {
+        this.info.stop();
     }
 };
