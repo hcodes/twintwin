@@ -164,6 +164,7 @@ body.support_transform3d_false .cage_opened .cage__back {
 }
 .cage_opened .cage__back {
   background: white;
+  cursor: default;
 }
 body.input_mouse .cage__front:hover {
   opacity: 0.8;
@@ -211,6 +212,48 @@ body.input_mouse .exit:hover {
 .info__time,
 .info__clicks {
   margin-left: 1em;
+}
+.trophy-notice {
+  position: fixed;
+  left: 0;
+  top: 30px;
+  background: #000;
+  padding: 10px 13px 10px 10px;
+  opacity: 0;
+  -webkit-transition: 0.3s transform, 0.1s opacity;
+  transition: 0.3s transform, 0.1s opacity;
+  -webkit-transform: translateX(-100%);
+      -ms-transform: translateX(-100%);
+          transform: translateX(-100%);
+  -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-left: 0;
+  z-index: 1000;
+  cursor: pointer;
+}
+.trophy-notice_open {
+  -webkit-transform: translateX(0);
+      -ms-transform: translateX(0);
+          transform: translateX(0);
+  opacity: 1;
+}
+.trophy-notice__title {
+  font-size: 20px;
+  line-height: 1.2em;
+  color: #fff;
+  margin-left: 30px;
+}
+.trophy-notice__type {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  font-size: 25px;
+  line-height: normal;
+  width: 25px;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
 }
 body.page_field .page_field {
   display: block;

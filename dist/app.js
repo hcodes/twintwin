@@ -25,6 +25,15 @@ var $ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
+$._fromHTML = document.createElement('div');
+$.fromHTML = function(data) {
+    this._fromHTML.innerHTML = jstohtml(data);
+    var result = this._fromHTML.firstElementChild;
+    this._fromHTML.innerHTML = '';
+
+    return result;
+};
+
 $.on = function(el, type, callback) {
     $(el).addEventListener(type, callback, false);
 
@@ -106,6 +115,116 @@ if(!Function.prototype.bind) {
         return fBound;
     };
 }
+
+/*!
+ * jstohtml v1.1.0
+ * Copyright 2014 Denis Seleznev
+ * Released under the MIT license.
+ *
+ * https://github.com/hcodes/jstohtml/
+*/
+
+(function(root, factory) {
+    if(typeof define === 'function' && define.amd) {
+        define('jstohtml', [], factory);
+    } else if(typeof exports === 'object') {
+        module.exports = factory();
+    } else {
+        root.jstohtml = factory();
+    }
+}(this, function() {
+    'use strict';
+
+    var noClosingTag = [
+            'img', 'input', 'br', 'embed', 'source',
+            'link', 'meta', 'area', 'command',
+            'base', 'col', 'param', 'wbr', 'hr', 'keygen'
+        ],
+        ignoredKeys = ['c', 'cl', 't', 'class'],
+        isArray = Array.isArray,
+        toString = Object.prototype.toString,
+        entityMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            '\'': '&#39;',
+            '/': '&#x2F;'
+        },
+        escapeRE = /[&<>"'\/]/g;
+
+    function escapeHtml(str) {
+        return str.replace(escapeRE, function(s) {
+            return entityMap[s];
+        });
+    }
+
+    function isPlainObj(obj) {
+        return toString.call(obj) === '[object Object]';
+    }
+
+    function buildItem(data) {
+        if(data === null || data === undefined) {
+            return '';
+        }
+
+        var buf = [];
+
+        if(isPlainObj(data)) {
+            return tag(data);
+        } else if(isArray(data)) {
+            for(var i = 0, len = data.length; i < len; i++) {
+                buf.push(buildItem(data[i]));
+            }
+
+            return buf.join('');
+        } else {
+            return '' + data;
+        }
+    }
+
+    function tag(data) {
+        var t = data.t || 'div',
+            text = '<' + t + attrs(data);
+
+        if(noClosingTag.indexOf(t) !== -1) {
+            return text + '/>';
+        }
+
+        text += '>';
+
+        if(data.c) {
+            text += buildItem(data.c);
+        }
+
+        text += '</' + t + '>';
+
+        return text;
+    }
+
+    function attrs(data) {
+        var cl = data['cl'] || data['class'],
+            text = cl ? attr('class', cl) : '';
+
+        for(var key in data) {
+            if(data.hasOwnProperty(key) && ignoredKeys.indexOf(key) === -1) {
+                text += attr(key, data[key]);
+            }
+        }
+
+        return text;
+    }
+
+    function attr(name, value) {
+        if(value === undefined || value === null || value === false) {
+            return '';
+        }
+
+        return ' ' + name + '="' + escapeHtml(isArray(value) ? value.join(' ') : '' + value) + '"';
+    }
+
+    return buildItem;
+}));
 
 var body = document.body;
 var App = {
@@ -586,11 +705,17 @@ App.page.add({
     addCages: function() {
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
-                var cage = document.createElement('div');
-                cage.className = 'cage';
-                cage.dataset.x = x;
-                cage.dataset.y = y;
-                cage.innerHTML = '<div class="cage__front"></div><div class="cage__back emoji"></div>';
+                var cage = $.fromHTML({
+                    cl: 'cage',
+                    'data-x': x,
+                    'data-y': y,
+                    c: [{
+                        cl: 'cage__front'
+                    }, {
+                        cl: 'cage__back emoji'
+                    }]
+                });
+
                 this._el.appendChild(cage);
             }
         }
@@ -797,7 +922,7 @@ App.page.add({
             this.resizeEmoji();
         }.bind(this));
         
-        $.on('.main-menu__continue', 'mousedown', function(e) {
+        $.on('.main-menu__continue', 'click', function(e) {
             if (this.classList.contains('btn_disabled')) {
                 return;
             }
@@ -805,7 +930,7 @@ App.page.add({
             App.page.show('select-level');
         });
 
-        $.on('.main-menu__new-game', 'mousedown', function(e) {
+        $.on('.main-menu__new-game', 'click', function(e) {
             App.settings.set('level', 1);
             App.page.show('select-level');
         }.bind(this));
@@ -824,12 +949,12 @@ App.page.add({
 
         symbols.shuffle();
 
-        var html = [];
-        symbols.forEach(function(sym) {
-            html.push('<span class="main-emoji emoji">' + sym + '</span>');
-        });
-
-        return html.join(' ');
+        return jstohtml(symbols.map(function(sym) {
+            return {
+                cl: ['main-emoji', 'emoji'],
+                c: sym
+            };
+        }));
     },
     resizeEmoji: function() {
         var width = Math.floor(document.documentElement.clientWidth / 12),
@@ -893,18 +1018,79 @@ App.page.add({
                 return;
             }
 
-            var btnClass = ['btn', 'btn_red', 'btn_middle'];
-            if (maxLevel < i) {
-                btnClass.push('btn_disabled');
-            }
-
-            html.push('<li class="select-level__item"><span data-level="' + i + '" class="' +
-                btnClass.join(' ') + '"><span class="select-level__emoji emoji">' +
-                App.levelSymbol(i) + '</span>' + level.name + '</span></li>');
+            html.push({
+                t: 'li',
+                cl: 'select-level__item',
+                c: {
+                    t: 'span',
+                    cl: [
+                        'btn btn_red btn_middle',
+                        maxLevel < i ? 'btn_disabled' : ''
+                    ],
+                    'data-level': i,
+                    c: [
+                        {
+                            t: 'span',
+                            cl: 'select-level__emoji emoji',
+                            c: App.levelSymbol(i)
+                        },
+                        level.name
+                    ]
+                }
+            });
         }, this);
         
-        return html.join('');
+        return jstohtml(html);
     },
     show: function() {},
     hide: function() {}
 });
+
+var TrophyNotice = function(data) {
+    this._data = data;
+    this._onclick = function() {
+        this.close();
+        App.page.show('trophies');
+    }.bind(this);
+};
+
+TrophyNotice.prototype = {
+    open: function() {
+        this._el = $.fromHTML({
+            cl: 'trophy-notice',
+            c: [{
+                cl: 'trophy-notice__title',
+                c: this._data.title
+            }, {
+                cl: 'trophy-notice__type',
+                c: this._data.type
+            }]
+        });
+
+        body.appendChild(this._el);
+
+        setTimeout(function() {
+            this._el.classList.add('trophy-notice_open');
+            $.on(this._el, 'click', this._onclick);
+        }.bind(this), 50);
+
+        return this;
+    },
+    close: function() {
+        this._el.classList.remove('trophy-notice_open');
+        $.off(this._el, 'click', this._onclick);
+
+        setTimeout(this.remove.bind(this), 200);
+
+        return this;
+    },
+    remove: function() {
+        body.removeChild(this._el);
+        delete this._el;
+    }
+};
+
+/*var tp = new TrophyNotice({
+    title: 'Hello world!',
+    type: '🏆'
+}).open();*/

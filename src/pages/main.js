@@ -9,7 +9,7 @@ App.page.add({
             this.resizeEmoji();
         }.bind(this));
         
-        $.on('.main-menu__continue', 'mousedown', function(e) {
+        $.on('.main-menu__continue', 'click', function(e) {
             if (this.classList.contains('btn_disabled')) {
                 return;
             }
@@ -17,7 +17,7 @@ App.page.add({
             App.page.show('select-level');
         });
 
-        $.on('.main-menu__new-game', 'mousedown', function(e) {
+        $.on('.main-menu__new-game', 'click', function(e) {
             App.settings.set('level', 1);
             App.page.show('select-level');
         }.bind(this));
@@ -36,12 +36,12 @@ App.page.add({
 
         symbols.shuffle();
 
-        var html = [];
-        symbols.forEach(function(sym) {
-            html.push('<span class="main-emoji emoji">' + sym + '</span>');
-        });
-
-        return html.join(' ');
+        return jstohtml(symbols.map(function(sym) {
+            return {
+                cl: ['main-emoji', 'emoji'],
+                c: sym
+            };
+        }));
     },
     resizeEmoji: function() {
         var width = Math.floor(document.documentElement.clientWidth / 12),

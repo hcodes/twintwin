@@ -36,11 +36,17 @@ App.page.add({
     addCages: function() {
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
-                var cage = document.createElement('div');
-                cage.className = 'cage';
-                cage.dataset.x = x;
-                cage.dataset.y = y;
-                cage.innerHTML = '<div class="cage__front"></div><div class="cage__back emoji"></div>';
+                var cage = $.fromHTML({
+                    cl: 'cage',
+                    'data-x': x,
+                    'data-y': y,
+                    c: [{
+                        cl: 'cage__front'
+                    }, {
+                        cl: 'cage__back emoji'
+                    }]
+                });
+
                 this._el.appendChild(cage);
             }
         }

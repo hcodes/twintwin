@@ -20,6 +20,7 @@ var paths = {
     ],
     js: [
         'src/lib/*.js',
+        'node_modules/jstohtml/dist/jstohtml.js',
         'src/app.js',
         'src/levels.js',
         'src/pages/*.js',

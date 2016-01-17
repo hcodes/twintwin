@@ -30,17 +30,29 @@ App.page.add({
                 return;
             }
 
-            var btnClass = ['btn', 'btn_red', 'btn_middle'];
-            if (maxLevel < i) {
-                btnClass.push('btn_disabled');
-            }
-
-            html.push('<li class="select-level__item"><span data-level="' + i + '" class="' +
-                btnClass.join(' ') + '"><span class="select-level__emoji emoji">' +
-                App.levelSymbol(i) + '</span>' + level.name + '</span></li>');
+            html.push({
+                t: 'li',
+                cl: 'select-level__item',
+                c: {
+                    t: 'span',
+                    cl: [
+                        'btn btn_red btn_middle',
+                        maxLevel < i ? 'btn_disabled' : ''
+                    ],
+                    'data-level': i,
+                    c: [
+                        {
+                            t: 'span',
+                            cl: 'select-level__emoji emoji',
+                            c: App.levelSymbol(i)
+                        },
+                        level.name
+                    ]
+                }
+            });
         }, this);
         
-        return html.join('');
+        return jstohtml(html);
     },
     show: function() {},
     hide: function() {}

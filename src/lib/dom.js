@@ -2,6 +2,15 @@
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
+$._fromHTML = document.createElement('div');
+$.fromHTML = function(data) {
+    this._fromHTML.innerHTML = jstohtml(data);
+    var result = this._fromHTML.firstElementChild;
+    this._fromHTML.innerHTML = '';
+
+    return result;
+};
+
 $.on = function(el, type, callback) {
     $(el).addEventListener(type, callback, false);
 
