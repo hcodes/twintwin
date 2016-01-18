@@ -34,6 +34,16 @@ $.off = function(el, type, callback) {
     return $;
 };
 
+$.extend = function(dest, source) {
+    Object.keys(source).forEach(function(key) {
+        if(typeof dest[key] === 'undefined') {
+           dest[key] = source[key];
+        }
+    });
+    
+    return dest;
+};
+
 var $$ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
 };
