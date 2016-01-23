@@ -9,7 +9,7 @@ body {
   padding: 0;
   border: 0;
   font-size: 16px;
-  font-family: Helvetica;
+  font-family: Helvetica, sans-serif;
   background: black;
 }
 .page {
@@ -323,6 +323,36 @@ body.page_main .page_main {
   transition: opacity 1.5s;
   color: white;
   opacity: 0;
+}
+.main-logo {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  padding: 5px 9px;
+  z-index: 1;
+  opacity: 0;
+  background: #5194A4;
+  border-left: 10px solid #115464;
+  -webkit-transition: opacity 1s;
+  transition: opacity 1s;
+  color: white;
+  font-size: 35px;
+  line-height: 1;
+  text-shadow: 0 0 1px #115464;
+  cursor: default;
+}
+.main-logo_visible {
+  opacity: 1;
+}
+.main-qr {
+  position: absolute;
+  left: 20px;
+  bottom: 10px;
+}
+.main-qr img {
+  width: 70px;
+  height: 70px;
+  border: 3px solid #fff;
 }
 .main-bg {
   position: absolute;

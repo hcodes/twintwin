@@ -18,6 +18,43 @@ body.page_main .page_main
     opacity: 0;
 }
 
+.main-logo
+{
+    position: absolute;
+    left: 20px;
+    top: 0;
+    padding: 5px 9px;
+    z-index: 1;
+    opacity: 0;
+    background: #5194A4;
+    border-left: 10px solid #115464;
+    transition: opacity 1s;
+    color: white;
+    font-size: 35px;
+    line-height: 1;
+    text-shadow: 0 0 1px #115464;
+    cursor: default;
+}
+
+.main-logo_visible
+{
+    opacity: 1;
+}
+
+.main-qr
+{
+    position: absolute;
+    left: 20px;
+    bottom: 10px;
+}
+
+.main-qr img
+{
+    width: 70px;
+    height: 70px;
+    border: 3px solid #fff;
+}
+
 .main-bg
 {
     position: absolute;
@@ -35,14 +72,14 @@ body.page_main .page_main
     transform: translate(-50%, -50%);
     margin: 0;
     padding: 0;
-    
+
     li
     {
         list-style: none;
         margin: 5px 0;
         padding: 0;
     }
-    
+
     .btn
     {
         min-width: 8em;

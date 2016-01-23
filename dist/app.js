@@ -992,7 +992,7 @@ App.page.add({
         $.on(window, 'resize', function() {
             this.resizeEmoji();
         }.bind(this));
-        
+
         $.on('.main-menu__continue', 'click', function(e) {
             if (this.classList.contains('btn_disabled')) {
                 return;
@@ -1007,8 +1007,15 @@ App.page.add({
         }.bind(this));
 
         this.resizeEmoji();
-        
+        this.initLogo();
+
         return this;
+    },
+    initLogo: function() {
+        var el  = $('.main-logo');
+        setTimeout(function() {
+            el.classList.add('main-logo_visible');
+        }, 500);
     },
     getBackground: function() {
         var symbols = [];
