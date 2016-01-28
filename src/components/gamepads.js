@@ -8,12 +8,22 @@ var Gamepads = {
             this.search();
             this.trigger('connected');
             this.showConnected(e);
+
+            if (!this._rafId) {
+                this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
+            }
+
         }.bind(this));
 
         $.on(window, 'gamepaddisconnected', function(e) {
             this.search();
             this.trigger('disconnected');
             this.showDisconnected(e);
+
+            if (!this.get().length && this._rafId) {
+                window.cancelAnimationFrame(this._rafId);
+                this._rafId = null;
+            }
         }.bind(this));
 
         $.extend(this, Event.prototype);
@@ -40,24 +50,23 @@ var Gamepads = {
 
         body.appendChild(this._elConnected);
         body.appendChild(this._elDisconnected);
-
-        this.search();
-
-        setInterval(this.checkButtons.bind(this), 25);
     },
-    pressedBuffer: {},
+    pressedBuffer: [],
     checkButtons: function() {
-        this.get().forEach(function(pad) {
-            pad.buttons.forEach(function(button, i) {
+        this.get().forEach(function(pad, padIndex) {
+            this.pressedBuffer[padIndex] = this.pressedBuffer[padIndex] || {};
+            pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
-                    if (this.pressedBuffer[i] && !button.pressed) {
+                    if (this.pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
                         this.trigger(this.getButtonEventName(pad.index, i));
                     }
 
-                    this.pressedBuffer[i] = button.pressed;
+                    this.pressedBuffer[padIndex][buttonIndex] = button.pressed;
                 }
             }, this);
         }, this);
+
+        this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
     },
     supported: function() {
         return typeof navigator.getGamepads === 'function';

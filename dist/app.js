@@ -186,6 +186,37 @@ if(!Function.prototype.bind) {
     };
 }
 
+(function () {
+    'use strict';
+
+    var lastTime = 0,
+        vendors = ['ms', 'moz', 'webkit', 'o'],
+        x;
+
+    for (x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+        window.cancelAnimationFrame  = window[vendors[x] + 'CancelAnimationFrame']
+                                   || window[vendors[x] + 'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = function (callback, element) {
+            var currTime = new Date().getTime(),
+                timeToCall = Math.max(0, 16 - (currTime - lastTime)),
+                id = window.setTimeout(function () {
+                    callback(currTime + timeToCall);
+                }, timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+    }
+
+    if (!window.cancelAnimationFrame) {
+        window.cancelAnimationFrame = function (id) {
+            window.clearTimeout(id);
+        };
+    }
+}());
 /*!
  * jstohtml v1.1.0
  * Copyright 2014 Denis Seleznev
@@ -1134,12 +1165,22 @@ var Gamepads = {
             this.search();
             this.trigger('connected');
             this.showConnected(e);
+
+            if (!this._rafId) {
+                this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
+            }
+
         }.bind(this));
 
         $.on(window, 'gamepaddisconnected', function(e) {
             this.search();
             this.trigger('disconnected');
             this.showDisconnected(e);
+
+            if (!this.get().length && this._rafId) {
+                window.cancelAnimationFrame(this._rafId);
+                this._rafId = null;
+            }
         }.bind(this));
 
         $.extend(this, Event.prototype);
@@ -1166,24 +1207,23 @@ var Gamepads = {
 
         body.appendChild(this._elConnected);
         body.appendChild(this._elDisconnected);
-
-        this.search();
-
-        setInterval(this.checkButtons.bind(this), 25);
     },
-    pressedBuffer: {},
+    pressedBuffer: [],
     checkButtons: function() {
-        this.get().forEach(function(pad) {
-            pad.buttons.forEach(function(button, i) {
+        this.get().forEach(function(pad, padIndex) {
+            this.pressedBuffer[padIndex] = this.pressedBuffer[padIndex] || {};
+            pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
-                    if (this.pressedBuffer[i] && !button.pressed) {
+                    if (this.pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
                         this.trigger(this.getButtonEventName(pad.index, i));
                     }
 
-                    this.pressedBuffer[i] = button.pressed;
+                    this.pressedBuffer[padIndex][buttonIndex] = button.pressed;
                 }
             }, this);
         }, this);
+
+        this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
     },
     supported: function() {
         return typeof navigator.getGamepads === 'function';
