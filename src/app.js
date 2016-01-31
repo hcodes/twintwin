@@ -137,6 +137,6 @@ var App = {
 };
 
 $.on(document, 'DOMContentLoaded', function() {
-    Gamepads.init();
+    Gamepad.init();
     App.init();
 });

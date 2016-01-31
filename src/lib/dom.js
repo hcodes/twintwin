@@ -1,4 +1,8 @@
 ﻿var $ = function(el, context) {
+    if (typeof context === 'string') {
+        context = document.querySelector(context);
+    }
+
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
@@ -40,19 +44,27 @@ $.extend = function(dest, source) {
            dest[key] = source[key];
         }
     });
-    
+
     return dest;
 };
 
-var $$ = function(el, context) {
-    return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
+$.move = function(elem, left, top) {
+    $.css(elem, {left: left + 'px', top: top + 'px'});
 };
 
-var setCSS = function(el, props) {
+$.size = function(elem, width, height) {
+    $.css(elem, {width: width + 'px', height: height + 'px'});
+};
+
+$.css = function(el, props) {
     var style = el.style;
     Object.keys(props).forEach(function(key) {
         style[key] = props[key];
     });
+};
+
+var $$ = function(el, context) {
+    return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
 };
 
 var hasSupportCss = (function() {
@@ -71,7 +83,7 @@ var hasSupportCss = (function() {
         while(len--) {
             if (vendors[len] + prop in div.style) {
                 return true;
-            } 
+            }
         }
 
         return false;

@@ -22,6 +22,10 @@ function formatTime(ms) {
 }
 
 var $ = function(el, context) {
+    if (typeof context === 'string') {
+        context = document.querySelector(context);
+    }
+
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
@@ -63,19 +67,27 @@ $.extend = function(dest, source) {
            dest[key] = source[key];
         }
     });
-    
+
     return dest;
 };
 
-var $$ = function(el, context) {
-    return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
+$.move = function(elem, left, top) {
+    $.css(elem, {left: left + 'px', top: top + 'px'});
 };
 
-var setCSS = function(el, props) {
+$.size = function(elem, width, height) {
+    $.css(elem, {width: width + 'px', height: height + 'px'});
+};
+
+$.css = function(el, props) {
     var style = el.style;
     Object.keys(props).forEach(function(key) {
         style[key] = props[key];
     });
+};
+
+var $$ = function(el, context) {
+    return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
 };
 
 var hasSupportCss = (function() {
@@ -94,7 +106,7 @@ var hasSupportCss = (function() {
         while(len--) {
             if (vendors[len] + prop in div.style) {
                 return true;
-            } 
+            }
         }
 
         return false;
@@ -466,7 +478,7 @@ var App = {
 };
 
 $.on(document, 'DOMContentLoaded', function() {
-    Gamepads.init();
+    Gamepad.init();
     App.init();
 });
 
@@ -774,6 +786,13 @@ App.page.add({
     locationHash: 'game',
     init: function(data) {
         this._el = $('.field__cages');
+        this._fieldCursor = new FieldCursor({
+            elem: $('.field-cursor', '.field'),
+            hidden: true,
+            cols: this.cols,
+            rows: this.rows,
+            padding: this.padding
+        });
 
         this.setEvents();
         this.info.parent = this;
@@ -781,6 +800,9 @@ App.page.add({
         return this;
     },
     setEvents: function() {
+        this.setGamepadEvents();
+        this.setKeyboardEvents();
+
         $.on('.field__exit', 'mousedown', function() {
             App.page.show('select-level');
         });
@@ -790,13 +812,54 @@ App.page.add({
         }.bind(this));
 
         $.delegate(this._el, '.cage__front', 'mousedown', function(e) {
+            this._fieldCursor.hide();
+
             var cage = e.target.parentNode,
                 ds = cage.dataset;
 
-            if (!cage.classList.contains('cage_opened')) {
-                this.info.clicks++;
-                this.info.update();
-                this.openCage(ds.x, ds.y);
+            this.openCage(ds.x, ds.y);
+        }.bind(this));
+    },
+    setGamepadEvents: function() {
+        Gamepad.onbutton(0, 'left', function() {
+            this._fieldCursor.left();
+        }.bind(this));
+
+        Gamepad.onbutton(0, 'right', function() {
+            this._fieldCursor.right();
+        }.bind(this));
+
+        Gamepad.onbutton(0, 'up', function() {
+            this._fieldCursor.up();
+        }.bind(this));
+
+        Gamepad.onbutton(0, 'down', function() {
+            this._fieldCursor.down();
+        }.bind(this));
+
+        Gamepad.onbutton(0, ['yellow', 'blue', 'green'], function() {
+            this.openCageWithCursor();
+        }.bind(this));
+    },
+    setKeyboardEvents: function() {
+        $.on(document, 'keydown', function(e) {
+            switch (e.key) {
+                case 'ArrowUp':
+                    this._fieldCursor.up();
+                break;
+                case 'ArrowLeft':
+                    this._fieldCursor.left();
+                break;
+                case 'ArrowRight':
+                    this._fieldCursor.right();
+                break;
+                case 'ArrowDown':
+                    this._fieldCursor.down();
+                break;
+                case ' ':
+                case 'Enter':
+                    this.openCageWithCursor();
+                break;
             }
         }.bind(this));
     },
@@ -822,12 +885,16 @@ App.page.add({
             }
         }
     },
+    openCageWithCursor: function() {
+        var xy = this._fieldCursor.getXY();
+        this.openCage(xy.x, xy.y);
+    },
     resizeCages: function() {
         var size = this.getSize();
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
                 var cage = this.findCage(x, y);
-                cage && setCSS(cage, {
+                cage && $.css(cage, {
                     width: size.width + 'px',
                     height: size.height + 'px',
                     left: x * (size.width + this.padding) + 'px',
@@ -837,6 +904,8 @@ App.page.add({
                 });
             }
         }
+
+        this._fieldCursor.size(size.width, size.height, this.padding);
     },
     getLevelSymbols: function() {
         var level = this._level,
@@ -879,6 +948,13 @@ App.page.add({
         var cage = this.findCage(x, y),
             len = this._openedCages.length,
             xy = {x: x, y: y};
+
+        if (!cage || cage.classList.contains('cage_opened')) {
+            return;
+        }
+
+        this.info.clicks++;
+        this.info.update();
 
         cage.classList.add('cage_opened');
         $('.cage__back', cage).innerHTML = this.field[y][x];
@@ -1155,7 +1231,119 @@ App.page.add({
     hide: function() {}
 });
 
-var Gamepads = {
+function FieldCursor(data) {
+    this.elem = data.elem;
+
+    this.width = data.width;
+    this.height = data.height;
+
+    this.padding = data.padding;
+    
+    this.cols = data.cols;
+    this.rows = data.rows;
+
+    this.x = data.x || 0;
+    this.y = data.y || 0;
+
+    if (data.hidden) {
+        this.hide();
+    } else {
+        this.show();
+    }
+}
+
+FieldCursor.prototype = {
+    hide: function() {
+        if (this.hidden !== true) {
+            this.hidden = true;
+            this.elem.classList.add('field-cursor_hidden');
+        }
+    },
+    show: function() {
+        if (this.hidden !== false) {
+            this.hidden = false;
+            this.elem.classList.remove('field-cursor_hidden');
+            this.update();
+        }
+    },
+    update: function() {
+        this.size(this.width, this.height, this.padding);
+    },
+    size: function(width, height, padding) {
+        this.width = width;
+        this.height = height;
+        this.padding = padding;
+
+        console.log(width, height);
+        $.size(this.elem, width, height);
+
+        this.move(this.x, this.y);
+    },
+    move: function(kx, ky) {
+        var x = this.x,
+            y = this.y;
+
+        if (kx) {
+            x += kx;
+        }
+
+        if (ky) {
+            y += ky;
+        }
+
+        if (x > this.cols - 1) {
+            x = this.cols - 1;
+        }
+        
+        if (x < 0) {
+            x = 0;
+        }
+
+        if (y > this.rows - 1) {
+            y = this.rows - 1;
+        }
+
+        if (y < 0) {
+            y = 0;
+        }
+
+        this.x = x;
+        this.y = y;
+
+        $.move(
+            this.elem,
+            x * (this.width + this.padding),
+            y * (this.height + this.padding)
+        );
+    },
+    left: function() {
+        this.show();
+        this.move(-1, 0);
+    },
+    right: function() {
+        this.show();
+        this.move(1, 0);
+    },
+    up: function() {
+        this.show();
+        this.move(0, -1);
+    },
+    down: function() {
+        this.show();
+        this.move(0, 1);
+    },
+    getXY: function() {
+        return {
+            x: this.x,
+            y: this.y
+        };
+    },
+    destroy: function() {
+        this.elem = null;
+    }
+};
+
+var Gamepad = {
     init: function() {
         if (!this.supported()) {
             return;
@@ -1208,14 +1396,16 @@ var Gamepads = {
         body.appendChild(this._elConnected);
         body.appendChild(this._elDisconnected);
     },
-    pressedBuffer: [],
+    pressedBuffer: {},
     checkButtons: function() {
-        this.get().forEach(function(pad, padIndex) {
+        this.get().forEach(function(pad) {
+            var padIndex = pad.index;
             this.pressedBuffer[padIndex] = this.pressedBuffer[padIndex] || {};
+
             pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
                     if (this.pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
-                        this.trigger(this.getButtonEventName(pad.index, i));
+                        this.trigger(this.getButtonEventName(pad.index, buttonIndex));
                     }
 
                     this.pressedBuffer[padIndex][buttonIndex] = button.pressed;
@@ -1243,15 +1433,30 @@ var Gamepads = {
     // Gamepad: XBox360
     buttonName: {
         green: 0,
+        x: 0,
+
         red: 1,
+        b: 1,
+
         yellow: 3,
+        a: 3,
+
         blue: 2,
+        x: 2,
+
         left: 14,
-        top: 12,
         right: 15,
-        bottom: 13,
+        up: 12,
+        down: 13,
+
         back: 8,
-        start: 9
+        start: 9,
+
+        lt: 6,
+        lb: 4,
+        
+        rt: 7,
+        rb: 5
     },
     getButtonId: function(name) {
         return this.buttonName[name];

@@ -1,4 +1,4 @@
-var Gamepads = {
+var Gamepad = {
     init: function() {
         if (!this.supported()) {
             return;
@@ -51,14 +51,16 @@ var Gamepads = {
         body.appendChild(this._elConnected);
         body.appendChild(this._elDisconnected);
     },
-    pressedBuffer: [],
+    pressedBuffer: {},
     checkButtons: function() {
-        this.get().forEach(function(pad, padIndex) {
+        this.get().forEach(function(pad) {
+            var padIndex = pad.index;
             this.pressedBuffer[padIndex] = this.pressedBuffer[padIndex] || {};
+
             pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
                     if (this.pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
-                        this.trigger(this.getButtonEventName(pad.index, i));
+                        this.trigger(this.getButtonEventName(pad.index, buttonIndex));
                     }
 
                     this.pressedBuffer[padIndex][buttonIndex] = button.pressed;
@@ -86,15 +88,30 @@ var Gamepads = {
     // Gamepad: XBox360
     buttonName: {
         green: 0,
+        x: 0,
+
         red: 1,
+        b: 1,
+
         yellow: 3,
+        a: 3,
+
         blue: 2,
+        x: 2,
+
         left: 14,
-        top: 12,
         right: 15,
-        bottom: 13,
+        up: 12,
+        down: 13,
+
         back: 8,
-        start: 9
+        start: 9,
+
+        lt: 6,
+        lb: 4,
+        
+        rt: 7,
+        rb: 5
     },
     getButtonId: function(name) {
         return this.buttonName[name];

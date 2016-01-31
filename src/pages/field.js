@@ -3,6 +3,13 @@ App.page.add({
     locationHash: 'game',
     init: function(data) {
         this._el = $('.field__cages');
+        this._fieldCursor = new FieldCursor({
+            elem: $('.field-cursor', '.field'),
+            hidden: true,
+            cols: this.cols,
+            rows: this.rows,
+            padding: this.padding
+        });
 
         this.setEvents();
         this.info.parent = this;
@@ -10,6 +17,9 @@ App.page.add({
         return this;
     },
     setEvents: function() {
+        this.setGamepadEvents();
+        this.setKeyboardEvents();
+
         $.on('.field__exit', 'mousedown', function() {
             App.page.show('select-level');
         });
@@ -19,13 +29,54 @@ App.page.add({
         }.bind(this));
 
         $.delegate(this._el, '.cage__front', 'mousedown', function(e) {
+            this._fieldCursor.hide();
+
             var cage = e.target.parentNode,
                 ds = cage.dataset;
 
-            if (!cage.classList.contains('cage_opened')) {
-                this.info.clicks++;
-                this.info.update();
-                this.openCage(ds.x, ds.y);
+            this.openCage(ds.x, ds.y);
+        }.bind(this));
+    },
+    setGamepadEvents: function() {
+        Gamepad.onbutton(0, 'left', function() {
+            this._fieldCursor.left();
+        }.bind(this));
+
+        Gamepad.onbutton(0, 'right', function() {
+            this._fieldCursor.right();
+        }.bind(this));
+
+        Gamepad.onbutton(0, 'up', function() {
+            this._fieldCursor.up();
+        }.bind(this));
+
+        Gamepad.onbutton(0, 'down', function() {
+            this._fieldCursor.down();
+        }.bind(this));
+
+        Gamepad.onbutton(0, ['yellow', 'blue', 'green'], function() {
+            this.openCageWithCursor();
+        }.bind(this));
+    },
+    setKeyboardEvents: function() {
+        $.on(document, 'keydown', function(e) {
+            switch (e.key) {
+                case 'ArrowUp':
+                    this._fieldCursor.up();
+                break;
+                case 'ArrowLeft':
+                    this._fieldCursor.left();
+                break;
+                case 'ArrowRight':
+                    this._fieldCursor.right();
+                break;
+                case 'ArrowDown':
+                    this._fieldCursor.down();
+                break;
+                case ' ':
+                case 'Enter':
+                    this.openCageWithCursor();
+                break;
             }
         }.bind(this));
     },
@@ -51,12 +102,16 @@ App.page.add({
             }
         }
     },
+    openCageWithCursor: function() {
+        var xy = this._fieldCursor.getXY();
+        this.openCage(xy.x, xy.y);
+    },
     resizeCages: function() {
         var size = this.getSize();
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
                 var cage = this.findCage(x, y);
-                cage && setCSS(cage, {
+                cage && $.css(cage, {
                     width: size.width + 'px',
                     height: size.height + 'px',
                     left: x * (size.width + this.padding) + 'px',
@@ -66,6 +121,8 @@ App.page.add({
                 });
             }
         }
+
+        this._fieldCursor.size(size.width, size.height, this.padding);
     },
     getLevelSymbols: function() {
         var level = this._level,
@@ -108,6 +165,13 @@ App.page.add({
         var cage = this.findCage(x, y),
             len = this._openedCages.length,
             xy = {x: x, y: y};
+
+        if (!cage || cage.classList.contains('cage_opened')) {
+            return;
+        }
+
+        this.info.clicks++;
+        this.info.update();
 
         cage.classList.add('cage_opened');
         $('.cage__back', cage).innerHTML = this.field[y][x];
