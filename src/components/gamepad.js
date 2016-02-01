@@ -1,5 +1,7 @@
 var Gamepad = {
     init: function() {
+        $.extend(this, Event.prototype);
+
         if (!this.supported()) {
             return;
         }
@@ -7,7 +9,6 @@ var Gamepad = {
         $.on(window, 'gamepadconnected', function(e) {
             this.search();
             this.trigger('connected');
-            this.showConnected(e);
 
             if (!this._rafId) {
                 this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
@@ -18,38 +19,12 @@ var Gamepad = {
         $.on(window, 'gamepaddisconnected', function(e) {
             this.search();
             this.trigger('disconnected');
-            this.showDisconnected(e);
 
             if (!this.get().length && this._rafId) {
                 window.cancelAnimationFrame(this._rafId);
                 this._rafId = null;
             }
         }.bind(this));
-
-        $.extend(this, Event.prototype);
-
-        this._elConnected = $.fromHTML({
-            cl: 'gamepad-connected',
-            c: [
-                '✔ 🎮',
-                {
-                    cl: 'gamepad-connected__num'
-                }
-            ]
-        });
-
-        this._elDisconnected = $.fromHTML({
-            cl: 'gamepad-disconnected',
-            c: [
-                '✖ 🎮',
-                {
-                    cl: 'gamepad-disconnected__num'
-                }
-            ]
-        });
-
-        body.appendChild(this._elConnected);
-        body.appendChild(this._elDisconnected);
     },
     pressedBuffer: {},
     checkButtons: function() {
@@ -60,7 +35,8 @@ var Gamepad = {
             pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
                     if (this.pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
-                        this.trigger(this.getButtonEventName(pad.index, buttonIndex));
+                        this.trigger(this.getButtonEventName(buttonIndex));
+                        this.trigger(this.getButtonEventName(buttonIndex, pad.index));
                     }
 
                     this.pressedBuffer[padIndex][buttonIndex] = button.pressed;
@@ -109,64 +85,57 @@ var Gamepad = {
 
         lt: 6,
         lb: 4,
-        
+
         rt: 7,
         rb: 5
     },
     getButtonId: function(name) {
         return this.buttonName[name];
     },
-    getButtonEventName: function(gamepadIndex, button) {
-        return 'gamepad-' + gamepadIndex + ':button-' + button;
+    getButtonEventName: function(button, gamepadIndex) {
+        var index = typeof gamepadIndex === 'undefined' ? '*' : gamepadIndex;
+        return 'gamepad:button-' + button + ':index-' + index;
     },
-    onbutton: function(gamepadIndex, button, callback) {
-        var self = this;
+    /*
+     * Set a event on a button.
+     * @param {number|string} button - button id or name of button ('start', 'yellow')
+     * @param {Function} callback
+     *
+     * @example
+     * .onbutton('green:0', function() {}); // gamepad 0, button "green"
+     * .onbutton('lb', function() {}); //  button "lb", any gamepad
+     */
+    onbutton: function(button, callback) {
+        var self = this,
+            gamepadIndex;
+
+        if (typeof button === 'string') {
+            gamepadIndex = button.split(':')[1];
+
+            if (typeof gamepadIndex !== 'undefined') {
+                gamepadIndex = +gamepadIndex;
+            }
+        }
 
         function setEvent(b) {
-            var num = typeof b === 'number' ? b : self.getButtonId(b);
-            self.on(self.getButtonEventName(gamepadIndex, num), callback);
+            var buttonId = typeof b === 'number' ? b : self.getButtonId(b);
+            self.on(self.getButtonEventName(buttonId, gamepadIndex), callback);
         }
 
-        if (Array.isArray(button)) {
-            button.forEach(function(b) {
-                setEvent(b);
-            });
-        } else {
-            setEvent(button);
-        }
+        setEvent(button);
     },
-    timeout: 3000,
-    showDisconnected: function(e) {
-        var cl = 'gamepad-disconnected_show',
-            el = this._elDisconnected;
-
-        el.classList.add(cl);
-
-        if (this._dtimer) {
-            clearTimeout(this._dtime);
-            this._dtimer = null;
-        }
-
-        this._dtimer = setTimeout(function() {
-            el.classList.remove(cl);
-            this._dtimer = null;
-        }.bind(this), this.timeout);
-    },
-    showConnected: function(e) {
-        var cl = 'gamepad-connected_show',
-            el = this._elConnected;
-
-        el.classList.add(cl);
-
-        if (this._timer) {
-            clearTimeout(this._time);
-            this._timer = null;
-        }
-
-        this._timer = setTimeout(function() {
-            el.classList.remove(cl);
-            this._timer = null;
-        }.bind(this), this.timeout);
+    /*
+     * Set events on buttons.
+     * @param {Array} buttons
+     * @param {Function} callback
+     *
+     * @example
+     * .onbuttons(['green:0', 'red:0'], function() {});
+     */
+    onbuttons: function(buttons, callback) {
+        buttons.forEach(function(button) {
+            this.onbutton(button, callback);
+        }, this);
     },
     _pads: []
 };

@@ -138,5 +138,6 @@ var App = {
 
 $.on(document, 'DOMContentLoaded', function() {
     Gamepad.init();
+    GamepadNotice.init();
     App.init();
 });

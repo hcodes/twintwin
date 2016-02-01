@@ -1,34 +1,42 @@
-App.page.add({
-    name: 'field',
-    locationHash: 'game',
-    init: function(data) {
-        this._el = $('.field__cages');
-        this._fieldCursor = new FieldCursor({
-            elem: $('.field-cursor', '.field'),
-            hidden: true,
-            cols: this.cols,
-            rows: this.rows,
-            padding: this.padding
-        });
+function Field(data) {
+    this._elem = $('.field__cages', data.elem);
 
-        this.setEvents();
-        this.info.parent = this;
+    this.cols = data.cols;
+    this.rows = data.rows;
+    this.padding = 5;
 
-        return this;
-    },
+    this.field = [];
+
+    this._fieldCursor = new FieldCursor({
+        elem: $('.field-cursor', this._elem),
+        hidden: true,
+        cols: this.cols,
+        rows: this.rows,
+        padding: this.padding
+    });
+
+    this.setEvents();
+}
+
+Field.prototype = {
     setEvents: function() {
-        this.setGamepadEvents();
         this.setKeyboardEvents();
-
-        $.on('.field__exit', 'mousedown', function() {
-            App.page.show('select-level');
-        });
+        this.setMouseEvents();
+        this.setGamepadEvents();
 
         $.on(window, 'resize', function() {
             this.resizeCages();
         }.bind(this));
+    },
+    isControl: function(type) {
+        return this.control !== '*' && this.control !== type;
+    },
+    setMouseEvents: function() {
+        $.delegate(this._elem, '.cage__front', 'mousedown', function(e) {
+            if (!this.isControl('mouse')) {
+                return;
+            }
 
-        $.delegate(this._el, '.cage__front', 'mousedown', function(e) {
             this._fieldCursor.hide();
 
             var cage = e.target.parentNode,
@@ -37,29 +45,12 @@ App.page.add({
             this.openCage(ds.x, ds.y);
         }.bind(this));
     },
-    setGamepadEvents: function() {
-        Gamepad.onbutton(0, 'left', function() {
-            this._fieldCursor.left();
-        }.bind(this));
-
-        Gamepad.onbutton(0, 'right', function() {
-            this._fieldCursor.right();
-        }.bind(this));
-
-        Gamepad.onbutton(0, 'up', function() {
-            this._fieldCursor.up();
-        }.bind(this));
-
-        Gamepad.onbutton(0, 'down', function() {
-            this._fieldCursor.down();
-        }.bind(this));
-
-        Gamepad.onbutton(0, ['yellow', 'blue', 'green'], function() {
-            this.openCageWithCursor();
-        }.bind(this));
-    },
     setKeyboardEvents: function() {
         $.on(document, 'keydown', function(e) {
+            if (!this.isControl('keyboard')) {
+                return;
+            }
+
             switch (e.key) {
                 case 'ArrowUp':
                     this._fieldCursor.up();
@@ -80,10 +71,40 @@ App.page.add({
             }
         }.bind(this));
     },
-    padding: 5,
-    cols: 6,
-    rows: 5,
-    field: [],
+    setGamepadEvents: function() {
+        Gamepad.onbutton('left', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.left();
+            }
+        }.bind(this));
+
+        Gamepad.onbutton('right', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.right();
+            }
+        }.bind(this));
+
+        Gamepad.onbutton('up', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.up();
+            }
+        }.bind(this));
+
+        Gamepad.onbutton('down', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.down();
+            }
+        }.bind(this));
+
+        Gamepad.onbuttons(
+            ['yellow', 'blue', 'green'],
+            function() {
+                if (this.isControl('gamepad')) {
+                    this.openCageWithCursor();
+                }
+            }.bind(this)
+        );
+    },
     addCages: function() {
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
@@ -91,20 +112,15 @@ App.page.add({
                     cl: 'cage',
                     'data-x': x,
                     'data-y': y,
-                    c: [{
-                        cl: 'cage__front'
-                    }, {
-                        cl: 'cage__back emoji'
-                    }]
+                    c: [
+                        {cl: 'cage__front'},
+                        {cl: 'cage__back emoji'}
+                    ]
                 });
 
-                this._el.appendChild(cage);
+                this._elem.appendChild(cage);
             }
         }
-    },
-    openCageWithCursor: function() {
-        var xy = this._fieldCursor.getXY();
-        this.openCage(xy.x, xy.y);
     },
     resizeCages: function() {
         var size = this.getSize();
@@ -140,8 +156,8 @@ App.page.add({
         return buf.concat(buf).shuffle();
     },
     getSize: function() {
-        var width = Math.floor(this._el.offsetWidth / this.cols) - this.padding,
-            height = Math.floor(this._el.offsetHeight / this.rows) - this.padding;
+        var width = Math.floor(this._elem.offsetWidth / this.cols) - this.padding,
+            height = Math.floor(this._elem.offsetHeight / this.rows) - this.padding;
 
         return {
             width: width,
@@ -150,7 +166,7 @@ App.page.add({
         }
     },
     findCage: function(x, y) {
-        var cages = $$('.cage', this._el);
+        var cages = $$('.cage', this._elem);
         for (var i = 0; i < cages.length; i++) {
             var cage = cages[i];
             var ds = cage.dataset;
@@ -160,6 +176,10 @@ App.page.add({
         }
 
         return null;
+    },
+    openCageWithCursor: function() {
+        var xy = this._fieldCursor.getXY();
+        this.openCage(xy.x, xy.y);
     },
     openCage: function(x, y) {
         var cage = this.findCage(x, y),
@@ -223,7 +243,7 @@ App.page.add({
             this.info.update();
 
             setTimeout(function() {
-                this._el.removeChild(cage);
+                this._elem.removeChild(cage);
             }.bind(this), 200);
 
             if (!this.info.cages) {
@@ -256,10 +276,10 @@ App.page.add({
     info: {
         update: function() {
             this.currentTime = Date.now();
-            $('.info__clicks-num', this._el).innerHTML = this.clicks;
-            $('.info__cages-num', this._el).innerHTML = this.cages;
-            $('.info__level-title', this._el).innerHTML = this.levelTitle;
-            $('.info__time-num', this._el).innerHTML = formatTime(this.currentTime - this.startTime);
+            $('.info__clicks-num', this._elem).innerHTML = this.clicks;
+            $('.info__cages-num', this._elem).innerHTML = this.cages;
+            $('.info__level-title', this._elem).innerHTML = this.levelTitle;
+            $('.info__time-num', this._elem).innerHTML = formatTime(this.currentTime - this.startTime);
         },
         start: function(level, cages) {
             this.stop();
@@ -286,7 +306,7 @@ App.page.add({
         this.info.stop();
     },
     show: function() {
-        this._el.innerHTML = '';
+        this._elem.innerHTML = '';
         this._openedCages = [];
         this._level = App.settings.get('level');
 
@@ -304,4 +324,4 @@ App.page.add({
     hide: function() {
         this.info.stop();
     }
-});
+};

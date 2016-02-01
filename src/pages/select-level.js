@@ -16,7 +16,7 @@ App.page.add({
 
             var level = parseInt(e.target.dataset['level']);
             App.settings.set('level', level);
-            App.page.show('field');
+            App.page.show('game');
         });
 
         return this;
