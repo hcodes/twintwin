@@ -36,8 +36,8 @@ body {
           user-select: none;
   -moz-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  -webkit-transition: 0.2s transform;
-  transition: 0.2s transform;
+  -webkit-transition: 0.1s transform;
+  transition: 0.1s transform;
 }
 .btn:active {
   -webkit-transform: translate(0px, 5px);
@@ -214,8 +214,45 @@ body.input_mouse .exit:hover {
 .field-cursor_hidden {
   visibility: hidden;
 }
-.gamepad-disconnected,
-.gamepad-connected {
+body.page_field .page_field {
+  display: block;
+}
+.field {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  -webkit-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -moz-user-select: none;
+}
+.field_one {
+  right: 50%;
+  right: -webkit-calc(50% + 10px);
+  right: calc(50% + 10px);
+}
+.field_two {
+  left: -webkit-calc(50% + 10px);
+  left: calc(50% + 10px);
+  right: 0;
+}
+.field__cages {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  -webkit-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -moz-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.gamepad-notice-disconnected,
+.gamepad-notice-connected {
   position: fixed;
   left: 0;
   top: 30px;
@@ -235,14 +272,14 @@ body.input_mouse .exit:hover {
   cursor: pointer;
   color: #fff;
 }
-.gamepad-disconnected_show,
-.gamepad-connected_show {
+.gamepad-notice-disconnected_show,
+.gamepad-notice-connected_show {
   -webkit-transform: translateX(0);
       -ms-transform: translateX(0);
           transform: translateX(0);
   opacity: 1;
 }
-.info {
+.info-panel {
   position: absolute;
   left: 0;
   bottom: -1.5em;
@@ -251,9 +288,9 @@ body.input_mouse .exit:hover {
   white-space: nowrap;
   padding: 4px;
 }
-.info__cages,
-.info__time,
-.info__clicks {
+.info-panel__cages,
+.info-panel__time,
+.info-panel__clicks {
   margin-left: 1em;
 }
 .trophy-notice {
@@ -298,32 +335,15 @@ body.input_mouse .exit:hover {
   vertical-align: middle;
   text-align: center;
 }
-body.page_field .page_field {
+body.page_game .page_game {
   display: block;
 }
-.field {
+.game {
   position: absolute;
   left: 30px;
   top: 30px;
-  bottom: 30px;
   right: 30px;
-  -webkit-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  -moz-user-select: none;
-}
-.field__cages {
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  -webkit-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  -moz-user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  bottom: 30px;
 }
 body.page_main .page_main {
   display: block;
@@ -394,6 +414,16 @@ body.page_main .page_main {
 }
 .main-menu .btn {
   min-width: 8em;
+}
+body.page_multiplayer .page_multiplayer {
+  display: block;
+}
+.multiplayer {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  right: 30px;
+  bottom: 30px;
 }
 body.page_select-level .page_select-level {
   display: block;

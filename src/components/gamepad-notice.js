@@ -1,10 +1,10 @@
 var GamepadNotice = {
     init: function() {
         this.build();
-        this.events();
+        this.setEvents();
     },
     build: function() {
-        this._elemConnected = $.fromHTML({
+        this._elemConnected = $.js2dom({
             cl: 'gamepad-notice-connected',
             c: [
                 '✔ 🎮',
@@ -14,7 +14,7 @@ var GamepadNotice = {
             ]
         });
 
-        this._elemDisconnected = $.fromHTML({
+        this._elemDisconnected = $.js2dom({
             cl: 'gamepad-notice-disconnected',
             c: [
                 '✖ 🎮',

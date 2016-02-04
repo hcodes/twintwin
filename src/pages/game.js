@@ -7,7 +7,7 @@ App.page.add({
             cols: 6,
             rows: 5,
             control: '*',
-            info: true
+            infoPanel: true
         });
 
         $.on($('.game__exit', this._elem), 'mousedown', function() {

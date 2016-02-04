@@ -8,7 +8,7 @@ var TrophyNotice = function(data) {
 
 TrophyNotice.prototype = {
     open: function() {
-        this._el = $.fromHTML({
+        this._el = $.js2dom({
             cl: 'trophy-notice',
             c: [{
                 cl: 'trophy-notice__title',

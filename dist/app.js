@@ -29,14 +29,15 @@ var $ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
-$._fromHTML = document.createElement('div');
-$.fromHTML = function(data) {
-    this._fromHTML.innerHTML = jstohtml(data);
-    var result = this._fromHTML.firstElementChild;
-    this._fromHTML.innerHTML = '';
+$.js2dom = function(data) {
+    this.js2dom._div.innerHTML = jstohtml(data);
+    var result = this.js2dom._div.firstElementChild;
+    this.js2dom._div.innerHTML = '';
 
     return result;
 };
+
+$.js2dom._div = document.createElement('div');
 
 $.on = function(el, type, callback) {
     $(el).addEventListener(type, callback, false);
@@ -479,6 +480,7 @@ var App = {
 
 $.on(document, 'DOMContentLoaded', function() {
     Gamepad.init();
+    GamepadNotice.init();
     App.init();
 });
 
@@ -782,310 +784,26 @@ App.commonData.levels = [
     }
 ];
 App.page.add({
-    name: 'field',
+    name: 'game',
     locationHash: 'game',
     init: function(data) {
-        this._el = $('.field__cages');
-        this._fieldCursor = new FieldCursor({
-            elem: $('.field-cursor', '.field'),
-            hidden: true,
-            cols: this.cols,
-            rows: this.rows,
-            padding: this.padding
+        this._field = new Field({
+            elem: $('.field', '.game'),
+            cols: 6,
+            rows: 5,
+            control: '*',
+            infoPanel: true
         });
 
-        this.setEvents();
-        this.info.parent = this;
-
-        return this;
-    },
-    setEvents: function() {
-        this.setGamepadEvents();
-        this.setKeyboardEvents();
-
-        $.on('.field__exit', 'mousedown', function() {
+        $.on($('.game__exit', this._elem), 'mousedown', function() {
             App.page.show('select-level');
         });
-
-        $.on(window, 'resize', function() {
-            this.resizeCages();
-        }.bind(this));
-
-        $.delegate(this._el, '.cage__front', 'mousedown', function(e) {
-            this._fieldCursor.hide();
-
-            var cage = e.target.parentNode,
-                ds = cage.dataset;
-
-            this.openCage(ds.x, ds.y);
-        }.bind(this));
-    },
-    setGamepadEvents: function() {
-        Gamepad.onbutton(0, 'left', function() {
-            this._fieldCursor.left();
-        }.bind(this));
-
-        Gamepad.onbutton(0, 'right', function() {
-            this._fieldCursor.right();
-        }.bind(this));
-
-        Gamepad.onbutton(0, 'up', function() {
-            this._fieldCursor.up();
-        }.bind(this));
-
-        Gamepad.onbutton(0, 'down', function() {
-            this._fieldCursor.down();
-        }.bind(this));
-
-        Gamepad.onbutton(0, ['yellow', 'blue', 'green'], function() {
-            this.openCageWithCursor();
-        }.bind(this));
-    },
-    setKeyboardEvents: function() {
-        $.on(document, 'keydown', function(e) {
-            switch (e.key) {
-                case 'ArrowUp':
-                    this._fieldCursor.up();
-                break;
-                case 'ArrowLeft':
-                    this._fieldCursor.left();
-                break;
-                case 'ArrowRight':
-                    this._fieldCursor.right();
-                break;
-                case 'ArrowDown':
-                    this._fieldCursor.down();
-                break;
-                case ' ':
-                case 'Enter':
-                    this.openCageWithCursor();
-                break;
-            }
-        }.bind(this));
-    },
-    padding: 5,
-    cols: 6,
-    rows: 5,
-    field: [],
-    addCages: function() {
-        for (var x = 0; x < this.cols; x++) {
-            for (var y = 0; y < this.rows; y++) {
-                var cage = $.fromHTML({
-                    cl: 'cage',
-                    'data-x': x,
-                    'data-y': y,
-                    c: [{
-                        cl: 'cage__front'
-                    }, {
-                        cl: 'cage__back emoji'
-                    }]
-                });
-
-                this._el.appendChild(cage);
-            }
-        }
-    },
-    openCageWithCursor: function() {
-        var xy = this._fieldCursor.getXY();
-        this.openCage(xy.x, xy.y);
-    },
-    resizeCages: function() {
-        var size = this.getSize();
-        for (var x = 0; x < this.cols; x++) {
-            for (var y = 0; y < this.rows; y++) {
-                var cage = this.findCage(x, y);
-                cage && $.css(cage, {
-                    width: size.width + 'px',
-                    height: size.height + 'px',
-                    left: x * (size.width + this.padding) + 'px',
-                    top: y * (size.height + this.padding) + 'px',
-                    lineHeight: size.height + 'px',
-                    fontSize: size.fontSize + 'px'
-                });
-            }
-        }
-
-        this._fieldCursor.size(size.width, size.height, this.padding);
-    },
-    getLevelSymbols: function() {
-        var level = this._level,
-            syms = this.data.levels[level].symbols,
-            size = this.cols * this.rows,
-            halfSize = size / 2,
-            buf = [];
-
-        while(halfSize > buf.length) {
-            buf = buf.concat(syms);
-        }
-
-        buf = buf.slice(0, halfSize);
-
-        return buf.concat(buf).shuffle();
-    },
-    getSize: function() {
-        var width = Math.floor(this._el.offsetWidth / this.cols) - this.padding,
-            height = Math.floor(this._el.offsetHeight / this.rows) - this.padding;
-
-        return {
-            width: width,
-            height: height,
-            fontSize: height * 0.8
-        }
-    },
-    findCage: function(x, y) {
-        var cages = $$('.cage', this._el);
-        for (var i = 0; i < cages.length; i++) {
-            var cage = cages[i];
-            var ds = cage.dataset;
-            if (x == ds.x && y == ds.y) {
-                return cage;
-            }
-        }
-
-        return null;
-    },
-    openCage: function(x, y) {
-        var cage = this.findCage(x, y),
-            len = this._openedCages.length,
-            xy = {x: x, y: y};
-
-        if (!cage || cage.classList.contains('cage_opened')) {
-            return;
-        }
-
-        this.info.clicks++;
-        this.info.update();
-
-        cage.classList.add('cage_opened');
-        $('.cage__back', cage).innerHTML = this.field[y][x];
-
-        switch (len) {
-            case 0:
-            break;
-            case 1:
-                var sym1 = this.field[y][x],
-                    sym2 = this.field[this._openedCages[0].y][this._openedCages[0].x];
-                if (sym1 === sym2) {
-                    this.removeOpenedCages();
-                    this.removeCage(x, y);
-                } else {
-                    var openedCages = [xy].concat(this._openedCages);
-                    this._openedCages = [];
-                    setTimeout(function() {
-                        this.closeOpenedCages(openedCages);
-                    }.bind(this), 700);
-                }
-
-                xy = null;
-            break;
-            case 2:
-                this.closeOpenedCages();
-                this._openedCages = [];
-            break;
-        }
-
-        xy && this._openedCages.push(xy);
-    },
-    closeOpenedCages: function(openedCages) {
-        (openedCages || this._openedCages).forEach(function(cage) {
-            this.closeCage(cage.x, cage.y);
-        }, this);
-    },
-    removeOpenedCages: function() {
-        this._openedCages.forEach(function(cage) {
-            this.removeCage(cage.x, cage.y);
-        }, this);
-
-        this._openedCages = [];
-    },
-    removeCage: function(x, y) {
-        var cage = this.findCage(x, y);
-        if (cage) {
-            cage.classList.add('cage_removed');
-            this.info.cages--;
-            this.info.update();
-
-            setTimeout(function() {
-                this._el.removeChild(cage);
-            }.bind(this), 200);
-
-            if (!this.info.cages) {
-                this.finish();
-            }
-        }
-    },
-    closeCage: function(x, y) {
-        var cage = this.findCage(x, y);
-        if (cage) {
-            cage.classList.remove('cage_opened');
-            $('.cage__back', cage).innerHTML = '';
-        }
-    },
-    initField: function() {
-        var syms = this.getLevelSymbols(),
-            s = 0;
-
-        this.field = [];
-        for (var y = 0; y < this.rows; y++) {
-            var buf = [];
-            for (var x = 0; x < this.cols; x++) {
-                buf.push(syms[s]);
-                s++;
-            }
-
-            this.field[y] = buf;
-        }
-    },
-    info: {
-        update: function() {
-            this.currentTime = Date.now();
-            $('.info__clicks-num', this._el).innerHTML = this.clicks;
-            $('.info__cages-num', this._el).innerHTML = this.cages;
-            $('.info__level-title', this._el).innerHTML = this.levelTitle;
-            $('.info__time-num', this._el).innerHTML = formatTime(this.currentTime - this.startTime);
-        },
-        start: function(level, cages) {
-            this.stop();
-
-            this.clicks = 0;
-            this.cages = cages;
-            this.levelTitle = App.levelTitle(level);
-            this.startTime = Date.now();
-
-            this.update();
-            this._timer = setInterval(function() {
-                this.update();
-            }.bind(this), 500);
-        },
-        stop: function() {
-            this._timer && clearInterval(this._timer);
-            this._timer = null;
-        }
-    },
-    finish: function() {
-        var maxLevel = App.settings.get('maxLevel');
-        App.settings.set('maxLevel', Math.max(maxLevel, App.level + 1));
-
-        this.info.stop();
     },
     show: function() {
-        this._el.innerHTML = '';
-        this._openedCages = [];
-        this._level = App.settings.get('level');
-
-        this.info.start(this._level, this.cols * this.rows);
-        this.initField();
-        this.addCages();
-        this.resizeCages();
-
-        /*for (var y = 0; y < this.rows; y++) {
-            for (var x = 0; x < this.cols; x++) {
-                this.openCage(x, y);
-            }
-        }*/
+        this._field.show();
     },
     hide: function() {
-        this.info.stop();
+        this._field.hide();
     }
 });
 
@@ -1096,6 +814,14 @@ App.page.add({
         this._bg = $('.main-bg');
         this._bg.innerHTML = this.getBackground();
 
+        this.setEvents();
+
+        this.resizeEmoji();
+        this.initLogo();
+
+        return this;
+    },
+    setEvents: function() {
         $.on(window, 'resize', function() {
             this.resizeEmoji();
         }.bind(this));
@@ -1113,10 +839,9 @@ App.page.add({
             App.page.show('select-level');
         }.bind(this));
 
-        this.resizeEmoji();
-        this.initLogo();
-
-        return this;
+        $.on('.main-menu__multiplayer', 'click', function(e) {
+            App.page.show('multiplayer');
+        }.bind(this));
     },
     initLogo: function() {
         var el  = $('.main-logo');
@@ -1172,6 +897,41 @@ App.page.add({
 });
 
 App.page.add({
+    name: 'multiplayer',
+    locationHash: 'multiplayer',
+    init: function(data) {
+        var context = $('.multiplayer');
+        this._fieldOne = new Field({
+            elem: $('.field_one', context),
+            cols: 6,
+            rows: 5,
+            control: 'mouse',
+            infoPanel: true
+        });
+
+        this._fieldTwo = new Field({
+            elem: $('.field_two', context),
+            cols: 6,
+            rows: 5,
+            control: 'keyboard',
+            infoPanel: true
+        });
+
+        $.on($('.multiplayer__exit', this._elem), 'mousedown', function() {
+            App.page.show('select-level');
+        });
+    },
+    show: function() {
+        this._fieldOne.show();
+        this._fieldTwo.show();
+    },
+    hide: function() {
+        this._fieldOne.hide();
+        this._fieldTwo.hide();
+    }
+});
+
+App.page.add({
     name: 'select-level',
     locationHash: 'select-level',
     init: function(data) {
@@ -1189,7 +949,7 @@ App.page.add({
 
             var level = parseInt(e.target.dataset['level']);
             App.settings.set('level', level);
-            App.page.show('field');
+            App.page.show('game');
         });
 
         return this;
@@ -1343,8 +1103,387 @@ FieldCursor.prototype = {
     }
 };
 
+function Field(data) {
+    this._elem = $('.field__cages', data.elem);
+
+    this.cols = data.cols;
+    this.rows = data.rows;
+    this.padding = 5;
+
+    this.field = [];
+
+    this._fieldCursor = new FieldCursor({
+        elem: $('.field-cursor', data.elem),
+        hidden: true,
+        cols: this.cols,
+        rows: this.rows,
+        padding: this.padding
+    });
+    
+    this._infoPanel = new InfoPanel(data.elem);
+
+    this.setEvents();
+}
+
+Field.prototype = {
+    setEvents: function() {
+        this.setKeyboardEvents();
+        this.setMouseEvents();
+        this.setGamepadEvents();
+
+        $.on(window, 'resize', function() {
+            this.resizeCages();
+        }.bind(this));
+    },
+    isControl: function(type) {
+        return this.control !== '*' && this.control !== type;
+    },
+    setMouseEvents: function() {
+        $.delegate(this._elem, '.cage__front', 'mousedown', function(e) {
+            if (!this.isControl('mouse')) {
+                return;
+            }
+
+            this._fieldCursor.hide();
+
+            var cage = e.target.parentNode,
+                ds = cage.dataset;
+
+            this.openCage(ds.x, ds.y);
+        }.bind(this));
+    },
+    setKeyboardEvents: function() {
+        $.on(document, 'keydown', function(e) {
+            if (!this.isControl('keyboard')) {
+                return;
+            }
+
+            switch (e.key) {
+                case 'ArrowUp':
+                    this._fieldCursor.up();
+                break;
+                case 'ArrowLeft':
+                    this._fieldCursor.left();
+                break;
+                case 'ArrowRight':
+                    this._fieldCursor.right();
+                break;
+                case 'ArrowDown':
+                    this._fieldCursor.down();
+                break;
+                case ' ':
+                case 'Enter':
+                    this.openCageWithCursor();
+                break;
+            }
+        }.bind(this));
+    },
+    setGamepadEvents: function() {
+        Gamepad.onbutton('left', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.left();
+            }
+        }.bind(this));
+
+        Gamepad.onbutton('right', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.right();
+            }
+        }.bind(this));
+
+        Gamepad.onbutton('up', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.up();
+            }
+        }.bind(this));
+
+        Gamepad.onbutton('down', function() {
+            if (this.isControl('gamepad')) {
+                this._fieldCursor.down();
+            }
+        }.bind(this));
+
+        Gamepad.onbuttons(
+            ['yellow', 'blue', 'green'],
+            function() {
+                if (this.isControl('gamepad')) {
+                    this.openCageWithCursor();
+                }
+            }.bind(this)
+        );
+    },
+    addCages: function() {
+        for (var x = 0; x < this.cols; x++) {
+            for (var y = 0; y < this.rows; y++) {
+                var cage = $.js2dom({
+                    cl: 'cage',
+                    'data-x': x,
+                    'data-y': y,
+                    c: [
+                        {cl: 'cage__front'},
+                        {cl: 'cage__back emoji'}
+                    ]
+                });
+
+                this._elem.appendChild(cage);
+            }
+        }
+    },
+    resizeCages: function() {
+        var size = this.getSize();
+        for (var x = 0; x < this.cols; x++) {
+            for (var y = 0; y < this.rows; y++) {
+                var cage = this.findCage(x, y);
+                cage && $.css(cage, {
+                    width: size.width + 'px',
+                    height: size.height + 'px',
+                    left: x * (size.width + this.padding) + 'px',
+                    top: y * (size.height + this.padding) + 'px',
+                    lineHeight: size.height + 'px',
+                    fontSize: size.fontSize + 'px'
+                });
+            }
+        }
+
+        this._fieldCursor.size(size.width, size.height, this.padding);
+    },
+    getLevelSymbols: function() {
+        var level = this._level,
+            syms = App.commonData.levels[level].symbols,
+            size = this.cols * this.rows,
+            halfSize = size / 2,
+            buf = [];
+
+        while(halfSize > buf.length) {
+            buf = buf.concat(syms);
+        }
+
+        buf = buf.slice(0, halfSize);
+
+        return buf.concat(buf).shuffle();
+    },
+    getSize: function() {
+        var width = Math.floor(this._elem.offsetWidth / this.cols) - this.padding,
+            height = Math.floor(this._elem.offsetHeight / this.rows) - this.padding;
+
+        return {
+            width: width,
+            height: height,
+            fontSize: height * 0.8
+        }
+    },
+    findCage: function(x, y) {
+        var cages = $$('.cage', this._elem);
+        for (var i = 0; i < cages.length; i++) {
+            var cage = cages[i];
+            var ds = cage.dataset;
+            if (x == ds.x && y == ds.y) {
+                return cage;
+            }
+        }
+
+        return null;
+    },
+    openCageWithCursor: function() {
+        var xy = this._fieldCursor.getXY();
+        this.openCage(xy.x, xy.y);
+    },
+    openCage: function(x, y) {
+        var cage = this.findCage(x, y),
+            len = this._openedCages.length,
+            xy = {x: x, y: y};
+
+        if (!cage || cage.classList.contains('cage_opened')) {
+            return;
+        }
+
+        this._infoPanel.clicks++;
+        this._infoPanel.update();
+
+        cage.classList.add('cage_opened');
+        $('.cage__back', cage).innerHTML = this.field[y][x];
+
+        switch (len) {
+            case 0:
+            break;
+            case 1:
+                var sym1 = this.field[y][x],
+                    sym2 = this.field[this._openedCages[0].y][this._openedCages[0].x];
+                if (sym1 === sym2) {
+                    this.removeOpenedCages();
+                    this.removeCage(x, y);
+                } else {
+                    var openedCages = [xy].concat(this._openedCages);
+                    this._openedCages = [];
+                    setTimeout(function() {
+                        this.closeOpenedCages(openedCages);
+                    }.bind(this), 700);
+                }
+
+                xy = null;
+            break;
+            case 2:
+                this.closeOpenedCages();
+                this._openedCages = [];
+            break;
+        }
+
+        xy && this._openedCages.push(xy);
+    },
+    closeOpenedCages: function(openedCages) {
+        (openedCages || this._openedCages).forEach(function(cage) {
+            this.closeCage(cage.x, cage.y);
+        }, this);
+    },
+    removeOpenedCages: function() {
+        this._openedCages.forEach(function(cage) {
+            this.removeCage(cage.x, cage.y);
+        }, this);
+
+        this._openedCages = [];
+    },
+    removeCage: function(x, y) {
+        var cage = this.findCage(x, y);
+        if (cage) {
+            cage.classList.add('cage_removed');
+            this._infoPanel.cages--;
+            this._infoPanel.update();
+
+            setTimeout(function() {
+                this._elem.removeChild(cage);
+            }.bind(this), 200);
+
+            if (!this._infoPanel.cages) {
+                this.finish();
+            }
+        }
+    },
+    closeCage: function(x, y) {
+        var cage = this.findCage(x, y);
+        if (cage) {
+            cage.classList.remove('cage_opened');
+            $('.cage__back', cage).innerHTML = '';
+        }
+    },
+    initField: function() {
+        var syms = this.getLevelSymbols(),
+            s = 0;
+
+        this.field = [];
+        for (var y = 0; y < this.rows; y++) {
+            var buf = [];
+            for (var x = 0; x < this.cols; x++) {
+                buf.push(syms[s]);
+                s++;
+            }
+
+            this.field[y] = buf;
+        }
+    },
+    finish: function() {
+        var maxLevel = App.settings.get('maxLevel');
+        App.settings.set('maxLevel', Math.max(maxLevel, App.level + 1));
+
+        this._infoPanel.stop();
+    },
+    show: function() {
+        this._elem.innerHTML = '';
+        this._openedCages = [];
+        this._level = App.settings.get('level');
+
+        this._infoPanel.start(this._level, this.cols * this.rows);
+        this.initField();
+        this.addCages();
+        this.resizeCages();
+
+        /*for (var y = 0; y < this.rows; y++) {
+            for (var x = 0; x < this.cols; x++) {
+                this.openCage(x, y);
+            }
+        }*/
+    },
+    hide: function() {
+        this._infoPanel.stop();
+    }
+};
+
+var GamepadNotice = {
+    init: function() {
+        this.build();
+        this.setEvents();
+    },
+    build: function() {
+        this._elemConnected = $.js2dom({
+            cl: 'gamepad-notice-connected',
+            c: [
+                '✔ 🎮',
+                {
+                    cl: 'gamepad-notice-connected__num'
+                }
+            ]
+        });
+
+        this._elemDisconnected = $.js2dom({
+            cl: 'gamepad-notice-disconnected',
+            c: [
+                '✖ 🎮',
+                {
+                    cl: 'gamepad-notice-disconnected__num'
+                }
+            ]
+        });
+    },
+    setEvents: function() {
+        Gamepad.on('connected', function() {
+            this.showConnected(e);
+        }.bind(this));
+
+        Gamepad.on('disconnected', function() {
+            this.showDisconnected(e);
+        }.bind(this));
+
+        body.appendChild(this._elemConnected);
+        body.appendChild(this._elemDisconnected);
+    },
+    timeout: 3000,
+    showDisconnected: function(e) {
+        var cl = 'gamepad-disconnected_show',
+            el = this._elemDisconnected;
+
+        el.classList.add(cl);
+
+        if (this._disTimer) {
+            clearTimeout(this._disTimer);
+            this._disTimer = null;
+        }
+
+        this._disTimer = setTimeout(function() {
+            el.classList.remove(cl);
+            this._disTimer = null;
+        }.bind(this), this.timeout);
+    },
+    showConnected: function(e) {
+        var cl = 'gamepad-connected_show',
+            el = this._elemConnected;
+
+        el.classList.add(cl);
+
+        if (this._timer) {
+            clearTimeout(this._timer);
+            this._timer = null;
+        }
+
+        this._timer = setTimeout(function() {
+            el.classList.remove(cl);
+            this._timer = null;
+        }.bind(this), this.timeout);
+    }
+};
+
 var Gamepad = {
     init: function() {
+        $.extend(this, Event.prototype);
+
         if (!this.supported()) {
             return;
         }
@@ -1352,7 +1491,6 @@ var Gamepad = {
         $.on(window, 'gamepadconnected', function(e) {
             this.search();
             this.trigger('connected');
-            this.showConnected(e);
 
             if (!this._rafId) {
                 this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
@@ -1363,38 +1501,12 @@ var Gamepad = {
         $.on(window, 'gamepaddisconnected', function(e) {
             this.search();
             this.trigger('disconnected');
-            this.showDisconnected(e);
 
             if (!this.get().length && this._rafId) {
                 window.cancelAnimationFrame(this._rafId);
                 this._rafId = null;
             }
         }.bind(this));
-
-        $.extend(this, Event.prototype);
-
-        this._elConnected = $.fromHTML({
-            cl: 'gamepad-connected',
-            c: [
-                '✔ 🎮',
-                {
-                    cl: 'gamepad-connected__num'
-                }
-            ]
-        });
-
-        this._elDisconnected = $.fromHTML({
-            cl: 'gamepad-disconnected',
-            c: [
-                '✖ 🎮',
-                {
-                    cl: 'gamepad-disconnected__num'
-                }
-            ]
-        });
-
-        body.appendChild(this._elConnected);
-        body.appendChild(this._elDisconnected);
     },
     pressedBuffer: {},
     checkButtons: function() {
@@ -1405,7 +1517,8 @@ var Gamepad = {
             pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
                     if (this.pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
-                        this.trigger(this.getButtonEventName(pad.index, buttonIndex));
+                        this.trigger(this.getButtonEventName(buttonIndex));
+                        this.trigger(this.getButtonEventName(buttonIndex, pad.index));
                     }
 
                     this.pressedBuffer[padIndex][buttonIndex] = button.pressed;
@@ -1454,68 +1567,141 @@ var Gamepad = {
 
         lt: 6,
         lb: 4,
-        
+
         rt: 7,
         rb: 5
     },
     getButtonId: function(name) {
         return this.buttonName[name];
     },
-    getButtonEventName: function(gamepadIndex, button) {
-        return 'gamepad-' + gamepadIndex + ':button-' + button;
+    getButtonEventName: function(button, gamepadIndex) {
+        var index = typeof gamepadIndex === 'undefined' ? '*' : gamepadIndex;
+        return 'gamepad:button-' + button + ':index-' + index;
     },
-    onbutton: function(gamepadIndex, button, callback) {
-        var self = this;
+    /*
+     * Set a event on a button.
+     * @param {number|string} button - button id or name of button ('start', 'yellow')
+     * @param {Function} callback
+     *
+     * @example
+     * .onbutton('green:0', function() {}); // gamepad 0, button "green"
+     * .onbutton('lb', function() {}); //  button "lb", any gamepad
+     */
+    onbutton: function(button, callback) {
+        var self = this,
+            gamepadIndex;
+
+        if (typeof button === 'string') {
+            gamepadIndex = button.split(':')[1];
+
+            if (typeof gamepadIndex !== 'undefined') {
+                gamepadIndex = +gamepadIndex;
+            }
+        }
 
         function setEvent(b) {
-            var num = typeof b === 'number' ? b : self.getButtonId(b);
-            self.on(self.getButtonEventName(gamepadIndex, num), callback);
+            var buttonId = typeof b === 'number' ? b : self.getButtonId(b);
+            self.on(self.getButtonEventName(buttonId, gamepadIndex), callback);
         }
 
-        if (Array.isArray(button)) {
-            button.forEach(function(b) {
-                setEvent(b);
-            });
-        } else {
-            setEvent(button);
-        }
+        setEvent(button);
     },
-    timeout: 3000,
-    showDisconnected: function(e) {
-        var cl = 'gamepad-disconnected_show',
-            el = this._elDisconnected;
-
-        el.classList.add(cl);
-
-        if (this._dtimer) {
-            clearTimeout(this._dtime);
-            this._dtimer = null;
-        }
-
-        this._dtimer = setTimeout(function() {
-            el.classList.remove(cl);
-            this._dtimer = null;
-        }.bind(this), this.timeout);
-    },
-    showConnected: function(e) {
-        var cl = 'gamepad-connected_show',
-            el = this._elConnected;
-
-        el.classList.add(cl);
-
-        if (this._timer) {
-            clearTimeout(this._time);
-            this._timer = null;
-        }
-
-        this._timer = setTimeout(function() {
-            el.classList.remove(cl);
-            this._timer = null;
-        }.bind(this), this.timeout);
+    /*
+     * Set events on buttons.
+     * @param {Array} buttons
+     * @param {Function} callback
+     *
+     * @example
+     * .onbuttons(['green:0', 'red:0'], function() {});
+     */
+    onbuttons: function(buttons, callback) {
+        buttons.forEach(function(button) {
+            this.onbutton(button, callback);
+        }, this);
     },
     _pads: []
 };
 
+function InfoPanel(container) {
+    this._container = container;
+    this._elem = $.js2dom(this.build());
+    this._container.appendChild(this._elem);
+}
+
+InfoPanel.prototype = {
+    build: function() {
+        return {
+            cl: 'info-panel',
+            c: [
+                {
+                    t: 'span',
+                    cl: 'info-panel__level-title'
+                },
+                {
+                    cl: 'info-panel__time',
+                    t: 'span',
+                    c: [
+                        'Time: ',
+                        {
+                            t: 'span',
+                            cl: 'info-panel__time-num'
+                        }
+                    ]
+                },
+                {
+                    cl: 'info-panel__cages',
+                    t: 'span',
+                    c: [
+                        'Time: ',
+                        {
+                            t: 'span',
+                            cl: 'info-panel__cages-num'
+                        }
+                    ]
+                },
+                {
+                    cl: 'info-panel__clicks',
+                    t: 'span',
+                    c: [
+                        'Clicks: ',
+                        {
+                            t: 'span',
+                            cl: 'info-panel__clicks-num'
+                        }
+                    ]
+                }
+            ]
+        };
+    },
+    update: function() {
+        this.currentTime = Date.now();
+
+        this.updatePart('clicks-num', this.clicks);
+        this.updatePart('cages-num', this.cages);
+        this.updatePart('level-title', this.levelTitle);
+        this.updatePart('time-num', formatTime(this.currentTime - this.startTime));
+    },
+    updatePart: function(name, value) {
+        $('.info-panel__' + name, this._elem).innerHTML = value;
+    },
+    start: function(level, cages) {
+        this.stop();
+
+        this.clicks = 0;
+        this.cages = cages;
+        this.levelTitle = App.levelTitle(level);
+        this.startTime = Date.now();
+
+        this.update();
+        this._timer = setInterval(function() {
+            this.update();
+        }.bind(this), 500);
+    },
+    stop: function() {
+        this._timer && clearInterval(this._timer);
+        this._timer = null;
+    }
+}
 var TrophyNotice = function(data) {
     this._data = data;
     this._onclick = function() {
@@ -1526,7 +1712,7 @@ var TrophyNotice = function(data) {
 
 TrophyNotice.prototype = {
     open: function() {
-        this._el = $.fromHTML({
+        this._el = $.js2dom({
             cl: 'trophy-notice',
             c: [{
                 cl: 'trophy-notice__title',

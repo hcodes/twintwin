@@ -6,12 +6,24 @@ body.page_field .page_field
 .field
 {
     position: absolute;
-    left: 30px;
-    top: 30px;
-    bottom: 30px;
-    right: 30px;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
     user-select: none;
     -moz-user-select: none;
+}
+
+.field_one
+{
+    right: 50%;
+    right: ~"calc(50% + 10px)";
+}
+
+.field_two
+{
+    left: ~"calc(50% + 10px)";
+    right: 0;
 }
 
 .field__cages

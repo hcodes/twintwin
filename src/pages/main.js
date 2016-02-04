@@ -5,6 +5,14 @@ App.page.add({
         this._bg = $('.main-bg');
         this._bg.innerHTML = this.getBackground();
 
+        this.setEvents();
+
+        this.resizeEmoji();
+        this.initLogo();
+
+        return this;
+    },
+    setEvents: function() {
         $.on(window, 'resize', function() {
             this.resizeEmoji();
         }.bind(this));
@@ -22,10 +30,9 @@ App.page.add({
             App.page.show('select-level');
         }.bind(this));
 
-        this.resizeEmoji();
-        this.initLogo();
-
-        return this;
+        $.on('.main-menu__multiplayer', 'click', function(e) {
+            App.page.show('multiplayer');
+        }.bind(this));
     },
     initLogo: function() {
         var el  = $('.main-logo');

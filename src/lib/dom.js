@@ -6,14 +6,15 @@
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
-$._fromHTML = document.createElement('div');
-$.fromHTML = function(data) {
-    this._fromHTML.innerHTML = jstohtml(data);
-    var result = this._fromHTML.firstElementChild;
-    this._fromHTML.innerHTML = '';
+$.js2dom = function(data) {
+    this.js2dom._div.innerHTML = jstohtml(data);
+    var result = this.js2dom._div.firstElementChild;
+    this.js2dom._div.innerHTML = '';
 
     return result;
 };
+
+$.js2dom._div = document.createElement('div');
 
 $.on = function(el, type, callback) {
     $(el).addEventListener(type, callback, false);

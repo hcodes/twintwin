@@ -8,12 +8,14 @@ function Field(data) {
     this.field = [];
 
     this._fieldCursor = new FieldCursor({
-        elem: $('.field-cursor', this._elem),
+        elem: $('.field-cursor', data.elem),
         hidden: true,
         cols: this.cols,
         rows: this.rows,
         padding: this.padding
     });
+    
+    this._infoPanel = new InfoPanel(data.elem);
 
     this.setEvents();
 }
@@ -108,7 +110,7 @@ Field.prototype = {
     addCages: function() {
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
-                var cage = $.fromHTML({
+                var cage = $.js2dom({
                     cl: 'cage',
                     'data-x': x,
                     'data-y': y,
@@ -142,7 +144,7 @@ Field.prototype = {
     },
     getLevelSymbols: function() {
         var level = this._level,
-            syms = this.data.levels[level].symbols,
+            syms = App.commonData.levels[level].symbols,
             size = this.cols * this.rows,
             halfSize = size / 2,
             buf = [];
@@ -190,8 +192,8 @@ Field.prototype = {
             return;
         }
 
-        this.info.clicks++;
-        this.info.update();
+        this._infoPanel.clicks++;
+        this._infoPanel.update();
 
         cage.classList.add('cage_opened');
         $('.cage__back', cage).innerHTML = this.field[y][x];
@@ -239,14 +241,14 @@ Field.prototype = {
         var cage = this.findCage(x, y);
         if (cage) {
             cage.classList.add('cage_removed');
-            this.info.cages--;
-            this.info.update();
+            this._infoPanel.cages--;
+            this._infoPanel.update();
 
             setTimeout(function() {
                 this._elem.removeChild(cage);
             }.bind(this), 200);
 
-            if (!this.info.cages) {
+            if (!this._infoPanel.cages) {
                 this.finish();
             }
         }
@@ -273,44 +275,18 @@ Field.prototype = {
             this.field[y] = buf;
         }
     },
-    info: {
-        update: function() {
-            this.currentTime = Date.now();
-            $('.info__clicks-num', this._elem).innerHTML = this.clicks;
-            $('.info__cages-num', this._elem).innerHTML = this.cages;
-            $('.info__level-title', this._elem).innerHTML = this.levelTitle;
-            $('.info__time-num', this._elem).innerHTML = formatTime(this.currentTime - this.startTime);
-        },
-        start: function(level, cages) {
-            this.stop();
-
-            this.clicks = 0;
-            this.cages = cages;
-            this.levelTitle = App.levelTitle(level);
-            this.startTime = Date.now();
-
-            this.update();
-            this._timer = setInterval(function() {
-                this.update();
-            }.bind(this), 500);
-        },
-        stop: function() {
-            this._timer && clearInterval(this._timer);
-            this._timer = null;
-        }
-    },
     finish: function() {
         var maxLevel = App.settings.get('maxLevel');
         App.settings.set('maxLevel', Math.max(maxLevel, App.level + 1));
 
-        this.info.stop();
+        this._infoPanel.stop();
     },
     show: function() {
         this._elem.innerHTML = '';
         this._openedCages = [];
         this._level = App.settings.get('level');
 
-        this.info.start(this._level, this.cols * this.rows);
+        this._infoPanel.start(this._level, this.cols * this.rows);
         this.initField();
         this.addCages();
         this.resizeCages();
@@ -322,6 +298,6 @@ Field.prototype = {
         }*/
     },
     hide: function() {
-        this.info.stop();
+        this._infoPanel.stop();
     }
 };

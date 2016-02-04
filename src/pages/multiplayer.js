@@ -2,20 +2,21 @@ App.page.add({
     name: 'multiplayer',
     locationHash: 'multiplayer',
     init: function(data) {
+        var context = $('.multiplayer');
         this._fieldOne = new Field({
-            elem: $('.field_one', '.multiplayer'),
+            elem: $('.field_one', context),
             cols: 6,
             rows: 5,
             control: 'mouse',
-            info: false
+            infoPanel: true
         });
 
         this._fieldTwo = new Field({
-            elem: $('.field_two', '.multiplayer'),
+            elem: $('.field_two', context),
             cols: 6,
             rows: 5,
             control: 'keyboard',
-            info: false
+            infoPanel: true
         });
 
         $.on($('.multiplayer__exit', this._elem), 'mousedown', function() {
