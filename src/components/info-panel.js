@@ -1,3 +1,7 @@
+var $ = require('dom').$,
+    lutils = require('level-utils'),
+    dtime = require('date-time');
+
 function InfoPanel(container) {
     this._container = container;
     this._elem = $.js2dom(this.build());
@@ -55,7 +59,7 @@ InfoPanel.prototype = {
         this.updatePart('clicks-num', this.clicks);
         this.updatePart('cages-num', this.cages);
         this.updatePart('level-title', this.levelTitle);
-        this.updatePart('time-num', formatTime(this.currentTime - this.startTime));
+        this.updatePart('time-num', dtime.formatTime(this.currentTime - this.startTime));
     },
     updatePart: function(name, value) {
         $('.info-panel__' + name, this._elem).innerHTML = value;
@@ -65,7 +69,7 @@ InfoPanel.prototype = {
 
         this.clicks = 0;
         this.cages = cages;
-        this.levelTitle = App.levelTitle(level);
+        this.levelTitle = lutils.levelTitle(level);
         this.startTime = Date.now();
 
         this.update();
@@ -78,3 +82,5 @@ InfoPanel.prototype = {
         this._timer = null;
     }
 }
+
+module.exports = InfoPanel;

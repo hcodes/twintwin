@@ -1,4 +1,12 @@
-App.page.add({
+var dom = require('dom'),
+    $ = dom.$,
+    $$ = dom.$$,
+    levels = require('levels'),
+    Settings = require('settings'),
+    Page = require('page'),
+    jstohtml = require('jstohtml');
+
+module.exports = {
     name: 'main',
     locationHash: '',
     init: function() {
@@ -22,16 +30,16 @@ App.page.add({
                 return;
             }
 
-            App.page.show('select-level');
+            Page.show('select-level');
         });
 
         $.on('.main-menu__new-game', 'click', function(e) {
-            App.settings.set('level', 1);
-            App.page.show('select-level');
+            Settings.set('level', 1);
+            Page.show('select-level');
         }.bind(this));
 
         $.on('.main-menu__multiplayer', 'click', function(e) {
-            App.page.show('multiplayer');
+            Page.show('multiplayer');
         }.bind(this));
     },
     initLogo: function() {
@@ -42,7 +50,7 @@ App.page.add({
     },
     getBackground: function() {
         var symbols = [];
-        this.data.levels.forEach(function(level) {
+        levels.forEach(function(level) {
             if (level.bg !== false) {
                 symbols = symbols.concat(level.symbols);
             }
@@ -66,7 +74,7 @@ App.page.add({
     },
     show: function() {
         var cont = $('.main-menu__continue');
-        if (App.settings.get('level')) {
+        if (Settings.get('level')) {
             cont.classList.remove('btn_disabled');
         } else {
             cont.classList.add('btn_disabled');
@@ -85,4 +93,4 @@ App.page.add({
         this._timer && clearInterval(this._timer);
         this._timer = null;
     }
-});
+};

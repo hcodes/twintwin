@@ -40,11 +40,11 @@ body {
   transition: 0.1s transform;
 }
 .btn:active {
-  -webkit-transform: translate(0px, 5px);
-      -ms-transform: translate(0px, 5px);
-          transform: translate(0px, 5px);
-  -webkit-box-shadow: 0 1px 0 0;
-          box-shadow: 0 1px 0 0;
+  -webkit-transform: translate(3px, 3px);
+      -ms-transform: translate(3px, 3px);
+          transform: translate(3px, 3px);
+  -webkit-box-shadow: 0 4px 0 0 #CE3323;
+          box-shadow: 0 4px 0 0 #CE3323;
 }
 .btn_red {
   background-color: #e74c3c;
@@ -209,6 +209,8 @@ body.input_mouse .exit:hover {
           user-select: none;
   -moz-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-transition: 0.1s ease left, 0.1s ease top;
+  transition: 0.1s ease left, 0.1s ease top;
   z-index: 5;
 }
 .field-cursor_hidden {

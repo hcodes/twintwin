@@ -1,8 +1,11 @@
+var $ = require('dom').$,
+    Page = require('page');
+
 var TrophyNotice = function(data) {
     this._data = data;
     this._onclick = function() {
         this.close();
-        App.page.show('trophies');
+        Page.show('trophies');
     }.bind(this);
 };
 
@@ -46,3 +49,5 @@ TrophyNotice.prototype = {
     title: 'Hello world!',
     type: '🏆'
 }).open();*/
+
+module.exports = TrophyNotice;

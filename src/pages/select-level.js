@@ -1,4 +1,11 @@
-App.page.add({
+var $ = require('dom').$,
+    jstohtml = require('jstohtml'),
+    levels = require('levels'),
+    lutils = require('level-utils'),
+    Settings = require('settings'),
+    Page = require('page');
+
+module.exports = {
     name: 'select-level',
     locationHash: 'select-level',
     init: function(data) {
@@ -6,7 +13,7 @@ App.page.add({
         el.innerHTML = this.getList();
         
         $.on('.select-level__exit', 'click', function() {
-            App.page.show('main');
+            Page.show('main');
         });
         
         $.delegate(el, '.btn', 'click', function(e) {
@@ -15,17 +22,17 @@ App.page.add({
             }
 
             var level = parseInt(e.target.dataset['level']);
-            App.settings.set('level', level);
-            App.page.show('game');
+            Settings.set('level', level);
+            Page.show('game');
         });
 
         return this;
     },
     getList: function() {
         var html = [],
-            maxLevel = App.settings.get('maxLevel');
+            maxLevel = Settings.get('maxLevel');
 
-        this.data.levels.forEach(function(level, i) {
+        levels.forEach(function(level, i) {
             if (!i) {
                 return;
             }
@@ -44,7 +51,7 @@ App.page.add({
                         {
                             t: 'span',
                             cl: 'select-level__emoji emoji',
-                            c: App.levelSymbol(i)
+                            c: lutils.levelSymbol(i)
                         },
                         level.name
                     ]
@@ -56,4 +63,4 @@ App.page.add({
     },
     show: function() {},
     hide: function() {}
-});
+};

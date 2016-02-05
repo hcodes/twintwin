@@ -1,4 +1,8 @@
-App.page.add({
+var $ = require('dom').$,
+    Page = require('page'),
+    Field = require('field');
+
+module.exports = {
     name: 'game',
     locationHash: 'game',
     init: function(data) {
@@ -11,7 +15,7 @@ App.page.add({
         });
 
         $.on($('.game__exit', this._elem), 'mousedown', function() {
-            App.page.show('select-level');
+            Page.show('select-level');
         });
     },
     show: function() {
@@ -20,4 +24,4 @@ App.page.add({
     hide: function() {
         this._field.hide();
     }
-});
+};

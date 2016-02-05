@@ -1,4 +1,6 @@
-﻿function FieldCursor(data) {
+﻿var $ = require('dom').$;
+
+function FieldCursor(data) {
     this.elem = data.elem;
 
     this.width = data.width;
@@ -41,7 +43,6 @@ FieldCursor.prototype = {
         this.height = height;
         this.padding = padding;
 
-        console.log(width, height);
         $.size(this.elem, width, height);
 
         this.move(this.x, this.y);
@@ -109,3 +110,5 @@ FieldCursor.prototype = {
         this.elem = null;
     }
 };
+
+module.exports = FieldCursor;

@@ -1,21 +1,31 @@
-function Field(data) {
-    this._elem = $('.field__cages', data.elem);
+var dom = require('dom'),
+    $ = dom.$,
+    $$ = dom.$$,
+    levels = require('levels'),
+    Settings = require('settings'),
+    FieldCursor = require('field-cursor'),
+    InfoPanel = require('info-panel'),
+    Gamepad = require('gamepad');
 
+function Field(data) {
+    this.elem = $('.field__cages', data.elem);
+
+    this.control = data.control;
     this.cols = data.cols;
     this.rows = data.rows;
     this.padding = 5;
 
     this.field = [];
 
-    this._fieldCursor = new FieldCursor({
+    this.fieldCursor = new FieldCursor({
         elem: $('.field-cursor', data.elem),
         hidden: true,
         cols: this.cols,
         rows: this.rows,
         padding: this.padding
     });
-    
-    this._infoPanel = new InfoPanel(data.elem);
+
+    this.infoPanel = new InfoPanel(data.elem);
 
     this.setEvents();
 }
@@ -27,19 +37,21 @@ Field.prototype = {
         this.setGamepadEvents();
 
         $.on(window, 'resize', function() {
-            this.resizeCages();
+            if (!this.isHidden) {
+                this.resizeCages();
+            }
         }.bind(this));
     },
     isControl: function(type) {
-        return this.control !== '*' && this.control !== type;
+        return this.control === '*' || this.control === type;
     },
     setMouseEvents: function() {
-        $.delegate(this._elem, '.cage__front', 'mousedown', function(e) {
+        $.delegate(this.elem, '.cage__front', 'mousedown', function(e) {
             if (!this.isControl('mouse')) {
                 return;
             }
 
-            this._fieldCursor.hide();
+            this.fieldCursor.hide();
 
             var cage = e.target.parentNode,
                 ds = cage.dataset;
@@ -55,16 +67,16 @@ Field.prototype = {
 
             switch (e.key) {
                 case 'ArrowUp':
-                    this._fieldCursor.up();
+                    this.fieldCursor.up();
                 break;
                 case 'ArrowLeft':
-                    this._fieldCursor.left();
+                    this.fieldCursor.left();
                 break;
                 case 'ArrowRight':
-                    this._fieldCursor.right();
+                    this.fieldCursor.right();
                 break;
                 case 'ArrowDown':
-                    this._fieldCursor.down();
+                    this.fieldCursor.down();
                 break;
                 case ' ':
                 case 'Enter':
@@ -76,25 +88,25 @@ Field.prototype = {
     setGamepadEvents: function() {
         Gamepad.onbutton('left', function() {
             if (this.isControl('gamepad')) {
-                this._fieldCursor.left();
+                this.fieldCursor.left();
             }
         }.bind(this));
 
         Gamepad.onbutton('right', function() {
             if (this.isControl('gamepad')) {
-                this._fieldCursor.right();
+                this.fieldCursor.right();
             }
         }.bind(this));
 
         Gamepad.onbutton('up', function() {
             if (this.isControl('gamepad')) {
-                this._fieldCursor.up();
+                this.fieldCursor.up();
             }
         }.bind(this));
 
         Gamepad.onbutton('down', function() {
             if (this.isControl('gamepad')) {
-                this._fieldCursor.down();
+                this.fieldCursor.down();
             }
         }.bind(this));
 
@@ -120,7 +132,7 @@ Field.prototype = {
                     ]
                 });
 
-                this._elem.appendChild(cage);
+                this.elem.appendChild(cage);
             }
         }
     },
@@ -140,11 +152,11 @@ Field.prototype = {
             }
         }
 
-        this._fieldCursor.size(size.width, size.height, this.padding);
+        this.fieldCursor.size(size.width, size.height, this.padding);
     },
     getLevelSymbols: function() {
         var level = this._level,
-            syms = App.commonData.levels[level].symbols,
+            syms = levels[level].symbols,
             size = this.cols * this.rows,
             halfSize = size / 2,
             buf = [];
@@ -158,8 +170,8 @@ Field.prototype = {
         return buf.concat(buf).shuffle();
     },
     getSize: function() {
-        var width = Math.floor(this._elem.offsetWidth / this.cols) - this.padding,
-            height = Math.floor(this._elem.offsetHeight / this.rows) - this.padding;
+        var width = Math.floor(this.elem.offsetWidth / this.cols) - this.padding,
+            height = Math.floor(this.elem.offsetHeight / this.rows) - this.padding;
 
         return {
             width: width,
@@ -168,7 +180,7 @@ Field.prototype = {
         }
     },
     findCage: function(x, y) {
-        var cages = $$('.cage', this._elem);
+        var cages = $$('.cage', this.elem);
         for (var i = 0; i < cages.length; i++) {
             var cage = cages[i];
             var ds = cage.dataset;
@@ -180,7 +192,7 @@ Field.prototype = {
         return null;
     },
     openCageWithCursor: function() {
-        var xy = this._fieldCursor.getXY();
+        var xy = this.fieldCursor.getXY();
         this.openCage(xy.x, xy.y);
     },
     openCage: function(x, y) {
@@ -192,8 +204,8 @@ Field.prototype = {
             return;
         }
 
-        this._infoPanel.clicks++;
-        this._infoPanel.update();
+        this.infoPanel.clicks++;
+        this.infoPanel.update();
 
         cage.classList.add('cage_opened');
         $('.cage__back', cage).innerHTML = this.field[y][x];
@@ -241,14 +253,14 @@ Field.prototype = {
         var cage = this.findCage(x, y);
         if (cage) {
             cage.classList.add('cage_removed');
-            this._infoPanel.cages--;
-            this._infoPanel.update();
+            this.infoPanel.cages--;
+            this.infoPanel.update();
 
             setTimeout(function() {
-                this._elem.removeChild(cage);
+                this.elem.removeChild(cage);
             }.bind(this), 200);
 
-            if (!this._infoPanel.cages) {
+            if (!this.infoPanel.cages) {
                 this.finish();
             }
         }
@@ -276,17 +288,17 @@ Field.prototype = {
         }
     },
     finish: function() {
-        var maxLevel = App.settings.get('maxLevel');
-        App.settings.set('maxLevel', Math.max(maxLevel, App.level + 1));
+        var maxLevel = Settings.get('maxLevel');
+        Settings.set('maxLevel', Math.max(maxLevel, Settings.level + 1));
 
-        this._infoPanel.stop();
+        this.infoPanel.stop();
     },
     show: function() {
-        this._elem.innerHTML = '';
+        this.elem.innerHTML = '';
         this._openedCages = [];
-        this._level = App.settings.get('level');
+        this._level = Settings.get('level');
 
-        this._infoPanel.start(this._level, this.cols * this.rows);
+        this.infoPanel.start(this._level, this.cols * this.rows);
         this.initField();
         this.addCages();
         this.resizeCages();
@@ -296,8 +308,13 @@ Field.prototype = {
                 this.openCage(x, y);
             }
         }*/
+
+        this.isHidden = false;
     },
     hide: function() {
-        this._infoPanel.stop();
+        this.isHidden = true;
+        this.infoPanel.stop();
     }
 };
+
+module.exports = Field;

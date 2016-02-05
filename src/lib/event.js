@@ -57,3 +57,6 @@ Event.prototype = {
         return this;
     }
 };
+
+module.exports = Event;
+

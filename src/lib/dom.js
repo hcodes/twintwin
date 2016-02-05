@@ -1,4 +1,6 @@
-﻿var $ = function(el, context) {
+﻿var jstohtml = require('jstohtml');
+
+var $ = function(el, context) {
     if (typeof context === 'string') {
         context = document.querySelector(context);
     }
@@ -90,3 +92,9 @@ var hasSupportCss = (function() {
         return false;
     };
 })();
+
+module.exports = {
+    $: $,
+    $$: $$,
+    hasSupportCss: hasSupportCss
+};

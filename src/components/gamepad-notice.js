@@ -1,4 +1,8 @@
-var GamepadNotice = {
+var $ = require('dom').$,
+    Gamepad = require('gamepad'),
+    body = document.body;
+
+module.exports = {
     init: function() {
         this.build();
         this.setEvents();

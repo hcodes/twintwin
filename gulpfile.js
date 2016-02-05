@@ -1,6 +1,8 @@
 var fs = require('fs'),
     gulp = require('gulp'),
     path = require('path'),
+    browserify = require('browserify'),
+    source = require('vinyl-source-stream'),
     less = require('gulp-less');
     concat = require('gulp-concat'),
     rename = require('gulp-rename'),
@@ -19,18 +21,24 @@ var paths = {
         'src/**/*.less'
     ],
     js: [
-        'src/lib/*.js',
-        'node_modules/jstohtml/dist/jstohtml.js',
-        'src/app.js',
-        'src/levels.js',
-        'src/pages/*.js',
-        'src/components/*.js'
+        'src/',
+        'src/lib',
+        'src/pages',
+        'src/components',
+        'node_modules'
     ]
 };
 
 gulp.task('js', function() {
-    return gulp.src(paths.js)
-        .pipe(concat('app.js'))
+    return browserify('./src/app.js', {
+            paths: paths.js
+        })
+        .bundle()
+        .pipe(source('app.js'))
+/*        .pipe(uglify({
+            output: {ascii_only: true},
+            preserveComments: 'some'
+        }))*/
         .pipe(gulp.dest(destDir));
 });
 

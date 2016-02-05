@@ -1,4 +1,9 @@
-var Gamepad = {
+var $ = require('dom').$,
+    Event = require('event');
+
+require('raf');
+
+module.exports = {
     init: function() {
         $.extend(this, Event.prototype);
 

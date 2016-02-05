@@ -1,4 +1,8 @@
-App.page.add({
+var $ = require('dom').$,
+    Field = require('field'),
+    Page = require('page');
+
+module.exports = {
     name: 'multiplayer',
     locationHash: 'multiplayer',
     init: function(data) {
@@ -20,7 +24,7 @@ App.page.add({
         });
 
         $.on($('.multiplayer__exit', this._elem), 'mousedown', function() {
-            App.page.show('select-level');
+            Page.show('select-level');
         });
     },
     show: function() {
@@ -31,4 +35,4 @@ App.page.add({
         this._fieldOne.hide();
         this._fieldTwo.hide();
     }
-});
+};

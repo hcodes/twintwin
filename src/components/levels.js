@@ -1,4 +1,4 @@
-﻿App.commonData.levels = [
+﻿module.exports = [
     {
         name: '',
         symbols: []
