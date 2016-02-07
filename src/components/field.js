@@ -161,7 +161,7 @@ Field.prototype = {
             halfSize = size / 2,
             buf = [];
 
-        while(halfSize > buf.length) {
+        while (halfSize > buf.length) {
             buf = buf.concat(syms);
         }
 
@@ -177,14 +177,14 @@ Field.prototype = {
             width: width,
             height: height,
             fontSize: height * 0.8
-        }
+        };
     },
     findCage: function(x, y) {
         var cages = $$('.cage', this.elem);
         for (var i = 0; i < cages.length; i++) {
             var cage = cages[i];
             var ds = cage.dataset;
-            if (x == ds.x && y == ds.y) {
+            if (x === ds.x && y === ds.y) {
                 return cage;
             }
         }

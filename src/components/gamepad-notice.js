@@ -30,18 +30,18 @@ module.exports = {
     },
     setEvents: function() {
         Gamepad.on('connected', function() {
-            this.showConnected(e);
+            this.showConnected();
         }.bind(this));
 
         Gamepad.on('disconnected', function() {
-            this.showDisconnected(e);
+            this.showDisconnected();
         }.bind(this));
 
         body.appendChild(this._elemConnected);
         body.appendChild(this._elemDisconnected);
     },
     timeout: 3000,
-    showDisconnected: function(e) {
+    showDisconnected: function() {
         var cl = 'gamepad-disconnected_show',
             el = this._elemDisconnected;
 
@@ -57,7 +57,7 @@ module.exports = {
             this._disTimer = null;
         }.bind(this), this.timeout);
     },
-    showConnected: function(e) {
+    showConnected: function() {
         var cl = 'gamepad-connected_show',
             el = this._elemConnected;
 

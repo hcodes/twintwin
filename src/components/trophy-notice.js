@@ -1,5 +1,6 @@
 var $ = require('dom').$,
-    Page = require('page');
+    Page = require('page'),
+    body = document.body;
 
 var TrophyNotice = function(data) {
     this._data = data;

@@ -1,20 +1,17 @@
-var fs = require('fs'),
-    gulp = require('gulp'),
-    path = require('path'),
+var gulp = require('gulp'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
-    less = require('gulp-less');
+    less = require('gulp-less'),
     concat = require('gulp-concat'),
-    rename = require('gulp-rename'),
-    replace = require('gulp-replace'),
-    cleancss = require('gulp-cleancss'),
+    //rename = require('gulp-rename'),
+    //replace = require('gulp-replace'),
+    //cleancss = require('gulp-cleancss'),
+    //uglify = require('gulp-uglify'),
     autoprefixer = require('gulp-autoprefixer'),
-    uglify = require('gulp-uglify'),
     apBrowsers = {
         browsers: ['ie >= 9', 'Firefox >= 24', 'Chrome >= 26', 'iOS >= 5', 'Safari >= 6', 'Android > 2.3']
     },
-    destDir = './dist',
-    version = require('./package.json').version;
+    destDir = './dist';
 
 var paths = {
     css: [

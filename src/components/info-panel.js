@@ -81,6 +81,6 @@ InfoPanel.prototype = {
         this._timer && clearInterval(this._timer);
         this._timer = null;
     }
-}
+};
 
 module.exports = InfoPanel;

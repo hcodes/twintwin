@@ -43,8 +43,8 @@ $.off = function(el, type, callback) {
 
 $.extend = function(dest, source) {
     Object.keys(source).forEach(function(key) {
-        if(typeof dest[key] === 'undefined') {
-           dest[key] = source[key];
+        if (typeof dest[key] === 'undefined') {
+            dest[key] = source[key];
         }
     });
 
@@ -77,13 +77,15 @@ var hasSupportCss = (function() {
 
     return function(prop) {
 
-        if (prop in div.style) return true;
+        if (prop in div.style) {
+            return true;
+        }
 
         prop = prop.replace(/^[a-z]/, function(val) {
             return val.toUpperCase();
         });
 
-        while(len--) {
+        while (len--) {
             if (vendors[len] + prop in div.style) {
                 return true;
             }

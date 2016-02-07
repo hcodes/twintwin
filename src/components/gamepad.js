@@ -69,13 +69,13 @@ module.exports = {
     // Gamepad: XBox360
     buttonName: {
         green: 0,
-        x: 0,
-
+        a: 0,
+        
         red: 1,
         b: 1,
 
         yellow: 3,
-        a: 3,
+        v: 3,
 
         blue: 2,
         x: 2,

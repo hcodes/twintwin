@@ -1,4 +1,4 @@
-function Event() {};
+function Event() {}
 
 Event.prototype = {
     /*
@@ -12,7 +12,7 @@ Event.prototype = {
             this._eventBuffer = [];
         }
 
-        if(type && callback) {
+        if (type && callback) {
             this._eventBuffer.push({
                 type: type,
                 callback: callback
@@ -30,8 +30,8 @@ Event.prototype = {
     off: function(type, callback) {
         var buf = this._eventBuffer || [];
 
-        for(var i = 0; i < buf.length; i++) {
-            if(callback === buf[i].callback && type === buf[i].type) {
+        for (var i = 0; i < buf.length; i++) {
+            if (callback === buf[i].callback && type === buf[i].type) {
                 buf.splice(i, 1);
                 i--;
             }
@@ -48,8 +48,8 @@ Event.prototype = {
     trigger: function(type, data) {
         var buf = this._eventBuffer || [];
 
-        for(var i = 0; i < buf.length; i++) {
-            if(type === buf[i].type) {
+        for (var i = 0; i < buf.length; i++) {
+            if (type === buf[i].type) {
                 buf[i].callback.call(this, {type: type}, data);
             }
         }

@@ -3,7 +3,6 @@ var dom = require('dom'),
     Gamepad = require('gamepad'),
     GamepadNotice = require('gamepad-notice'),
     Page = require('page'),
-    jstohtml = require('jstohtml'),
     body = document.body;
 
 require('array');
