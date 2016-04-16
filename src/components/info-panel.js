@@ -1,5 +1,5 @@
 var $ = require('dom').$,
-    lutils = require('level-utils'),
+    levels = require('levels'),
     dtime = require('date-time');
 
 function InfoPanel(container) {
@@ -32,7 +32,7 @@ InfoPanel.prototype = {
                     cl: 'info-panel__cages',
                     t: 'span',
                     c: [
-                        'Time: ',
+                        'Cages: ',
                         {
                             t: 'span',
                             cl: 'info-panel__cages-num'
@@ -64,12 +64,12 @@ InfoPanel.prototype = {
     updatePart: function(name, value) {
         $('.info-panel__' + name, this._elem).innerHTML = value;
     },
-    start: function(level, cages) {
+    start: function(levelData, cages) {
         this.stop();
 
         this.clicks = 0;
         this.cages = cages;
-        this.levelTitle = lutils.levelTitle(level);
+        this.levelTitle = levels.getTitle(levelData);
         this.startTime = Date.now();
 
         this.update();

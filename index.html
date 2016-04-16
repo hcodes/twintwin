@@ -5,7 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <link rel="icon" href="icons/favicon.png" />
-    <link rel="apple-touch-icon" href="icons/touchicon.png" />
+    <link rel="apple-touch-icon" href="icons/touchicon.png" />\
+    <!-- debug:start -->
+    <link rel="stylesheet" href="node_modules/show-js-error/dist/show-js-error.css" />
+    <script src="node_modules/show-js-error/dist/show-js-error.js"></script>
+    <!-- debug:end -->
     <link rel="stylesheet" href="dist/app.css" />
 </head>
 <body>
@@ -36,6 +40,7 @@
         <div class="game__exit exit">×</div>
     </div>
     <div class="page page_multiplayer">
+        <div class="field-separator"></div>
         <div class="multiplayer">
             <div class="field field_one">
                 <div class="field__cages"></div>

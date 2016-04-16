@@ -8,26 +8,28 @@ var dom = require('dom'),
     Gamepad = require('gamepad');
 
 function Field(data) {
-    this.elem = $('.field__cages', data.elem);
+    this.elem = data.elem;
+    this.cages = $('.field__cages', this.elem);
 
-    this.control = data.control;
     this.cols = data.cols;
     this.rows = data.rows;
     this.padding = 5;
+    this.levelData = data.levelData;
 
     this.field = [];
 
     this.fieldCursor = new FieldCursor({
-        elem: $('.field-cursor', data.elem),
+        elem: $('.field-cursor', this.elem),
         hidden: true,
         cols: this.cols,
         rows: this.rows,
         padding: this.padding
     });
 
-    this.infoPanel = new InfoPanel(data.elem);
+    this.infoPanel = new InfoPanel(this.cages);
 
     this.setEvents();
+    this.setControl(data.control);
 }
 
 Field.prototype = {
@@ -42,11 +44,15 @@ Field.prototype = {
             }
         }.bind(this));
     },
+    setControl: function(type) {
+        this.control = type;
+        this.elem.dataset.control = type;
+    },
     isControl: function(type) {
-        return this.control === '*' || this.control === type;
+        return this.control === 'any' || this.control === type;
     },
     setMouseEvents: function() {
-        $.delegate(this.elem, '.cage__front', 'mousedown', function(e) {
+        $.delegate(this.cages, '.cage__front', 'mousedown', function(e) {
             if (!this.isControl('mouse')) {
                 return;
             }
@@ -132,7 +138,7 @@ Field.prototype = {
                     ]
                 });
 
-                this.elem.appendChild(cage);
+                this.cages.appendChild(cage);
             }
         }
     },
@@ -155,8 +161,7 @@ Field.prototype = {
         this.fieldCursor.size(size.width, size.height, this.padding);
     },
     getLevelSymbols: function() {
-        var level = this._level,
-            syms = levels[level].symbols,
+        var syms = this.levelData.symbols,
             size = this.cols * this.rows,
             halfSize = size / 2,
             buf = [];
@@ -170,8 +175,8 @@ Field.prototype = {
         return buf.concat(buf).shuffle();
     },
     getSize: function() {
-        var width = Math.floor(this.elem.offsetWidth / this.cols) - this.padding,
-            height = Math.floor(this.elem.offsetHeight / this.rows) - this.padding;
+        var width = Math.floor(this.cages.offsetWidth / this.cols) - this.padding,
+            height = Math.floor(this.cages.offsetHeight / this.rows) - this.padding;
 
         return {
             width: width,
@@ -180,11 +185,12 @@ Field.prototype = {
         };
     },
     findCage: function(x, y) {
-        var cages = $$('.cage', this.elem);
+        var cages = $$('.cage', this.cages);
         for (var i = 0; i < cages.length; i++) {
             var cage = cages[i];
             var ds = cage.dataset;
-            if (x === ds.x && y === ds.y) {
+
+            if (String(x) === String(ds.x) && String(y) === String(ds.y)) {
                 return cage;
             }
         }
@@ -257,7 +263,7 @@ Field.prototype = {
             this.infoPanel.update();
 
             setTimeout(function() {
-                this.elem.removeChild(cage);
+                this.cages.removeChild(cage);
             }.bind(this), 200);
 
             if (!this.infoPanel.cages) {
@@ -289,16 +295,15 @@ Field.prototype = {
     },
     finish: function() {
         var maxLevel = Settings.get('maxLevel');
-        Settings.set('maxLevel', Math.max(maxLevel, Settings.level + 1));
+        Settings.set('maxLevel', Math.max(maxLevel, Settings.get('level') + 1));
 
         this.infoPanel.stop();
     },
     show: function() {
-        this.elem.innerHTML = '';
+        this.cages.innerHTML = '';
         this._openedCages = [];
-        this._level = Settings.get('level');
 
-        this.infoPanel.start(this._level, this.cols * this.rows);
+        this.infoPanel.start(this.levelData, this.cols * this.rows);
         this.initField();
         this.addCages();
         this.resizeCages();

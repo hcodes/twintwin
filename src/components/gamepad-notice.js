@@ -1,7 +1,6 @@
 var $ = require('dom').$,
     Gamepad = require('gamepad'),
     body = document.body;
-
 module.exports = {
     init: function() {
         this.build();
@@ -42,7 +41,7 @@ module.exports = {
     },
     timeout: 3000,
     showDisconnected: function() {
-        var cl = 'gamepad-disconnected_show',
+        var cl = 'gamepad-notice-disconnected_show',
             el = this._elemDisconnected;
 
         el.classList.add(cl);
@@ -58,7 +57,7 @@ module.exports = {
         }.bind(this), this.timeout);
     },
     showConnected: function() {
-        var cl = 'gamepad-connected_show',
+        var cl = 'gamepad-notice-connected_show',
             el = this._elemConnected;
 
         el.classList.add(cl);

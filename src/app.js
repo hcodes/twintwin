@@ -3,6 +3,7 @@ var dom = require('dom'),
     Gamepad = require('gamepad'),
     GamepadNotice = require('gamepad-notice'),
     Page = require('page'),
+    metrika = require('metrika'),
     body = document.body;
 
 require('array');
@@ -50,4 +51,6 @@ $.on(document, 'DOMContentLoaded', function() {
         require('select-level')
     ]);
     App.init();
+    
+    metrika.hit(35250605);
 });

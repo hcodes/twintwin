@@ -115,7 +115,7 @@ var dom = require('dom'),
     Gamepad = require('gamepad'),
     GamepadNotice = require('gamepad-notice'),
     Page = require('page'),
-    jstohtml = require('jstohtml'),
+    metrika = require('metrika'),
     body = document.body;
 
 require('array');
@@ -163,9 +163,11 @@ $.on(document, 'DOMContentLoaded', function() {
         require('select-level')
     ]);
     App.init();
+    
+    metrika.hit(35250605);
 });
 
-},{"array":11,"dom":13,"function":15,"game":17,"gamepad":6,"gamepad-notice":5,"jstohtml":1,"main":18,"multiplayer":19,"page":20,"select-level":21}],3:[function(require,module,exports){
+},{"array":11,"dom":13,"function":15,"game":17,"gamepad":6,"gamepad-notice":5,"main":18,"metrika":9,"multiplayer":19,"page":20,"select-level":21}],3:[function(require,module,exports){
 var $ = require('dom').$;
 
 function FieldCursor(data) {
@@ -292,26 +294,28 @@ var dom = require('dom'),
     Gamepad = require('gamepad');
 
 function Field(data) {
-    this.elem = $('.field__cages', data.elem);
+    this.elem = data.elem;
+    this.cages = $('.field__cages', this.elem);
 
-    this.control = data.control;
     this.cols = data.cols;
     this.rows = data.rows;
     this.padding = 5;
+    this.levelData = data.levelData;
 
     this.field = [];
 
     this.fieldCursor = new FieldCursor({
-        elem: $('.field-cursor', data.elem),
+        elem: $('.field-cursor', this.elem),
         hidden: true,
         cols: this.cols,
         rows: this.rows,
         padding: this.padding
     });
 
-    this.infoPanel = new InfoPanel(data.elem);
+    this.infoPanel = new InfoPanel(this.cages);
 
     this.setEvents();
+    this.setControl(data.control);
 }
 
 Field.prototype = {
@@ -326,11 +330,15 @@ Field.prototype = {
             }
         }.bind(this));
     },
+    setControl: function(type) {
+        this.control = type;
+        this.elem.dataset.control = type;
+    },
     isControl: function(type) {
-        return this.control === '*' || this.control === type;
+        return this.control === 'any' || this.control === type;
     },
     setMouseEvents: function() {
-        $.delegate(this.elem, '.cage__front', 'mousedown', function(e) {
+        $.delegate(this.cages, '.cage__front', 'mousedown', function(e) {
             if (!this.isControl('mouse')) {
                 return;
             }
@@ -416,7 +424,7 @@ Field.prototype = {
                     ]
                 });
 
-                this.elem.appendChild(cage);
+                this.cages.appendChild(cage);
             }
         }
     },
@@ -439,13 +447,12 @@ Field.prototype = {
         this.fieldCursor.size(size.width, size.height, this.padding);
     },
     getLevelSymbols: function() {
-        var level = this._level,
-            syms = levels[level].symbols,
+        var syms = this.levelData.symbols,
             size = this.cols * this.rows,
             halfSize = size / 2,
             buf = [];
 
-        while(halfSize > buf.length) {
+        while (halfSize > buf.length) {
             buf = buf.concat(syms);
         }
 
@@ -454,21 +461,22 @@ Field.prototype = {
         return buf.concat(buf).shuffle();
     },
     getSize: function() {
-        var width = Math.floor(this.elem.offsetWidth / this.cols) - this.padding,
-            height = Math.floor(this.elem.offsetHeight / this.rows) - this.padding;
+        var width = Math.floor(this.cages.offsetWidth / this.cols) - this.padding,
+            height = Math.floor(this.cages.offsetHeight / this.rows) - this.padding;
 
         return {
             width: width,
             height: height,
             fontSize: height * 0.8
-        }
+        };
     },
     findCage: function(x, y) {
-        var cages = $$('.cage', this.elem);
+        var cages = $$('.cage', this.cages);
         for (var i = 0; i < cages.length; i++) {
             var cage = cages[i];
             var ds = cage.dataset;
-            if (x == ds.x && y == ds.y) {
+
+            if (String(x) === String(ds.x) && String(y) === String(ds.y)) {
                 return cage;
             }
         }
@@ -541,7 +549,7 @@ Field.prototype = {
             this.infoPanel.update();
 
             setTimeout(function() {
-                this.elem.removeChild(cage);
+                this.cages.removeChild(cage);
             }.bind(this), 200);
 
             if (!this.infoPanel.cages) {
@@ -573,16 +581,15 @@ Field.prototype = {
     },
     finish: function() {
         var maxLevel = Settings.get('maxLevel');
-        Settings.set('maxLevel', Math.max(maxLevel, Settings.level + 1));
+        Settings.set('maxLevel', Math.max(maxLevel, Settings.get('level') + 1));
 
         this.infoPanel.stop();
     },
     show: function() {
-        this.elem.innerHTML = '';
+        this.cages.innerHTML = '';
         this._openedCages = [];
-        this._level = Settings.get('level');
 
-        this.infoPanel.start(this._level, this.cols * this.rows);
+        this.infoPanel.start(this.levelData, this.cols * this.rows);
         this.initField();
         this.addCages();
         this.resizeCages();
@@ -603,11 +610,10 @@ Field.prototype = {
 
 module.exports = Field;
 
-},{"dom":13,"field-cursor":3,"gamepad":6,"info-panel":7,"levels":9,"settings":10}],5:[function(require,module,exports){
+},{"dom":13,"field-cursor":3,"gamepad":6,"info-panel":7,"levels":8,"settings":10}],5:[function(require,module,exports){
 var $ = require('dom').$,
     Gamepad = require('gamepad'),
     body = document.body;
-
 module.exports = {
     init: function() {
         this.build();
@@ -636,19 +642,19 @@ module.exports = {
     },
     setEvents: function() {
         Gamepad.on('connected', function() {
-            this.showConnected(e);
+            this.showConnected();
         }.bind(this));
 
         Gamepad.on('disconnected', function() {
-            this.showDisconnected(e);
+            this.showDisconnected();
         }.bind(this));
 
         body.appendChild(this._elemConnected);
         body.appendChild(this._elemDisconnected);
     },
     timeout: 3000,
-    showDisconnected: function(e) {
-        var cl = 'gamepad-disconnected_show',
+    showDisconnected: function() {
+        var cl = 'gamepad-notice-disconnected_show',
             el = this._elemDisconnected;
 
         el.classList.add(cl);
@@ -663,8 +669,8 @@ module.exports = {
             this._disTimer = null;
         }.bind(this), this.timeout);
     },
-    showConnected: function(e) {
-        var cl = 'gamepad-connected_show',
+    showConnected: function() {
+        var cl = 'gamepad-notice-connected_show',
             el = this._elemConnected;
 
         el.classList.add(cl);
@@ -753,13 +759,13 @@ module.exports = {
     // Gamepad: XBox360
     buttonName: {
         green: 0,
-        x: 0,
-
+        a: 0,
+        
         red: 1,
         b: 1,
 
         yellow: 3,
-        a: 3,
+        v: 3,
 
         blue: 2,
         x: 2,
@@ -831,7 +837,7 @@ module.exports = {
 
 },{"dom":13,"event":14,"raf":16}],7:[function(require,module,exports){
 var $ = require('dom').$,
-    lutils = require('level-utils'),
+    levels = require('levels'),
     dtime = require('date-time');
 
 function InfoPanel(container) {
@@ -864,7 +870,7 @@ InfoPanel.prototype = {
                     cl: 'info-panel__cages',
                     t: 'span',
                     c: [
-                        'Time: ',
+                        'Cages: ',
                         {
                             t: 'span',
                             cl: 'info-panel__cages-num'
@@ -896,12 +902,12 @@ InfoPanel.prototype = {
     updatePart: function(name, value) {
         $('.info-panel__' + name, this._elem).innerHTML = value;
     },
-    start: function(level, cages) {
+    start: function(levelData, cages) {
         this.stop();
 
         this.clicks = 0;
         this.cages = cages;
-        this.levelTitle = lutils.levelTitle(level);
+        this.levelTitle = levels.getTitle(levelData);
         this.startTime = Date.now();
 
         this.update();
@@ -913,324 +919,339 @@ InfoPanel.prototype = {
         this._timer && clearInterval(this._timer);
         this._timer = null;
     }
-}
+};
 
 module.exports = InfoPanel;
 
-},{"date-time":12,"dom":13,"level-utils":8}],8:[function(require,module,exports){
-var levels = require('levels');
-
+},{"date-time":12,"dom":13,"levels":8}],8:[function(require,module,exports){
 module.exports = {
-    levelTitle: function(level) {
-        var levelObj = levels[level];
-        return this.levelSymbol(level) + ' ' + levelObj.name;
+    getTitle: function(levelData) {
+        return levelData.titleSymbol + ' ' + levelData.name;
     },
-    levelSymbol: function(level) {
-        var levelObj = levels[level];
-        return levelObj.titleSymbol;
-    }
+    getLevel: function(n) {
+        return this.data[n];
+    },
+    getRandomLevel: function() {
+        var n = Math.floor(1 + Math.random() * (this.data.length - 1));
+        return this.getLevel(n);
+    },
+    data: [
+        {
+            name: '',
+            symbols: []
+        },
+        {
+            name: 'Flowers and trees',
+            titleSymbol: '💐',
+            symbols: [
+                '💐',
+                '🌸',
+                '🌷',
+                '🍀',
+                '🌹',
+                '🌻',
+                '🌺',
+                '🍁',
+                '🍃',
+                '🍂',
+                '🌿',
+                '🌾',
+                '🌵',
+                '🌴',
+                '🌲',
+                '🌳',
+                '🌰',
+                '🌼',
+                '💮'
+            ]
+        },
+        {
+            name: 'Fruits and vegetables',
+            titleSymbol: '🍏',
+            symbols: [
+                '🌰',
+                '🌱',
+                '🍎',
+                '🍏',
+                '🍊',
+                '🍋',
+                '🍒',
+                '🍇',
+                '🍉',
+                '🍓',
+                '🍑',
+                '🍈',
+                '🍌',
+                '🍐',
+                '🍍',
+                '🍠',
+                '🍆',
+                '🍅',
+                '🌽'
+            ]
+        },
+        {
+            name: 'Zodiac Signs',
+            titleSymbol: '♋',
+            symbols: [
+                '♈',
+                '♉',
+                '♊',
+                '♋',
+                '♌',
+                '♍',
+                '♎',
+                '♏',
+                '♐',
+                '♑',
+                '♒',
+                '♓',
+                '⛎'
+            ]
+        },
+        {
+            name: 'Accessories',
+            titleSymbol: '👛',
+            symbols: [
+                '👑',
+                '💼',
+                '👜',
+                '👝',
+                '👛',
+                '👓',
+                '🎀',
+                '🌂',
+                '💄'
+            ]
+        },
+        {
+            name: 'Fashion',
+            titleSymbol: '👗',
+            symbols: [
+                '🎩',
+                '👒',
+                '👟',
+                '👞',
+                '👡',
+                '👠',
+                '👢',
+                '👕',
+                '👔',
+                '👚',
+                '👗',
+                '🎽',
+                '👖',
+                '👘',
+                '👙'
+            ]
+        },
+        {
+            name: 'Buildings',
+            titleSymbol: '🏢',
+            symbols: [
+                '🏠',
+                '🏡',
+                '🏫',
+                '🏢',
+                '🏣',
+                '🏥',
+                '🏦',
+                '🏪',
+                '🏩',
+                '🏨',
+                '💒',
+                '⛪',
+                '🏬',
+                '🏤',
+                '🌇',
+                '🌆',
+                '🏯',
+                '🏰',
+                '⛺',
+                '🏭',
+                '🗼',
+                '🗾',
+                '🗻',
+                '🌄',
+                '🌅',
+                '🌃',
+                '🗽',
+                '🌉',
+                '🎠',
+                '🎡',
+                '⛲',
+                '🎢'
+            ]
+        },
+        {
+            name: 'Trains',
+            titleSymbol: '🚄',
+            symbols: [
+                '🚂',
+                '🚊',
+                '🚉',
+                '🚞',
+                '🚆',
+                '🚄',
+                '🚅',
+                '🚈',
+                '🚇',
+                '🚝',
+                '🚋',
+                '🚃'
+            ]
+        },
+        {
+            name: 'Hand Signs',
+            titleSymbol: '👌',
+            bg: false,
+            symbols: [
+                '👍',
+                '👎',
+                '👌',
+                '👊',
+                '✊',
+                '✌',
+                '👋',
+                '✋',
+                '👐',
+                '👆',
+                '👇',
+                '👉',
+                '👈',
+                '🙌',
+                '🙏',
+                '☝',
+                '👏',
+                '💪'
+            ]
+        },
+        {
+            name: 'Arrows',
+            titleSymbol: '↗',
+            bg: false,
+            symbols: [
+                '⬇',
+                '⬅',
+                '➡',
+                '↗',
+                '↖',
+                '↘',
+                '↙',
+                '↔',
+                '↕',
+                '🔄',
+                '◀',
+                '▶',
+                '🔼',
+                '🔽',
+                '↩',
+                '↪',
+                '⏪',
+                '⏩',
+                '⏫',
+                '⏬',
+                '⤵',
+                '⤴',
+                '🔀',
+                '🔃',
+                '🔺',
+                '🔻',
+                '⬆'
+            ]
+        },
+        {
+            name: 'Technology',
+            titleSymbol: '📀',
+            symbols: [
+                '🎥',
+                '📷',
+                '📹',
+                '📼',
+                '💿',
+                '📀',
+                '💽',
+                '💾',
+                '💻',
+                '📱',
+                '☎',
+                '📞',
+                '📟',
+                '📠',
+                '📡',
+                '📺',
+                '📻'
+            ]
+        },
+        {
+            name: 'Sport',
+            titleSymbol: '🏀',
+            symbols: [
+                '🎯',
+                '🏈',
+                '🏀',
+                '⚽',
+                '⚾',
+                '🎾',
+                '🎱',
+                '🏉',
+                '🎳',
+                '⛳',
+                '🚵',
+                '🚴',
+                '🏁',
+                '🏇',
+                '🏆',
+                '🎿',
+                '🏂',
+                '🏊',
+                '🏄',
+                '🎣'
+            ]
+        },
+        {
+            name: 'Games and Hobbies',
+            titleSymbol: '🎨',
+            symbols: [
+                '🎨',
+                '🎬',
+                '🎤',
+                '🎧',
+                '🎼',
+                '🎵',
+                '🎶',
+                '🎹',
+                '🎻',
+                '🎺',
+                '🎷',
+                '🎸',
+                '👾',
+                '🎮',
+                '🃏',
+                '🎴',
+                '🀄',
+                '🎲'
+            ]
+        }
+    ]
 };
 
-},{"levels":9}],9:[function(require,module,exports){
-module.exports = [
-    {
-        name: '',
-        symbols: []
-    },
-    {
-        name: 'Flowers and trees',
-        titleSymbol: '💐',
-        symbols: [
-            '💐',
-            '🌸',
-            '🌷',
-            '🍀',
-            '🌹',
-            '🌻',
-            '🌺',
-            '🍁',
-            '🍃',
-            '🍂',
-            '🌿',
-            '🌾',
-            '🌵',
-            '🌴',
-            '🌲',
-            '🌳',
-            '🌰',
-            '🌼',
-            '💮'
-        ]
-    },
-    {
-        name: 'Fruits and vegetables',
-        titleSymbol: '🍏',
-        symbols: [
-            '🌰',
-            '🌱',
-            '🍎',
-            '🍏',
-            '🍊',
-            '🍋',
-            '🍒',
-            '🍇',
-            '🍉',
-            '🍓',
-            '🍑',
-            '🍈',
-            '🍌',
-            '🍐',
-            '🍍',
-            '🍠',
-            '🍆',
-            '🍅',
-            '🌽'
-        ]
-    },
-    {
-        name: 'Zodiac Signs',
-        titleSymbol: '♋',
-        symbols: [
-            '♈',
-            '♉',
-            '♊',
-            '♋',
-            '♌',
-            '♍',
-            '♎',
-            '♏',
-            '♐',
-            '♑',
-            '♒',
-            '♓',
-            '⛎'
-        ]
-    },
-    {
-        name: 'Accessories',
-        titleSymbol: '👛',
-        symbols: [
-            '👑',
-            '💼',
-            '👜',
-            '👝',
-            '👛',
-            '👓',
-            '🎀',
-            '🌂',
-            '💄'
-        ]
-    },
-    {
-        name: 'Fashion',
-        titleSymbol: '👗',
-        symbols: [
-            '🎩',
-            '👒',
-            '👟',
-            '👞',
-            '👡',
-            '👠',
-            '👢',
-            '👕',
-            '👔',
-            '👚',
-            '👗',
-            '🎽',
-            '👖',
-            '👘',
-            '👙'
-        ]
-    },
-    {
-        name: 'Buildings',
-        titleSymbol: '🏢',
-        symbols: [
-            '🏠',
-            '🏡',
-            '🏫',
-            '🏢',
-            '🏣',
-            '🏥',
-            '🏦',
-            '🏪',
-            '🏩',
-            '🏨',
-            '💒',
-            '⛪',
-            '🏬',
-            '🏤',
-            '🌇',
-            '🌆',
-            '🏯',
-            '🏰',
-            '⛺',
-            '🏭',
-            '🗼',
-            '🗾',
-            '🗻',
-            '🌄',
-            '🌅',
-            '🌃',
-            '🗽',
-            '🌉',
-            '🎠',
-            '🎡',
-            '⛲',
-            '🎢'
-        ]
-    },
-    {
-        name: 'Trains',
-        titleSymbol: '🚄',
-        symbols: [
-            '🚂',
-            '🚊',
-            '🚉',
-            '🚞',
-            '🚆',
-            '🚄',
-            '🚅',
-            '🚈',
-            '🚇',
-            '🚝',
-            '🚋',
-            '🚃'
-        ]
-    },
-    {
-        name: 'Hand Signs',
-        titleSymbol: '👌',
-        bg: false,
-        symbols: [
-            '👍',
-            '👎',
-            '👌',
-            '👊',
-            '✊',
-            '✌',
-            '👋',
-            '✋',
-            '👐',
-            '👆',
-            '👇',
-            '👉',
-            '👈',
-            '🙌',
-            '🙏',
-            '☝',
-            '👏',
-            '💪'
-        ]
-    },
-    {
-        name: 'Arrows',
-        titleSymbol: '↗',
-        bg: false,
-        symbols: [
-            '⬇',
-            '⬅',
-            '➡',
-            '↗',
-            '↖',
-            '↘',
-            '↙',
-            '↔',
-            '↕',
-            '🔄',
-            '◀',
-            '▶',
-            '🔼',
-            '🔽',
-            '↩',
-            '↪',
-            '⏪',
-            '⏩',
-            '⏫',
-            '⏬',
-            '⤵',
-            '⤴',
-            '🔀',
-            '🔃',
-            '🔺',,
-            '🔻',
-            '⬆'
-        ]
-    },
-    {
-        name: 'Technology',
-        titleSymbol: '📀',
-        symbols: [
-            '🎥',
-            '📷',
-            '📹',
-            '📼',
-            '💿',
-            '📀',
-            '💽',
-            '💾',
-            '💻',
-            '📱',
-            '☎',
-            '📞',
-            '📟',
-            '📠',
-            '📡',
-            '📺',
-            '📻'
-        ]
-    },
-    {
-        name: 'Sport',
-        titleSymbol: '🏀',
-        symbols: [
-            '🎯',
-            '🏈',
-            '🏀',
-            '⚽',
-            '⚾',
-            '🎾',
-            '🎱',
-            '🏉',
-            '🎳',
-            '⛳',
-            '🚵',
-            '🚴',
-            '🏁',
-            '🏇',
-            '🏆',
-            '🎿',
-            '🏂',
-            '🏊',
-            '🏄',
-            '🎣'
-        ]
-    },
-    {
-        name: 'Games and Hobbies',
-        titleSymbol: '🎨',
-        symbols: [
-            '🎨',
-            '🎬',
-            '🎤',
-            '🎧',
-            '🎼',
-            '🎵',
-            '🎶',
-            '🎹',
-            '🎻',
-            '🎺',
-            '🎷',
-            '🎸',
-            '👾',
-            '🎮',
-            '🃏',
-            '🎴',
-            '🀄',
-            '🎲'
-        ]
+},{}],9:[function(require,module,exports){
+// Yandex.Metrika
+function prepareParam(value) {
+    return window.encodeURIComponent((value || '').substr(0, 512));
+};
+
+module.exports = {
+    hit: function(id) {
+        var pageUrl = prepareParam(window.location.href),
+            pageRef = prepareParam(document.referrer);
+
+        new Image().src = 'https://mc.yandex.ru/watch/' + id +
+            '?page-url=' + pageUrl +
+            '&page-ref=' + pageRef;
     }
-];
+};
 
 },{}],10:[function(require,module,exports){
 module.exports = {
@@ -1267,7 +1288,7 @@ module.exports = {
 };
 
 },{}],11:[function(require,module,exports){
-Array.prototype.shuffle = function () {
+Array.prototype.shuffle = function() {
     var input = this;
     for (var i = input.length - 1; i > 0; i--) {
         var randomIndex = Math.floor(Math.random() * (i + 1));
@@ -1338,8 +1359,8 @@ $.off = function(el, type, callback) {
 
 $.extend = function(dest, source) {
     Object.keys(source).forEach(function(key) {
-        if(typeof dest[key] === 'undefined') {
-           dest[key] = source[key];
+        if (typeof dest[key] === 'undefined') {
+            dest[key] = source[key];
         }
     });
 
@@ -1372,13 +1393,15 @@ var hasSupportCss = (function() {
 
     return function(prop) {
 
-        if (prop in div.style) return true;
+        if (prop in div.style) {
+            return true;
+        }
 
         prop = prop.replace(/^[a-z]/, function(val) {
             return val.toUpperCase();
         });
 
-        while(len--) {
+        while (len--) {
             if (vendors[len] + prop in div.style) {
                 return true;
             }
@@ -1395,7 +1418,7 @@ module.exports = {
 };
 
 },{"jstohtml":1}],14:[function(require,module,exports){
-function Event() {};
+function Event() {}
 
 Event.prototype = {
     /*
@@ -1409,7 +1432,7 @@ Event.prototype = {
             this._eventBuffer = [];
         }
 
-        if(type && callback) {
+        if (type && callback) {
             this._eventBuffer.push({
                 type: type,
                 callback: callback
@@ -1427,8 +1450,8 @@ Event.prototype = {
     off: function(type, callback) {
         var buf = this._eventBuffer || [];
 
-        for(var i = 0; i < buf.length; i++) {
-            if(callback === buf[i].callback && type === buf[i].type) {
+        for (var i = 0; i < buf.length; i++) {
+            if (callback === buf[i].callback && type === buf[i].type) {
                 buf.splice(i, 1);
                 i--;
             }
@@ -1445,8 +1468,8 @@ Event.prototype = {
     trigger: function(type, data) {
         var buf = this._eventBuffer || [];
 
-        for(var i = 0; i < buf.length; i++) {
-            if(type === buf[i].type) {
+        for (var i = 0; i < buf.length; i++) {
+            if (type === buf[i].type) {
                 buf[i].callback.call(this, {type: type}, data);
             }
         }
@@ -1460,9 +1483,9 @@ module.exports = Event;
 
 },{}],15:[function(require,module,exports){
 // for iPad 1
-if(!Function.prototype.bind) {
+if (!Function.prototype.bind) {
     Function.prototype.bind = function(oThis) {
-        if(typeof this !== 'function') {
+        if (typeof this !== 'function') {
             throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
         }
 
@@ -1498,10 +1521,10 @@ for (x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
 }
 
 if (!window.requestAnimationFrame) {
-    window.requestAnimationFrame = function (callback, element) {
+    window.requestAnimationFrame = function(callback, element) {
         var currTime = new Date().getTime(),
             timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-            id = window.setTimeout(function () {
+            id = window.setTimeout(function() {
                 callback(currTime + timeToCall);
             }, timeToCall);
         lastTime = currTime + timeToCall;
@@ -1510,7 +1533,7 @@ if (!window.requestAnimationFrame) {
 }
 
 if (!window.cancelAnimationFrame) {
-    window.cancelAnimationFrame = function (id) {
+    window.cancelAnimationFrame = function(id) {
         window.clearTimeout(id);
     };
 }
@@ -1518,7 +1541,9 @@ if (!window.cancelAnimationFrame) {
 },{}],17:[function(require,module,exports){
 var $ = require('dom').$,
     Page = require('page'),
-    Field = require('field');
+    Settings = require('settings'),
+    Field = require('field'),
+    levels = require('levels');
 
 module.exports = {
     name: 'game',
@@ -1528,23 +1553,34 @@ module.exports = {
             elem: $('.field', '.game'),
             cols: 6,
             rows: 5,
-            control: '*',
+            levelData: levels.getLevel(Settings.get('level')),
+            control: 'any',
             infoPanel: true
         });
+        
+        this._onKeydown = this._onKeydown.bind(this);
 
-        $.on($('.game__exit', this._elem), 'mousedown', function() {
-            Page.show('select-level');
-        });
+        $.on($('.game__exit', this._elem), 'mousedown', this._onExit.bind(this));
+    },
+    _onKeydown: function(e) {
+        if (e.key === 'Escape') {
+            this._onExit();
+        }
+    },
+    _onExit: function() {
+        Page.show('select-level');
     },
     show: function() {
         this._field.show();
+        $.on(document, 'keydown', this._onKeydown);
     },
     hide: function() {
         this._field.hide();
+        $.off(document, 'keydown', this._onKeydown);
     }
 };
 
-},{"dom":13,"field":4,"page":20}],18:[function(require,module,exports){
+},{"dom":13,"field":4,"levels":8,"page":20,"settings":10}],18:[function(require,module,exports){
 var dom = require('dom'),
     $ = dom.$,
     $$ = dom.$$,
@@ -1597,7 +1633,7 @@ module.exports = {
     },
     getBackground: function() {
         var symbols = [];
-        levels.forEach(function(level) {
+        levels.data.forEach(function(level) {
             if (level.bg !== false) {
                 symbols = symbols.concat(level.symbols);
             }
@@ -1628,61 +1664,86 @@ module.exports = {
         }
 
         this._timer = setInterval(function() {
-            var elems = $$('.main-emoji'),
-                threshold = 0.1;
+            this.setOpacity(function() {
+                return 0.1 + Math.random() * 0.4;
+            });
+        }.bind(this), 1000);
+    },
+    setOpacity: function(callback) {
+        var elems = $$('.main-emoji');
 
-            for (var i = 0; i < elems.length; i++) {
-                elems[i].style.opacity = threshold + Math.random() * 0.4;
-            }
-        }, 1000);
+        for (var i = 0; i < elems.length; i++) {
+            elems[i].style.opacity = typeof callback === 'function' ? callback() : callback;
+        }
     },
     hide: function() {
         this._timer && clearInterval(this._timer);
         this._timer = null;
+
+        this.setOpacity(0);
     }
 };
 
-},{"dom":13,"jstohtml":1,"levels":9,"page":20,"settings":10}],19:[function(require,module,exports){
+},{"dom":13,"jstohtml":1,"levels":8,"page":20,"settings":10}],19:[function(require,module,exports){
 var $ = require('dom').$,
     Field = require('field'),
-    Page = require('page');
+    Page = require('page'),
+    levels = require('levels');
 
 module.exports = {
     name: 'multiplayer',
     locationHash: 'multiplayer',
     init: function(data) {
-        var context = $('.multiplayer');
+        var context = $('.multiplayer'),
+            levelData = levels.getRandomLevel();
+            
         this._fieldOne = new Field({
             elem: $('.field_one', context),
             cols: 6,
             rows: 5,
-            control: 'mouse',
-            infoPanel: true
+            levelData: levelData,
+            control: 'keyboard',
+            infoPanel: false
         });
 
         this._fieldTwo = new Field({
             elem: $('.field_two', context),
             cols: 6,
             rows: 5,
-            control: 'keyboard',
-            infoPanel: true
+            levelData: levelData,
+            control: 'gamepad',
+            infoPanel: false
         });
 
         $.on($('.multiplayer__exit', this._elem), 'mousedown', function() {
             Page.show('select-level');
         });
+
+        this._onKeydown = this._onKeydown.bind(this);
+    },
+    _onKeydown: function(e) {
+        if (e.key === 'Escape') {
+            this._onExit();
+        }
+    },
+    _onExit: function() {
+        Page.show('select-level');
     },
     show: function() {
         this._fieldOne.show();
         this._fieldTwo.show();
+
+        $.on(document, 'keydown', this._onKeydown);
     },
     hide: function() {
         this._fieldOne.hide();
         this._fieldTwo.hide();
+
+        $.off(document, 'keydown', this._onKeydown);
     }
 };
 
-},{"dom":13,"field":4,"page":20}],20:[function(require,module,exports){
+},{"dom":13,"field":4,"levels":8,"page":20}],20:[function(require,module,exports){
 var body = document.body;
 
 module.exports =  {
@@ -1753,7 +1814,6 @@ module.exports =  {
 var $ = require('dom').$,
     jstohtml = require('jstohtml'),
     levels = require('levels'),
-    lutils = require('level-utils'),
     Settings = require('settings'),
     Page = require('page');
 
@@ -1784,7 +1844,7 @@ module.exports = {
         var html = [],
             maxLevel = Settings.get('maxLevel');
 
-        levels.forEach(function(level, i) {
+        levels.data.forEach(function(levelData, i) {
             if (!i) {
                 return;
             }
@@ -1803,9 +1863,9 @@ module.exports = {
                         {
                             t: 'span',
                             cl: 'select-level__emoji emoji',
-                            c: lutils.levelSymbol(i)
+                            c: levelData.titleSymbol
                         },
-                        level.name
+                        levelData.name
                     ]
                 }
             });
@@ -1817,4 +1877,4 @@ module.exports = {
     hide: function() {}
 };
 
-},{"dom":13,"jstohtml":1,"level-utils":8,"levels":9,"page":20,"settings":10}]},{},[2]);
+},{"dom":13,"jstohtml":1,"levels":8,"page":20,"settings":10}]},{},[2]);
