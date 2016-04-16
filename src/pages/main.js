@@ -50,7 +50,7 @@ module.exports = {
     },
     getBackground: function() {
         var symbols = [];
-        levels.forEach(function(level) {
+        levels.data.forEach(function(level) {
             if (level.bg !== false) {
                 symbols = symbols.concat(level.symbols);
             }
@@ -81,16 +81,22 @@ module.exports = {
         }
 
         this._timer = setInterval(function() {
-            var elems = $$('.main-emoji'),
-                threshold = 0.1;
+            this.setOpacity(function() {
+                return 0.1 + Math.random() * 0.4;
+            });
+        }.bind(this), 1000);
+    },
+    setOpacity: function(callback) {
+        var elems = $$('.main-emoji');
 
-            for (var i = 0; i < elems.length; i++) {
-                elems[i].style.opacity = threshold + Math.random() * 0.4;
-            }
-        }, 1000);
+        for (var i = 0; i < elems.length; i++) {
+            elems[i].style.opacity = typeof callback === 'function' ? callback() : callback;
+        }
     },
     hide: function() {
         this._timer && clearInterval(this._timer);
         this._timer = null;
+
+        this.setOpacity(0);
     }
 };

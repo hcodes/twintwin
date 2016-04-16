@@ -1,7 +1,6 @@
 var $ = require('dom').$,
     jstohtml = require('jstohtml'),
     levels = require('levels'),
-    lutils = require('level-utils'),
     Settings = require('settings'),
     Page = require('page');
 
@@ -32,7 +31,7 @@ module.exports = {
         var html = [],
             maxLevel = Settings.get('maxLevel');
 
-        levels.forEach(function(level, i) {
+        levels.data.forEach(function(levelData, i) {
             if (!i) {
                 return;
             }
@@ -51,9 +50,9 @@ module.exports = {
                         {
                             t: 'span',
                             cl: 'select-level__emoji emoji',
-                            c: lutils.levelSymbol(i)
+                            c: levelData.titleSymbol
                         },
-                        level.name
+                        levelData.name
                     ]
                 }
             });
