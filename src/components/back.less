@@ -1,0 +1,37 @@
+.back
+{
+    font-size: 40px;
+    line-height: 20px;
+
+    position: fixed;
+    top: 5px;
+    right: 5px;
+
+    width: 20px;
+    height: 20px;
+    padding: 5px;
+
+    cursor: pointer;
+    -moz-user-select: none;
+         user-select: none;
+    text-align: center;
+    vertical-align: middle;
+
+    color: white;
+    border-radius: 100%;
+    background: rgba(255, 255, 255, .1);
+
+    -webkit-tap-highlight-color: transparent;
+    
+    display: none;
+}
+
+.back_visible
+{
+    display: block;
+}
+
+body.input_mouse .back:hover
+{
+    opacity: .8;
+}

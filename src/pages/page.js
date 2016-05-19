@@ -1,6 +1,11 @@
+var customEvent = require('event');
 var body = document.body;
 
-module.exports =  {
+var Page =  {
+    back: function() {
+        window.history.back();
+        this.showByLocationHash();
+    },
     add: function(pages) {
         if (Array.isArray(pages)) {
             pages.forEach(function(page) {
@@ -15,6 +20,9 @@ module.exports =  {
     },
     get: function(name) {
         return this.buffer[name];
+    },
+    has: function(name) {
+        return Boolean(this.get(name));
     },
     show: function(name, data) {
         var oldName = null;
@@ -34,14 +42,19 @@ module.exports =  {
         body.classList.add('page_' + name);
         page.show(data);
 
-        if (page.locationHash !== undefined) {
+        if (page.locationHash !== undefined && window.location.hash !== '#' + page.locationHash) {
             window.location.hash = page.locationHash;
         }
 
         this.current = page;
+        
+        this.trigger('show', page);
     },
     hide: function(name) {
         this.get(name).hide();
+    },
+    showByLocationHash: function() {
+        this.show(this. getNameByLocationHash(window.location.hash));
     },
     getNameByLocationHash: function(hash) {
         var name;
@@ -63,3 +76,7 @@ module.exports =  {
     current: null,
     buffer: {}
 };
+
+Object.assign(Page, customEvent.prototype);
+
+module.exports = Page;

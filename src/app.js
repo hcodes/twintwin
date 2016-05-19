@@ -3,10 +3,12 @@ var dom = require('dom'),
     Gamepad = require('gamepad'),
     GamepadNotice = require('gamepad-notice'),
     Page = require('page'),
+    Back = require('back'),
     metrika = require('metrika'),
     body = document.body;
 
 require('array');
+require('object');
 require('function');
 
 var App = {
@@ -27,9 +29,17 @@ var App = {
 
         this.setInputType('mouse');
 
-        Page.show(
-            Page.getNameByLocationHash(window.location.hash)
-        );
+        Page.showByLocationHash();
+
+        this._back = new Back(body);
+        
+        Page.on('show', function(e, page) {
+            if (page.name === 'main') {
+                this._back.hide();
+            } else {
+                this._back.show();
+            }
+        }.bind(this));
     },
     inputType: null,
     setInputType: function(type) {
@@ -51,6 +61,6 @@ $.on(document, 'DOMContentLoaded', function() {
         require('select-level')
     ]);
     App.init();
-    
+
     metrika.hit(35250605);
 });

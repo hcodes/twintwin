@@ -115,10 +115,12 @@ var dom = require('dom'),
     Gamepad = require('gamepad'),
     GamepadNotice = require('gamepad-notice'),
     Page = require('page'),
+    Back = require('back'),
     metrika = require('metrika'),
     body = document.body;
 
 require('array');
+require('object');
 require('function');
 
 var App = {
@@ -139,9 +141,17 @@ var App = {
 
         this.setInputType('mouse');
 
-        Page.show(
-            Page.getNameByLocationHash(window.location.hash)
-        );
+        Page.showByLocationHash();
+
+        this._back = new Back(body);
+        
+        Page.on('show', function(e, page) {
+            if (page.name === 'main') {
+                this._back.hide();
+            } else {
+                this._back.show();
+            }
+        }.bind(this));
     },
     inputType: null,
     setInputType: function(type) {
@@ -163,11 +173,40 @@ $.on(document, 'DOMContentLoaded', function() {
         require('select-level')
     ]);
     App.init();
-    
+
     metrika.hit(35250605);
 });
 
-},{"array":11,"dom":13,"function":15,"game":17,"gamepad":6,"gamepad-notice":5,"main":18,"metrika":9,"multiplayer":19,"page":20,"select-level":21}],3:[function(require,module,exports){
+},{"array":13,"back":3,"dom":15,"function":17,"game":21,"gamepad":7,"gamepad-notice":6,"main":22,"metrika":10,"multiplayer":23,"object":18,"page":24,"select-level":25}],3:[function(require,module,exports){
+var $ = require('dom').$,
+    Page = require('page');
+
+function Back(container) {
+    this.elem = $.js2dom({
+        cl: 'back',
+        c: '&times;'
+    });
+
+    container.appendChild(this.elem);
+
+    $.on(this.elem, 'click', this.onclick.bind(this));
+}
+
+Back.prototype = {
+    show: function() {
+        this.elem.classList.add('back_visible');
+    },
+    hide: function() {
+        this.elem.classList.remove('back_visible');
+    },
+    onclick: function() {
+        Page.back();
+    }
+};
+
+module.exports = Back;
+
+},{"dom":15,"page":24}],4:[function(require,module,exports){
 var $ = require('dom').$;
 
 function FieldCursor(data) {
@@ -177,7 +216,7 @@ function FieldCursor(data) {
     this.height = data.height;
 
     this.padding = data.padding;
-    
+
     this.cols = data.cols;
     this.rows = data.rows;
 
@@ -232,7 +271,7 @@ FieldCursor.prototype = {
         if (x > this.cols - 1) {
             x = this.cols - 1;
         }
-        
+
         if (x < 0) {
             x = 0;
         }
@@ -276,6 +315,12 @@ FieldCursor.prototype = {
             y: this.y
         };
     },
+    reset: function() {
+        this.x = 0;
+        this.y = 0;
+
+        !this.hidden && this.update();
+    },
     destroy: function() {
         this.elem = null;
     }
@@ -283,7 +328,7 @@ FieldCursor.prototype = {
 
 module.exports = FieldCursor;
 
-},{"dom":13}],4:[function(require,module,exports){
+},{"dom":15}],5:[function(require,module,exports){
 var dom = require('dom'),
     $ = dom.$,
     $$ = dom.$$,
@@ -610,7 +655,7 @@ Field.prototype = {
 
 module.exports = Field;
 
-},{"dom":13,"field-cursor":3,"gamepad":6,"info-panel":7,"levels":8,"settings":10}],5:[function(require,module,exports){
+},{"dom":15,"field-cursor":4,"gamepad":7,"info-panel":8,"levels":9,"settings":11}],6:[function(require,module,exports){
 var $ = require('dom').$,
     Gamepad = require('gamepad'),
     body = document.body;
@@ -687,7 +732,7 @@ module.exports = {
     }
 };
 
-},{"dom":13,"gamepad":6}],6:[function(require,module,exports){
+},{"dom":15,"gamepad":7}],7:[function(require,module,exports){
 var $ = require('dom').$,
     Event = require('event');
 
@@ -835,7 +880,7 @@ module.exports = {
     _pads: []
 };
 
-},{"dom":13,"event":14,"raf":16}],7:[function(require,module,exports){
+},{"dom":15,"event":16,"raf":19}],8:[function(require,module,exports){
 var $ = require('dom').$,
     levels = require('levels'),
     dtime = require('date-time');
@@ -923,7 +968,7 @@ InfoPanel.prototype = {
 
 module.exports = InfoPanel;
 
-},{"date-time":12,"dom":13,"levels":8}],8:[function(require,module,exports){
+},{"date-time":14,"dom":15,"levels":9}],9:[function(require,module,exports){
 module.exports = {
     getTitle: function(levelData) {
         return levelData.titleSymbol + ' ' + levelData.name;
@@ -1236,7 +1281,7 @@ module.exports = {
     ]
 };
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // Yandex.Metrika
 function prepareParam(value) {
     return window.encodeURIComponent((value || '').substr(0, 512));
@@ -1253,20 +1298,20 @@ module.exports = {
     }
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = {
     set: function(name, value) {
         this._buffer[name] = value;
         this._save();
     },
-    get: function(name, defValue) {
+    get: function(name, defaultValue) {
         if (!this._isLoaded) {
             this._load();
             this._isLoaded = true;
         }
 
         var value = this._buffer[name];
-        return value === undefined ? defValue : value;
+        return value === undefined ? defaultValue : value;
     },
     lsName: 'de',
     _buffer: {},
@@ -1287,7 +1332,51 @@ module.exports = {
     }
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
+var Settings = require('settings'),
+    $ = require('dom').$,
+    string = require('string');
+
+function UserPanel(container, data) {
+    this.container = container;
+
+    this.num = data.num;
+    this.settingName = 'player' + data.num;
+    this.name = this.getUserName(data.name);
+    
+    this.init();
+}
+
+UserPanel.prototype = {
+    init: function() {
+        this.elem = $.js2dom({
+            cl: 'user-panel',
+            c: this.name
+        });
+        
+
+        this.container.appendChild(this.elem);
+        this.setEvents();
+    },
+    setEvents: function() {
+        $.on(this.elem, 'click', this._onclick.bind(this));
+    },
+    getUserName: function(name) {
+        return name || Settings.get(this.settingName, 'Player ' + this.num);
+    },
+    _onclick: function() {
+        var result = window.prompt('Player name:');
+        if (result) {
+            this.name = this.getUserName(result);
+            this.elem.innerHTML = string.escapeHTML(this.name);
+            Settings.set(this.settingName, this.name);
+        }
+    }
+};
+
+module.exports = UserPanel;
+
+},{"dom":15,"settings":11,"string":20}],13:[function(require,module,exports){
 Array.prototype.shuffle = function() {
     var input = this;
     for (var i = input.length - 1; i > 0; i--) {
@@ -1299,7 +1388,7 @@ Array.prototype.shuffle = function() {
     return input;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = {
     leadZero: function(num) {
         return num < 10 ? '0' + num : num;
@@ -1313,7 +1402,7 @@ module.exports = {
     }
 };
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var jstohtml = require('jstohtml');
 
 var $ = function(el, context) {
@@ -1417,7 +1506,7 @@ module.exports = {
     hasSupportCss: hasSupportCss
 };
 
-},{"jstohtml":1}],14:[function(require,module,exports){
+},{"jstohtml":1}],16:[function(require,module,exports){
 function Event() {}
 
 Event.prototype = {
@@ -1481,7 +1570,7 @@ Event.prototype = {
 module.exports = Event;
 
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // for iPad 1
 if (!Function.prototype.bind) {
     Function.prototype.bind = function(oThis) {
@@ -1507,7 +1596,40 @@ if (!Function.prototype.bind) {
     };
 }
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
+if (!Object.assign) {
+  Object.defineProperty(Object, 'assign', {
+    enumerable: false,
+    configurable: true,
+    writable: true,
+    value: function(target, firstSource) {
+      'use strict';
+      if (target === undefined || target === null) {
+        throw new TypeError('Cannot convert first argument to object');
+      }
+
+      var to = Object(target);
+      for (var i = 1; i < arguments.length; i++) {
+        var nextSource = arguments[i];
+        if (nextSource === undefined || nextSource === null) {
+          continue;
+        }
+
+        var keysArray = Object.keys(Object(nextSource));
+        for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+          var nextKey = keysArray[nextIndex];
+          var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+          if (desc !== undefined && desc.enumerable) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+      return to;
+    }
+  });
+}
+
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var lastTime = 0,
@@ -1538,7 +1660,24 @@ if (!window.cancelAnimationFrame) {
     };
 }
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
+module.exports = {
+    escapeHTML: function(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    },
+    truncate: function(text, len) {
+        if(text) {
+            return text.length > len ? text.substr(0, len) : text;
+        }
+
+        return '';
+    }
+};
+
+},{}],21:[function(require,module,exports){
 var $ = require('dom').$,
     Page = require('page'),
     Settings = require('settings'),
@@ -1549,28 +1688,29 @@ module.exports = {
     name: 'game',
     locationHash: 'game',
     init: function(data) {
+        this.elem = $('.game');
+
+        this._levelData = levels.getLevel(Settings.get('level'));
+        
         this._field = new Field({
-            elem: $('.field', '.game'),
+            elem: $('.field', this.elem),
             cols: 6,
             rows: 5,
-            levelData: levels.getLevel(Settings.get('level')),
+            levelData: this._levelData,
             control: 'any',
             infoPanel: true
         });
         
         this._onKeydown = this._onKeydown.bind(this);
-
-        $.on($('.game__exit', this._elem), 'mousedown', this._onExit.bind(this));
     },
     _onKeydown: function(e) {
         if (e.key === 'Escape') {
-            this._onExit();
+            Page.back();
         }
     },
-    _onExit: function() {
-        Page.show('select-level');
-    },
     show: function() {
+        $('.level-title', this.elem).innerHTML = levels.getTitle(this._levelData);
+
         this._field.show();
         $.on(document, 'keydown', this._onKeydown);
     },
@@ -1580,7 +1720,7 @@ module.exports = {
     }
 };
 
-},{"dom":13,"field":4,"levels":8,"page":20,"settings":10}],18:[function(require,module,exports){
+},{"dom":15,"field":5,"levels":9,"page":24,"settings":11}],22:[function(require,module,exports){
 var dom = require('dom'),
     $ = dom.$,
     $$ = dom.$$,
@@ -1684,39 +1824,43 @@ module.exports = {
     }
 };
 
-},{"dom":13,"jstohtml":1,"levels":8,"page":20,"settings":10}],19:[function(require,module,exports){
+},{"dom":15,"jstohtml":1,"levels":9,"page":24,"settings":11}],23:[function(require,module,exports){
 var $ = require('dom').$,
     Field = require('field'),
-    Page = require('page'),
+    UserPanel = require('user-panel'),
     levels = require('levels');
 
 module.exports = {
     name: 'multiplayer',
     locationHash: 'multiplayer',
     init: function(data) {
-        var context = $('.multiplayer'),
-            levelData = levels.getRandomLevel();
-            
+        this.elem = $('.multiplayer');
+        
+        this._levelData = levels.getRandomLevel();
+        
+        var rows = 5,
+            cols = 6;
+           
+        var fieldOneElem = $('.field_one', this.elem);
         this._fieldOne = new Field({
-            elem: $('.field_one', context),
-            cols: 6,
-            rows: 5,
-            levelData: levelData,
+            elem: fieldOneElem,
+            cols: cols,
+            rows: rows,
+            levelData: this._levelData,
             control: 'keyboard',
-            infoPanel: false
+            infoPanel: false,
+            userPanel: new UserPanel(fieldOneElem, {num: 1})
         });
 
+        var fieldTwoElem = $('.field_two', this.elem);
         this._fieldTwo = new Field({
-            elem: $('.field_two', context),
-            cols: 6,
-            rows: 5,
-            levelData: levelData,
+            elem: fieldTwoElem,
+            cols: cols,
+            rows: rows,
+            levelData: this._levelData,
             control: 'gamepad',
-            infoPanel: false
-        });
-
-        $.on($('.multiplayer__exit', this._elem), 'mousedown', function() {
-            Page.show('select-level');
+            infoPanel: false,
+            userPanel: new UserPanel(fieldTwoElem, {num: 2})
         });
 
         this._onKeydown = this._onKeydown.bind(this);
@@ -1726,10 +1870,9 @@ module.exports = {
             this._onExit();
         }
     },
-    _onExit: function() {
-        Page.show('select-level');
-    },
     show: function() {
+        $('.level-title', this.elem).innerHTML = levels.getTitle(this._levelData);
+
         this._fieldOne.show();
         this._fieldTwo.show();
 
@@ -1743,10 +1886,15 @@ module.exports = {
     }
 };
 
-},{"dom":13,"field":4,"levels":8,"page":20}],20:[function(require,module,exports){
+},{"dom":15,"field":5,"levels":9,"user-panel":12}],24:[function(require,module,exports){
+var customEvent = require('event');
 var body = document.body;
 
-module.exports =  {
+var Page =  {
+    back: function() {
+        window.history.back();
+        this.showByLocationHash();
+    },
     add: function(pages) {
         if (Array.isArray(pages)) {
             pages.forEach(function(page) {
@@ -1761,6 +1909,9 @@ module.exports =  {
     },
     get: function(name) {
         return this.buffer[name];
+    },
+    has: function(name) {
+        return Boolean(this.get(name));
     },
     show: function(name, data) {
         var oldName = null;
@@ -1780,14 +1931,19 @@ module.exports =  {
         body.classList.add('page_' + name);
         page.show(data);
 
-        if (page.locationHash !== undefined) {
+        if (page.locationHash !== undefined && window.location.hash !== '#' + page.locationHash) {
             window.location.hash = page.locationHash;
         }
 
         this.current = page;
+        
+        this.trigger('show', page);
     },
     hide: function(name) {
         this.get(name).hide();
+    },
+    showByLocationHash: function() {
+        this.show(this. getNameByLocationHash(window.location.hash));
     },
     getNameByLocationHash: function(hash) {
         var name;
@@ -1810,7 +1966,11 @@ module.exports =  {
     buffer: {}
 };
 
-},{}],21:[function(require,module,exports){
+Object.assign(Page, customEvent.prototype);
+
+module.exports = Page;
+
+},{"event":16}],25:[function(require,module,exports){
 var $ = require('dom').$,
     jstohtml = require('jstohtml'),
     levels = require('levels'),
@@ -1823,11 +1983,7 @@ module.exports = {
     init: function(data) {
         var el = $('.select-level__list');
         el.innerHTML = this.getList();
-        
-        $.on('.select-level__exit', 'click', function() {
-            Page.show('main');
-        });
-        
+
         $.delegate(el, '.btn', 'click', function(e) {
             if (this.classList.contains('btn_disabled')) {
                 return;
@@ -1870,11 +2026,11 @@ module.exports = {
                 }
             });
         }, this);
-        
+
         return jstohtml(html);
     },
     show: function() {},
     hide: function() {}
 };
 
-},{"dom":13,"jstohtml":1,"levels":8,"page":20,"settings":10}]},{},[2]);
+},{"dom":15,"jstohtml":1,"levels":9,"page":24,"settings":11}]},{},[2]);

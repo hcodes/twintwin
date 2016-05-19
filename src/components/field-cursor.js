@@ -7,7 +7,7 @@ function FieldCursor(data) {
     this.height = data.height;
 
     this.padding = data.padding;
-    
+
     this.cols = data.cols;
     this.rows = data.rows;
 
@@ -62,7 +62,7 @@ FieldCursor.prototype = {
         if (x > this.cols - 1) {
             x = this.cols - 1;
         }
-        
+
         if (x < 0) {
             x = 0;
         }
@@ -105,6 +105,12 @@ FieldCursor.prototype = {
             x: this.x,
             y: this.y
         };
+    },
+    reset: function() {
+        this.x = 0;
+        this.y = 0;
+
+        !this.hidden && this.update();
     },
     destroy: function() {
         this.elem = null;

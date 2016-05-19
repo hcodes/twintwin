@@ -1,35 +1,39 @@
 var $ = require('dom').$,
     Field = require('field'),
-    Page = require('page'),
+    UserPanel = require('user-panel'),
     levels = require('levels');
 
 module.exports = {
     name: 'multiplayer',
     locationHash: 'multiplayer',
     init: function(data) {
-        var context = $('.multiplayer'),
-            levelData = levels.getRandomLevel();
-            
+        this.elem = $('.multiplayer');
+        
+        this._levelData = levels.getRandomLevel();
+        
+        var rows = 5,
+            cols = 6;
+           
+        var fieldOneElem = $('.field_one', this.elem);
         this._fieldOne = new Field({
-            elem: $('.field_one', context),
-            cols: 6,
-            rows: 5,
-            levelData: levelData,
+            elem: fieldOneElem,
+            cols: cols,
+            rows: rows,
+            levelData: this._levelData,
             control: 'keyboard',
-            infoPanel: false
+            infoPanel: false,
+            userPanel: new UserPanel(fieldOneElem, {num: 1})
         });
 
+        var fieldTwoElem = $('.field_two', this.elem);
         this._fieldTwo = new Field({
-            elem: $('.field_two', context),
-            cols: 6,
-            rows: 5,
-            levelData: levelData,
+            elem: fieldTwoElem,
+            cols: cols,
+            rows: rows,
+            levelData: this._levelData,
             control: 'gamepad',
-            infoPanel: false
-        });
-
-        $.on($('.multiplayer__exit', this._elem), 'mousedown', function() {
-            Page.show('select-level');
+            infoPanel: false,
+            userPanel: new UserPanel(fieldTwoElem, {num: 2})
         });
 
         this._onKeydown = this._onKeydown.bind(this);
@@ -39,10 +43,9 @@ module.exports = {
             this._onExit();
         }
     },
-    _onExit: function() {
-        Page.show('select-level');
-    },
     show: function() {
+        $('.level-title', this.elem).innerHTML = levels.getTitle(this._levelData);
+
         this._fieldOne.show();
         this._fieldTwo.show();
 

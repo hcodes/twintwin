@@ -8,28 +8,29 @@ module.exports = {
     name: 'game',
     locationHash: 'game',
     init: function(data) {
+        this.elem = $('.game');
+
+        this._levelData = levels.getLevel(Settings.get('level'));
+        
         this._field = new Field({
-            elem: $('.field', '.game'),
+            elem: $('.field', this.elem),
             cols: 6,
             rows: 5,
-            levelData: levels.getLevel(Settings.get('level')),
+            levelData: this._levelData,
             control: 'any',
             infoPanel: true
         });
         
         this._onKeydown = this._onKeydown.bind(this);
-
-        $.on($('.game__exit', this._elem), 'mousedown', this._onExit.bind(this));
     },
     _onKeydown: function(e) {
         if (e.key === 'Escape') {
-            this._onExit();
+            Page.back();
         }
     },
-    _onExit: function() {
-        Page.show('select-level');
-    },
     show: function() {
+        $('.level-title', this.elem).innerHTML = levels.getTitle(this._levelData);
+
         this._field.show();
         $.on(document, 'keydown', this._onKeydown);
     },

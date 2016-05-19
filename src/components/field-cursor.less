@@ -1,19 +1,19 @@
 .field-cursor
 {
     position: absolute;
-    left: 0; 
+    z-index: 5;
     top: 0;
+    left: 0;
+
+    -moz-user-select: none;
+         user-select: none;
+    transition: .05s ease left, .05s ease top;
 
     outline: 5px solid rgba(255, 100, 0, 1);
 
-    user-select: none;
-    -moz-user-select: none;
     -webkit-tap-highlight-color: transparent;
-    transition: 0.05s ease left, 0.05s ease top;
-
-    z-index: 5;
 }
- 
+
 .field-cursor_hidden
 {
     visibility: hidden;
@@ -21,5 +21,5 @@
 
 .field_two .field-cursor
 {
-    outline-color: rgba(0, 100, 255, 1)
+    outline-color: rgba(0, 100, 255, 1);
 }

@@ -3,14 +3,14 @@ module.exports = {
         this._buffer[name] = value;
         this._save();
     },
-    get: function(name, defValue) {
+    get: function(name, defaultValue) {
         if (!this._isLoaded) {
             this._load();
             this._isLoaded = true;
         }
 
         var value = this._buffer[name];
-        return value === undefined ? defValue : value;
+        return value === undefined ? defaultValue : value;
     },
     lsName: 'de',
     _buffer: {},

@@ -10,11 +10,7 @@ module.exports = {
     init: function(data) {
         var el = $('.select-level__list');
         el.innerHTML = this.getList();
-        
-        $.on('.select-level__exit', 'click', function() {
-            Page.show('main');
-        });
-        
+
         $.delegate(el, '.btn', 'click', function(e) {
             if (this.classList.contains('btn_disabled')) {
                 return;
@@ -57,7 +53,7 @@ module.exports = {
                 }
             });
         }, this);
-        
+
         return jstohtml(html);
     },
     show: function() {},

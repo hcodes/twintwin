@@ -20,6 +20,34 @@ body {
   height: 100%;
   display: none;
 }
+.back {
+  font-size: 40px;
+  line-height: 20px;
+  position: fixed;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+  cursor: pointer;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  text-align: center;
+  vertical-align: middle;
+  color: white;
+  border-radius: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-tap-highlight-color: transparent;
+  display: none;
+}
+.back_visible {
+  display: block;
+}
+body.input_mouse .back:hover {
+  opacity: .8;
+}
 .btn {
   border-radius: 5px;
   padding: 15px 25px;
@@ -93,7 +121,6 @@ body.input_mouse .btn_disabled:hover {
   position: absolute;
   left: 0;
   top: 0;
-  cursor: pointer;
   overflow: hidden;
   -webkit-transition: 0.2s transform, 0.2s opacity;
   transition: 0.2s transform, 0.2s opacity;
@@ -164,7 +191,6 @@ body.support_transform3d_false .cage_opened .cage__back {
 }
 .cage_opened .cage__back {
   background: white;
-  cursor: default;
 }
 body.input_mouse .field[data-control="any"] .cage__front:hover,
 body.input_mouse .field[data-control="mouse"] .cage__front:hover {
@@ -176,43 +202,19 @@ body.input_mouse .field[data-control="mouse"] .cage__front:hover {
 .emoji {
   font-family: "Apple Color Emoji", "Android Emoji", "Segoe UI Emoji", "NotoColorEmoji", "Segoe UI Symbol", "EmojiSymbols";
 }
-.exit {
-  position: fixed;
-  top: 5px;
-  right: 5px;
-  width: 20px;
-  height: 20px;
-  padding: 5px;
-  color: white;
-  cursor: pointer;
-  font-size: 40px;
-  line-height: 20px;
-  text-align: center;
-  border-radius: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  vertical-align: middle;
-  -webkit-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  -moz-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-body.input_mouse .exit:hover {
-  opacity: 0.8;
-}
 .field-cursor {
   position: absolute;
-  left: 0;
+  z-index: 5;
   top: 0;
-  outline: 5px solid #ff6400;
+  left: 0;
+  -moz-user-select: none;
   -webkit-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  -moz-user-select: none;
+  -webkit-transition: .05s ease left, .05s ease top;
+  transition: .05s ease left, .05s ease top;
+  outline: 5px solid #ff6400;
   -webkit-tap-highlight-color: transparent;
-  -webkit-transition: 0.05s ease left, 0.05s ease top;
-  transition: 0.05s ease left, 0.05s ease top;
-  z-index: 5;
 }
 .field-cursor_hidden {
   visibility: hidden;
@@ -234,14 +236,14 @@ body.page_field .page_field {
 }
 .field {
   position: absolute;
-  left: 0;
   top: 0;
-  bottom: 0;
   right: 0;
+  bottom: 0;
+  left: 0;
+  -moz-user-select: none;
   -webkit-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  -moz-user-select: none;
 }
 .field_one {
   right: 50%;
@@ -249,21 +251,21 @@ body.page_field .page_field {
   right: calc(50% + 10px);
 }
 .field_two {
+  right: 0;
   left: -webkit-calc(50% + 10px);
   left: calc(50% + 10px);
-  right: 0;
 }
 .field__cages {
   position: absolute;
-  left: 0;
+  z-index: 10;
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 10;
+  left: 0;
+  -moz-user-select: none;
   -webkit-user-select: none;
       -ms-user-select: none;
           user-select: none;
-  -moz-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 .gamepad-notice-disconnected,
@@ -308,24 +310,37 @@ body.page_field .page_field {
 .info-panel__clicks {
   margin-left: 1em;
 }
+.level-title {
+  position: absolute;
+  left: -20px;
+  top: 60%;
+  white-space: nowrap;
+  width: 0;
+  color: #fff;
+  z-index: 100;
+  font-size: 12px;
+  -webkit-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+}
 .trophy-notice {
   position: fixed;
-  left: 0;
+  z-index: 1000;
   top: 30px;
-  background: #000;
+  left: 0;
   padding: 10px 13px 10px 10px;
-  opacity: 0;
-  -webkit-transition: 0.3s transform, 0.1s opacity;
-  transition: 0.3s transform, 0.1s opacity;
+  cursor: pointer;
+  -webkit-transition: .3s transform, .1s opacity;
+  transition: .3s transform, .1s opacity;
   -webkit-transform: translateX(-100%);
       -ms-transform: translateX(-100%);
           transform: translateX(-100%);
-  -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
-          box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-left: 0;
-  z-index: 1000;
-  cursor: pointer;
+  background: #000;
+  -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
 }
 .trophy-notice_open {
   -webkit-transform: translateX(0);
@@ -336,19 +351,26 @@ body.page_field .page_field {
 .trophy-notice__title {
   font-size: 20px;
   line-height: 1.2em;
-  color: #fff;
   margin-left: 30px;
+  color: #fff;
 }
 .trophy-notice__type {
-  position: absolute;
-  left: 5px;
-  top: 5px;
   font-size: 25px;
   line-height: normal;
+  position: absolute;
+  top: 5px;
+  left: 5px;
   width: 25px;
   height: 100%;
-  vertical-align: middle;
   text-align: center;
+  vertical-align: middle;
+}
+.user-panel {
+  font-size: 16px;
+  position: absolute;
+  top: -22px;
+  left: 0;
+  color: #fff;
 }
 body.page_game .page_game {
   display: block;
@@ -383,7 +405,9 @@ body.page_main .page_main {
   z-index: 1;
   opacity: 0;
   background: #5194A4;
-  border-left: 10px solid #115464;
+  border: 10px solid #115464;
+  border-top: none;
+  border-radius: 5px;
   -webkit-transition: opacity 1s;
   transition: opacity 1s;
   color: white;
@@ -439,6 +463,12 @@ body.page_multiplayer .page_multiplayer {
   left: 30px;
   right: 30px;
   bottom: 30px;
+}
+.multiplayer__level-title {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  white-space: nowrap;
 }
 body.page_select-level .page_select-level {
   display: block;
