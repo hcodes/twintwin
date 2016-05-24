@@ -141,8 +141,6 @@ var App = {
 
         this.setInputType('mouse');
 
-        Page.showByLocationHash();
-
         this._back = new Back(body);
         
         Page.on('show', function(e, page) {
@@ -152,6 +150,11 @@ var App = {
                 this._back.show();
             }
         }.bind(this));
+
+        Page.showByLocationHash();
+        window.addEventListener('hashchange', function() {
+            Page.showByLocationHash();
+        }.bind(this), false);
     },
     inputType: null,
     setInputType: function(type) {
@@ -1917,10 +1920,16 @@ var Page =  {
         var oldName = null;
 
         if (this.current) {
-            this.current.hide();
             oldName = this.current.name;
+            if (oldName === name) {
+                return;
+            }
+
+            this.current.hide();
             body.classList.remove('page_' + oldName);
         }
+        
+        console.log(name);
 
         var page = this.get(name);
         if (!page._isInited) {
@@ -1936,7 +1945,7 @@ var Page =  {
         }
 
         this.current = page;
-        
+
         this.trigger('show', page);
     },
     hide: function(name) {

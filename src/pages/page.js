@@ -28,10 +28,16 @@ var Page =  {
         var oldName = null;
 
         if (this.current) {
-            this.current.hide();
             oldName = this.current.name;
+            if (oldName === name) {
+                return;
+            }
+
+            this.current.hide();
             body.classList.remove('page_' + oldName);
         }
+        
+        console.log(name);
 
         var page = this.get(name);
         if (!page._isInited) {
@@ -47,7 +53,7 @@ var Page =  {
         }
 
         this.current = page;
-        
+
         this.trigger('show', page);
     },
     hide: function(name) {

@@ -29,8 +29,6 @@ var App = {
 
         this.setInputType('mouse');
 
-        Page.showByLocationHash();
-
         this._back = new Back(body);
         
         Page.on('show', function(e, page) {
@@ -40,6 +38,11 @@ var App = {
                 this._back.show();
             }
         }.bind(this));
+
+        Page.showByLocationHash();
+        window.addEventListener('hashchange', function() {
+            Page.showByLocationHash();
+        }.bind(this), false);
     },
     inputType: null,
     setInputType: function(type) {

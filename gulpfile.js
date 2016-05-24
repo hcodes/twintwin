@@ -15,6 +15,7 @@ var gulp = require('gulp'),
 
 var paths = {
     css: [
+        'node_modules/show-js-error/dist/show-js-error.css',
         'src/**/*.less'
     ],
     js: [
@@ -39,6 +40,11 @@ gulp.task('js', function() {
         .pipe(gulp.dest(destDir));
 });
 
+gulp.task('jsError', function() {
+    return gulp.src('node_modules/show-js-error/dist/show-js-error.js')
+        .pipe(gulp.dest(destDir));
+});
+
 gulp.task('css', function() {
     return gulp.src(paths.css)
         .pipe(concat('app.css'))
@@ -51,4 +57,4 @@ gulp.task('watch', function() {
     gulp.watch('src/**/*', ['css', 'js']);
 });
 
-gulp.task('default', ['css', 'js']);
+gulp.task('default', ['css', 'js', 'jsError']);

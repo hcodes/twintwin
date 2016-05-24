@@ -1,28 +1,27 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Double emojis</title>
+    <title data-key="main.title">Double emojis</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <link rel="icon" href="icons/favicon.png" />
     <link rel="apple-touch-icon" href="icons/touchicon.png" />\
     <!-- debug:start -->
-    <link rel="stylesheet" href="node_modules/show-js-error/dist/show-js-error.css" />
-    <script src="node_modules/show-js-error/dist/show-js-error.js"></script>
+    <script src="dist/show-js-error.js"></script>
     <!-- debug:end -->
     <link rel="stylesheet" href="dist/app.css" />
 </head>
 <body>
     <div class="page page_main">
         <div class="main-bg"></div>
-        <div class="main-logo">Remember Emoji!</div>
-        <div class="main-qr"><img src="dist/qr_logo.png" alt="" /></div>
+        <div class="main-logo" data-key="main-logo.title">Remember Emoji!</div>
+        <div class="qr-code"><img src="dist/qr_logo.png" alt="" /></div>
         <ul class="main-menu">
-            <li><div class="main-menu__continue btn btn_red btn_middle">➡ Continue</div></li>
-            <li><div class="main-menu__new-game btn btn_red btn_middle">💫 New game</div></li>
-            <li><div class="main-menu__multiplayer btn btn_red btn_middle">🌐 Multiplayer</div></li>
-            <li><div class="btn btn_red btn_middle">🏆 Trophies</div></li>
-            <li><div class="btn btn_red btn_middle">🔁 Endless mode</div></li>
+            <li><div class="main-menu__continue btn btn_red btn_middle" data-key="main-menu.continue">➡ Continue</div></li>
+            <li><div class="main-menu__new-game btn btn_red btn_middle" data-key="main-menu.new-game">💫 New game</div></li>
+            <li><div class="main-menu__multiplayer btn btn_red btn_middle" data-key="main-menu.multiplayer">🌐 Multiplayer</div></li>
+            <li><div class="btn btn_red btn_middle" data-key="main-menu.trophies">🏆 Trophies</div></li>
+            <li><div class="btn btn_red btn_middle" data-key="main-menu.endless-mode">🔁 Endless mode</div></li>
         </ul>
     </div>
     <div class="page page_select-level">
