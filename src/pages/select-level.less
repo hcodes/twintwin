@@ -7,16 +7,25 @@ body.page_select-level .page_select-level
 {
     margin: 0;
     padding: 0;
-    
+
+    &__list
+    {
+        padding: 0;
+        margin: 20px 0 20px 0;
+    }
+
     &__item
     {
         list-style-type: none;
-        margin: 0 0 6px 0;
+        margin: 0 auto;
         padding: 0;
-        
+        width: 300px;
+
         .btn
         {
-            width: 11em;
+            white-space: nowrap;
+            max-width: 300px;
+            min-width: 300px;
             white-space: nowrap;
             overflow: hidden;
         }
@@ -26,7 +35,7 @@ body.page_select-level .page_select-level
             opacity: 0.4;
         }
     }
-    
+
     .emoji
     {
         margin-right: 10px;

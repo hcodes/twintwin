@@ -26,7 +26,7 @@ function Field(data) {
         padding: this.padding
     });
 
-    this.infoPanel = new InfoPanel(this.cages);
+    this.infoPanel = new InfoPanel(this.elem);
 
     this.setEvents();
     this.setControl(data.control);

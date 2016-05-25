@@ -213,8 +213,8 @@ body.input_mouse .btn_red:hover {
 }
 .btn_disabled {
   background-color: #c0c0c0;
-  -webkit-box-shadow: 0 5px 0 0 #c6c6c6;
-          box-shadow: 0 5px 0 0 #c6c6c6;
+  -webkit-box-shadow: 0 5px 0 0 #a0a0a0;
+          box-shadow: 0 5px 0 0 #a0a0a0;
   cursor: default;
   color: #e0e0e0;
 }
@@ -222,8 +222,8 @@ body.input_mouse .btn_red:hover {
   -webkit-transform: none;
       -ms-transform: none;
           transform: none;
-  -webkit-box-shadow: 0 5px 0 0 #c6c6c6;
-          box-shadow: 0 5px 0 0 #c6c6c6;
+  -webkit-box-shadow: 0 5px 0 0 #a0a0a0;
+          box-shadow: 0 5px 0 0 #a0a0a0;
 }
 body.input_mouse .btn_disabled:hover {
   background-color: #c0c0c0;
@@ -299,6 +299,7 @@ body.support_transform3d_false .cage_opened .cage__back {
 .cage__back {
   vertical-align: middle;
   text-align: center;
+  cursor: default;
 }
 .cage_opened .cage__back {
   background: white;
@@ -588,13 +589,19 @@ body.page_select-level .page_select-level {
   margin: 0;
   padding: 0;
 }
+.select-level__list {
+  padding: 0;
+  margin: 20px 0 20px 0;
+}
 .select-level__item {
   list-style-type: none;
-  margin: 0 0 6px 0;
+  margin: 0 auto;
   padding: 0;
+  width: 300px;
 }
 .select-level__item .btn {
-  width: 11em;
+  max-width: 300px;
+  min-width: 300px;
   white-space: nowrap;
   overflow: hidden;
 }

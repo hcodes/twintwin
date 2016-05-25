@@ -36,8 +36,6 @@ var Page =  {
             this.current.hide();
             body.classList.remove('page_' + oldName);
         }
-        
-        console.log(name);
 
         var page = this.get(name);
         if (!page._isInited) {

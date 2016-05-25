@@ -7,10 +7,6 @@ var dom = require('dom'),
     metrika = require('metrika'),
     body = document.body;
 
-require('array');
-require('object');
-require('function');
-
 var App = {
     init: function() {
         body.classList.add('support_transform3d_' + dom.hasSupportCss('perspective'));
@@ -30,7 +26,7 @@ var App = {
         this.setInputType('mouse');
 
         this._back = new Back(body);
-        
+
         Page.on('show', function(e, page) {
             if (page.name === 'main') {
                 this._back.hide();

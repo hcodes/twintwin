@@ -1,6 +1,6 @@
 ﻿var jstohtml = require('jstohtml');
 
-var $ = function(el, context) {
+var _$ = function(el, context) {
     if (typeof context === 'string') {
         context = document.querySelector(context);
     }
@@ -8,15 +8,21 @@ var $ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
-$.js2dom = function(data) {
-    this.js2dom._div.innerHTML = jstohtml(data);
-    var result = this.js2dom._div.firstElementChild;
-    this.js2dom._div.innerHTML = '';
-
-    return result;
+var $ = function(el, context) {
+    var res = _$(el, context);
+    if (!res) {
+        console.error('Can\'t find DOM element "' + el + '"', context);
+    }
+    
+    return res;
 };
 
-$.js2dom._div = document.createElement('div');
+$.js2dom = function(data) {
+    var div = document.createElement('div');
+    div.innerHTML = jstohtml(data);
+
+    return div.firstChild;
+};
 
 $.on = function(el, type, callback) {
     $(el).addEventListener(type, callback, false);

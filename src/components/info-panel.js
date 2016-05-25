@@ -3,9 +3,9 @@ var $ = require('dom').$,
     dtime = require('date-time');
 
 function InfoPanel(container) {
-    this._container = container;
-    this._elem = $.js2dom(this.build());
-    this._container.appendChild(this._elem);
+    this.container = container;
+    this.elem = $.js2dom(this.build());
+    this.container.appendChild(this.elem);
 }
 
 InfoPanel.prototype = {
@@ -62,7 +62,7 @@ InfoPanel.prototype = {
         this.updatePart('time-num', dtime.formatTime(this.currentTime - this.startTime));
     },
     updatePart: function(name, value) {
-        $('.info-panel__' + name, this._elem).innerHTML = value;
+        $('.info-panel__' + name, this.elem).innerHTML = value;
     },
     start: function(levelData, cages) {
         this.stop();

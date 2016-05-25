@@ -19,11 +19,13 @@ var paths = {
         'src/**/*.less'
     ],
     js: [
-        'src/',
         'src/lib',
         'src/pages',
         'src/components',
         'node_modules'
+    ],
+    polyfill: [
+        'src/polyfill/*.js'
     ]
 };
 
@@ -45,6 +47,12 @@ gulp.task('jsError', function() {
         .pipe(gulp.dest(destDir));
 });
 
+gulp.task('polyfill', function() {
+    return gulp.src(paths.polyfill)
+        .pipe(concat('polyfill.js'))
+        .pipe(gulp.dest(destDir));
+});
+
 gulp.task('css', function() {
     return gulp.src(paths.css)
         .pipe(concat('app.css'))
@@ -54,7 +62,7 @@ gulp.task('css', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch('src/**/*', ['css', 'js']);
+    gulp.watch('src/**/*', ['css', 'js', 'polyfill']);
 });
 
-gulp.task('default', ['css', 'js', 'jsError']);
+gulp.task('default', ['css', 'js', 'jsError', 'polyfill']);

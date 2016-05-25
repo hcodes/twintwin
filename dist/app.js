@@ -119,10 +119,6 @@ var dom = require('dom'),
     metrika = require('metrika'),
     body = document.body;
 
-require('array');
-require('object');
-require('function');
-
 var App = {
     init: function() {
         body.classList.add('support_transform3d_' + dom.hasSupportCss('perspective'));
@@ -142,7 +138,7 @@ var App = {
         this.setInputType('mouse');
 
         this._back = new Back(body);
-        
+
         Page.on('show', function(e, page) {
             if (page.name === 'main') {
                 this._back.hide();
@@ -180,7 +176,7 @@ $.on(document, 'DOMContentLoaded', function() {
     metrika.hit(35250605);
 });
 
-},{"array":13,"back":3,"dom":15,"function":17,"game":21,"gamepad":7,"gamepad-notice":6,"main":22,"metrika":10,"multiplayer":23,"object":18,"page":24,"select-level":25}],3:[function(require,module,exports){
+},{"back":3,"dom":14,"game":18,"gamepad":7,"gamepad-notice":6,"main":19,"metrika":10,"multiplayer":20,"page":21,"select-level":22}],3:[function(require,module,exports){
 var $ = require('dom').$,
     Page = require('page');
 
@@ -209,7 +205,7 @@ Back.prototype = {
 
 module.exports = Back;
 
-},{"dom":15,"page":24}],4:[function(require,module,exports){
+},{"dom":14,"page":21}],4:[function(require,module,exports){
 var $ = require('dom').$;
 
 function FieldCursor(data) {
@@ -331,7 +327,7 @@ FieldCursor.prototype = {
 
 module.exports = FieldCursor;
 
-},{"dom":15}],5:[function(require,module,exports){
+},{"dom":14}],5:[function(require,module,exports){
 var dom = require('dom'),
     $ = dom.$,
     $$ = dom.$$,
@@ -360,7 +356,7 @@ function Field(data) {
         padding: this.padding
     });
 
-    this.infoPanel = new InfoPanel(this.cages);
+    this.infoPanel = new InfoPanel(this.elem);
 
     this.setEvents();
     this.setControl(data.control);
@@ -658,7 +654,7 @@ Field.prototype = {
 
 module.exports = Field;
 
-},{"dom":15,"field-cursor":4,"gamepad":7,"info-panel":8,"levels":9,"settings":11}],6:[function(require,module,exports){
+},{"dom":14,"field-cursor":4,"gamepad":7,"info-panel":8,"levels":9,"settings":11}],6:[function(require,module,exports){
 var $ = require('dom').$,
     Gamepad = require('gamepad'),
     body = document.body;
@@ -735,7 +731,7 @@ module.exports = {
     }
 };
 
-},{"dom":15,"gamepad":7}],7:[function(require,module,exports){
+},{"dom":14,"gamepad":7}],7:[function(require,module,exports){
 var $ = require('dom').$,
     Event = require('event');
 
@@ -883,15 +879,15 @@ module.exports = {
     _pads: []
 };
 
-},{"dom":15,"event":16,"raf":19}],8:[function(require,module,exports){
+},{"dom":14,"event":15,"raf":16}],8:[function(require,module,exports){
 var $ = require('dom').$,
     levels = require('levels'),
     dtime = require('date-time');
 
 function InfoPanel(container) {
-    this._container = container;
-    this._elem = $.js2dom(this.build());
-    this._container.appendChild(this._elem);
+    this.container = container;
+    this.elem = $.js2dom(this.build());
+    this.container.appendChild(this.elem);
 }
 
 InfoPanel.prototype = {
@@ -948,7 +944,7 @@ InfoPanel.prototype = {
         this.updatePart('time-num', dtime.formatTime(this.currentTime - this.startTime));
     },
     updatePart: function(name, value) {
-        $('.info-panel__' + name, this._elem).innerHTML = value;
+        $('.info-panel__' + name, this.elem).innerHTML = value;
     },
     start: function(levelData, cages) {
         this.stop();
@@ -971,7 +967,7 @@ InfoPanel.prototype = {
 
 module.exports = InfoPanel;
 
-},{"date-time":14,"dom":15,"levels":9}],9:[function(require,module,exports){
+},{"date-time":13,"dom":14,"levels":9}],9:[function(require,module,exports){
 module.exports = {
     getTitle: function(levelData) {
         return levelData.titleSymbol + ' ' + levelData.name;
@@ -1379,19 +1375,7 @@ UserPanel.prototype = {
 
 module.exports = UserPanel;
 
-},{"dom":15,"settings":11,"string":20}],13:[function(require,module,exports){
-Array.prototype.shuffle = function() {
-    var input = this;
-    for (var i = input.length - 1; i > 0; i--) {
-        var randomIndex = Math.floor(Math.random() * (i + 1));
-        var itemAtIndex = input[randomIndex];
-        input[randomIndex] = input[i];
-        input[i] = itemAtIndex;
-    }
-    return input;
-};
-
-},{}],14:[function(require,module,exports){
+},{"dom":14,"settings":11,"string":17}],13:[function(require,module,exports){
 module.exports = {
     leadZero: function(num) {
         return num < 10 ? '0' + num : num;
@@ -1405,10 +1389,10 @@ module.exports = {
     }
 };
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var jstohtml = require('jstohtml');
 
-var $ = function(el, context) {
+var _$ = function(el, context) {
     if (typeof context === 'string') {
         context = document.querySelector(context);
     }
@@ -1416,15 +1400,21 @@ var $ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
-$.js2dom = function(data) {
-    this.js2dom._div.innerHTML = jstohtml(data);
-    var result = this.js2dom._div.firstElementChild;
-    this.js2dom._div.innerHTML = '';
-
-    return result;
+var $ = function(el, context) {
+    var res = _$(el, context);
+    if (!res) {
+        console.error('Can\'t find DOM element "' + el + '"', context);
+    }
+    
+    return res;
 };
 
-$.js2dom._div = document.createElement('div');
+$.js2dom = function(data) {
+    var div = document.createElement('div');
+    div.innerHTML = jstohtml(data);
+
+    return div.firstChild;
+};
 
 $.on = function(el, type, callback) {
     $(el).addEventListener(type, callback, false);
@@ -1509,7 +1499,7 @@ module.exports = {
     hasSupportCss: hasSupportCss
 };
 
-},{"jstohtml":1}],16:[function(require,module,exports){
+},{"jstohtml":1}],15:[function(require,module,exports){
 function Event() {}
 
 Event.prototype = {
@@ -1573,66 +1563,7 @@ Event.prototype = {
 module.exports = Event;
 
 
-},{}],17:[function(require,module,exports){
-// for iPad 1
-if (!Function.prototype.bind) {
-    Function.prototype.bind = function(oThis) {
-        if (typeof this !== 'function') {
-            throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-        }
-
-        var aArgs = Array.prototype.slice.call(arguments, 1),
-            fToBind = this,
-            NOP = function() {
-            },
-            fBound = function() {
-                return fToBind.apply(this instanceof NOP && oThis
-                        ? this
-                        : oThis,
-                    aArgs.concat(Array.prototype.slice.call(arguments)));
-            };
-
-        NOP.prototype = this.prototype;
-        fBound.prototype = new NOP();
-
-        return fBound;
-    };
-}
-
-},{}],18:[function(require,module,exports){
-if (!Object.assign) {
-  Object.defineProperty(Object, 'assign', {
-    enumerable: false,
-    configurable: true,
-    writable: true,
-    value: function(target, firstSource) {
-      'use strict';
-      if (target === undefined || target === null) {
-        throw new TypeError('Cannot convert first argument to object');
-      }
-
-      var to = Object(target);
-      for (var i = 1; i < arguments.length; i++) {
-        var nextSource = arguments[i];
-        if (nextSource === undefined || nextSource === null) {
-          continue;
-        }
-
-        var keysArray = Object.keys(Object(nextSource));
-        for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
-          var nextKey = keysArray[nextIndex];
-          var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
-          if (desc !== undefined && desc.enumerable) {
-            to[nextKey] = nextSource[nextKey];
-          }
-        }
-      }
-      return to;
-    }
-  });
-}
-
-},{}],19:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var lastTime = 0,
@@ -1663,7 +1594,7 @@ if (!window.cancelAnimationFrame) {
     };
 }
 
-},{}],20:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 module.exports = {
     escapeHTML: function(text) {
         return text
@@ -1680,7 +1611,7 @@ module.exports = {
     }
 };
 
-},{}],21:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var $ = require('dom').$,
     Page = require('page'),
     Settings = require('settings'),
@@ -1723,7 +1654,7 @@ module.exports = {
     }
 };
 
-},{"dom":15,"field":5,"levels":9,"page":24,"settings":11}],22:[function(require,module,exports){
+},{"dom":14,"field":5,"levels":9,"page":21,"settings":11}],19:[function(require,module,exports){
 var dom = require('dom'),
     $ = dom.$,
     $$ = dom.$$,
@@ -1827,7 +1758,7 @@ module.exports = {
     }
 };
 
-},{"dom":15,"jstohtml":1,"levels":9,"page":24,"settings":11}],23:[function(require,module,exports){
+},{"dom":14,"jstohtml":1,"levels":9,"page":21,"settings":11}],20:[function(require,module,exports){
 var $ = require('dom').$,
     Field = require('field'),
     UserPanel = require('user-panel'),
@@ -1889,7 +1820,7 @@ module.exports = {
     }
 };
 
-},{"dom":15,"field":5,"levels":9,"user-panel":12}],24:[function(require,module,exports){
+},{"dom":14,"field":5,"levels":9,"user-panel":12}],21:[function(require,module,exports){
 var customEvent = require('event');
 var body = document.body;
 
@@ -1928,8 +1859,6 @@ var Page =  {
             this.current.hide();
             body.classList.remove('page_' + oldName);
         }
-        
-        console.log(name);
 
         var page = this.get(name);
         if (!page._isInited) {
@@ -1979,7 +1908,7 @@ Object.assign(Page, customEvent.prototype);
 
 module.exports = Page;
 
-},{"event":16}],25:[function(require,module,exports){
+},{"event":15}],22:[function(require,module,exports){
 var $ = require('dom').$,
     jstohtml = require('jstohtml'),
     levels = require('levels'),
@@ -2042,4 +1971,4 @@ module.exports = {
     hide: function() {}
 };
 
-},{"dom":15,"jstohtml":1,"levels":9,"page":24,"settings":11}]},{},[2]);
+},{"dom":14,"jstohtml":1,"levels":9,"page":21,"settings":11}]},{},[2]);
