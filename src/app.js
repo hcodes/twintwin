@@ -5,11 +5,14 @@ var dom = require('dom'),
     Page = require('page'),
     Back = require('back'),
     metrika = require('metrika'),
+    isMobile = require('is-mobile'),
     body = document.body;
 
 var App = {
     init: function() {
         body.classList.add('support_transform3d_' + dom.hasSupportCss('perspective'));
+
+        body.classList.add('device_' + (isMobile() ? 'mobile' : 'desktop'));
 
         $.on(document, 'mousemove', function() {
             this.setInputType('mouse');
