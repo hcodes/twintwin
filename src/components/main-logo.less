@@ -1,21 +1,27 @@
 .main-logo
 {
+    font-size: 35px;
+    line-height: 1;
+
     position: absolute;
-    left: 20px;
-    top: 0;
-    padding: 5px 9px;
     z-index: 1;
+    top: 0;
+    left: 50%;
+
+    padding: 5px 9px;
+
+    cursor: default;
+    transition: opacity 1s;
+    transform: translate(-50%, 0);
+    white-space: nowrap;
+
     opacity: 0;
-    background: #5194A4;
+    color: white;
     border: 10px solid #115464;
     border-top: none;
     border-radius: 5px;
-    transition: opacity 1s;
-    color: white;
-    font-size: 35px;
-    line-height: 1;
+    background: #5194a4;
     text-shadow: 0 0 1px #115464;
-    cursor: default;
 }
 
 .main-logo_visible
