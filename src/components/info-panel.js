@@ -14,10 +14,6 @@ InfoPanel.prototype = {
             cl: 'info-panel',
             c: [
                 {
-                    t: 'span',
-                    cl: 'info-panel__level-title'
-                },
-                {
                     cl: 'info-panel__time',
                     t: 'span',
                     c: [
@@ -29,24 +25,13 @@ InfoPanel.prototype = {
                     ]
                 },
                 {
-                    cl: 'info-panel__cages',
+                    cl: 'info-panel__errors',
                     t: 'span',
                     c: [
-                        'Cages: ',
+                        'Errors: ',
                         {
                             t: 'span',
-                            cl: 'info-panel__cages-num'
-                        }
-                    ]
-                },
-                {
-                    cl: 'info-panel__clicks',
-                    t: 'span',
-                    c: [
-                        'Clicks: ',
-                        {
-                            t: 'span',
-                            cl: 'info-panel__clicks-num'
+                            cl: 'info-panel__errors-num'
                         }
                     ]
                 }
@@ -56,19 +41,16 @@ InfoPanel.prototype = {
     update: function() {
         this.currentTime = Date.now();
 
-        this.updatePart('clicks-num', this.clicks);
-        this.updatePart('cages-num', this.cages);
-        this.updatePart('level-title', this.levelTitle);
+        this.updatePart('errors-num', this.errors);
         this.updatePart('time-num', dtime.formatTime(this.currentTime - this.startTime));
     },
     updatePart: function(name, value) {
         $('.info-panel__' + name, this.elem).innerHTML = value;
     },
-    start: function(levelData, cages) {
+    start: function(levelData) {
         this.stop();
 
-        this.clicks = 0;
-        this.cages = cages;
+        this.errors = 0;
         this.levelTitle = levels.getTitle(levelData);
         this.startTime = Date.now();
 

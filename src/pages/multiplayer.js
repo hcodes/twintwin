@@ -20,7 +20,7 @@ module.exports = {
             cols: cols,
             rows: rows,
             levelData: this._levelData,
-            control: 'keyboard',
+            control: isMobile ? '*' : 'keyboard',
             infoPanel: false,
             userPanel: new UserPanel(fieldOneElem, {num: 1})
         });
@@ -31,7 +31,7 @@ module.exports = {
             cols: cols,
             rows: rows,
             levelData: this._levelData,
-            control: 'gamepad',
+            control: isMobile ? '*' : 'gamepad',
             infoPanel: false,
             userPanel: new UserPanel(fieldTwoElem, {num: 2})
         });
@@ -44,8 +44,6 @@ module.exports = {
         }
     },
     show: function() {
-        $('.level-title', this.elem).innerHTML = levels.getTitle(this._levelData);
-
         this._fieldOne.show();
         this._fieldTwo.show();
 

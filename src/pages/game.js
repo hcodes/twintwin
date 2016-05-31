@@ -29,8 +29,6 @@ module.exports = {
         }
     },
     show: function() {
-        $('.level-title', this.elem).innerHTML = levels.getTitle(this._levelData);
-
         this._field.show();
         $.on(document, 'keydown', this._onKeydown);
     },

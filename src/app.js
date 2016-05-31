@@ -12,7 +12,7 @@ var App = {
     init: function() {
         body.classList.add('support_transform3d_' + dom.hasSupportCss('perspective'));
 
-        body.classList.add('device_' + (isMobile() ? 'mobile' : 'desktop'));
+        body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
 
         $.on(document, 'mousemove', function() {
             this.setInputType('mouse');

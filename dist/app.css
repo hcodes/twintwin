@@ -338,15 +338,6 @@ body.input_mouse .field[data-control="mouse"] .cage__front:hover {
 .field_two .field-cursor {
   outline-color: #0064ff;
 }
-.field-separator {
-  position: absolute;
-  margin-left: -4px;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #bbb;
-}
 body.page_field .page_field {
   display: block;
 }
@@ -417,13 +408,10 @@ body.page_field .page_field {
   left: 0;
   bottom: -1.5em;
   color: #fff;
-  font-size: 14px;
+  font-size: 12px;
   white-space: nowrap;
-  padding: 4px;
 }
-.info-panel__cages,
-.info-panel__time,
-.info-panel__clicks {
+.info-panel__errors {
   margin-left: 1em;
 }
 .level-title {
@@ -495,8 +483,11 @@ body.page_field .page_field {
 }
 .qr-code {
   position: absolute;
-  left: 20px;
+  right: 20px;
   bottom: 10px;
+}
+.device_mobile .qr-code {
+  display: none;
 }
 .qr-code img {
   width: 70px;
@@ -591,6 +582,9 @@ body.page_multiplayer .page_multiplayer {
   top: 50%;
   white-space: nowrap;
 }
+.multiplayer .info-panel {
+  display: none;
+}
 body.page_select-level .page_select-level {
   display: block;
 }
@@ -601,9 +595,9 @@ body.page_select-level .page_select-level {
 .select-level__list {
   padding: 0;
   margin: 20px 0 20px 0;
+  list-style-type: none;
 }
 .select-level__item {
-  list-style-type: none;
   margin: 0 auto;
   padding: 0;
   width: 300px;
