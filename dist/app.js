@@ -515,7 +515,7 @@ Field.prototype = {
         return {
             width: width,
             height: height,
-            fontSize: height * 0.8
+            fontSize: Math.min(width, height) * 0.85
         };
     },
     findCage: function(x, y) {
