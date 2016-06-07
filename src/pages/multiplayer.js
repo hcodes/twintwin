@@ -1,7 +1,8 @@
 var $ = require('dom').$,
     Field = require('field'),
     UserPanel = require('user-panel'),
-    levels = require('levels');
+    levels = require('levels'),
+    isMobile = require('is-mobile');
 
 module.exports = {
     name: 'multiplayer',

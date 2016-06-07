@@ -1,5 +1,6 @@
 var customEvent = require('event');
 var body = document.body;
+var $ = require('dom').$;
 
 var Page =  {
     back: function() {
@@ -39,6 +40,7 @@ var Page =  {
 
         var page = this.get(name);
         if (!page._isInited) {
+            page.elem = $('.page_' + name);
             page.init();
             page._isInited = true;
         }

@@ -1,8 +1,9 @@
-var $ = require('dom').$,
-    jstohtml = require('jstohtml'),
-    levels = require('levels'),
-    Settings = require('settings'),
-    Page = require('page');
+var $ = require('dom').$;
+var $$ = require('dom').$$;
+var jstohtml = require('jstohtml');
+var levels = require('levels');
+var Settings = require('settings');
+var Page = require('page');
 
 module.exports = {
     name: 'select-level',
@@ -24,8 +25,7 @@ module.exports = {
         return this;
     },
     getList: function() {
-        var html = [],
-            maxLevel = Settings.get('maxLevel');
+        var html = [];
 
         levels.data.forEach(function(levelData, i) {
             if (!i) {
@@ -38,8 +38,7 @@ module.exports = {
                 c: {
                     t: 'span',
                     cl: [
-                        'btn btn_red btn_middle',
-                        maxLevel < i ? 'btn_disabled' : ''
+                        'btn btn_red btn_middle'
                     ],
                     'data-level': i,
                     c: [
@@ -56,6 +55,19 @@ module.exports = {
 
         return jstohtml(html);
     },
-    show: function() {},
+    show: function() {
+        var maxLevel = Settings.get('maxLevel'),
+            btns = $$('.select-level__list .btn', this.elem),
+            cl ='btn_disabled';
+        
+        for (var i = 0; i < btns.length; i++) {
+            var btnCl = btns[i].classList;
+            if (i <= maxLevel) {
+                btnCl.remove(cl);
+            } else {
+                btnCl.add(cl);
+            }
+        }
+    },
     hide: function() {}
 };

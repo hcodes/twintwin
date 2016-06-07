@@ -1756,7 +1756,8 @@ module.exports = {
 var $ = require('dom').$,
     Field = require('field'),
     UserPanel = require('user-panel'),
-    levels = require('levels');
+    levels = require('levels'),
+    isMobile = require('is-mobile');
 
 module.exports = {
     name: 'multiplayer',
@@ -1812,9 +1813,10 @@ module.exports = {
     }
 };
 
-},{"dom":14,"field":5,"levels":9,"user-panel":12}],22:[function(require,module,exports){
+},{"dom":14,"field":5,"is-mobile":16,"levels":9,"user-panel":12}],22:[function(require,module,exports){
 var customEvent = require('event');
 var body = document.body;
+var $ = require('dom').$;
 
 var Page =  {
     back: function() {
@@ -1854,6 +1856,7 @@ var Page =  {
 
         var page = this.get(name);
         if (!page._isInited) {
+            page.elem = $('.page_' + name);
             page.init();
             page._isInited = true;
         }
@@ -1900,12 +1903,13 @@ Object.assign(Page, customEvent.prototype);
 
 module.exports = Page;
 
-},{"event":15}],23:[function(require,module,exports){
-var $ = require('dom').$,
-    jstohtml = require('jstohtml'),
-    levels = require('levels'),
-    Settings = require('settings'),
-    Page = require('page');
+},{"dom":14,"event":15}],23:[function(require,module,exports){
+var $ = require('dom').$;
+var $$ = require('dom').$$;
+var jstohtml = require('jstohtml');
+var levels = require('levels');
+var Settings = require('settings');
+var Page = require('page');
 
 module.exports = {
     name: 'select-level',
@@ -1927,8 +1931,7 @@ module.exports = {
         return this;
     },
     getList: function() {
-        var html = [],
-            maxLevel = Settings.get('maxLevel');
+        var html = [];
 
         levels.data.forEach(function(levelData, i) {
             if (!i) {
@@ -1941,8 +1944,7 @@ module.exports = {
                 c: {
                     t: 'span',
                     cl: [
-                        'btn btn_red btn_middle',
-                        maxLevel < i ? 'btn_disabled' : ''
+                        'btn btn_red btn_middle'
                     ],
                     'data-level': i,
                     c: [
@@ -1959,7 +1961,20 @@ module.exports = {
 
         return jstohtml(html);
     },
-    show: function() {},
+    show: function() {
+        var maxLevel = Settings.get('maxLevel'),
+            btns = $$('.select-level__list .btn', this.elem),
+            cl ='btn_disabled';
+        
+        for (var i = 0; i < btns.length; i++) {
+            var btnCl = btns[i].classList;
+            if (i <= maxLevel) {
+                btnCl.remove(cl);
+            } else {
+                btnCl.add(cl);
+            }
+        }
+    },
     hide: function() {}
 };
 
