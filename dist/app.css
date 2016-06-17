@@ -217,6 +217,7 @@ body.input_mouse .btn_red:hover {
   border-radius: 3px;
   padding: 10px 10px;
   font-size: 26px;
+  line-height: 33px;
   color: #fff;
 }
 .btn_disabled {
@@ -601,10 +602,18 @@ body.page_select-level .page_select-level {
   margin: 20px 0 20px 0;
   list-style-type: none;
 }
+@media (max-width: 600px) {
+  .select-level .select-level__item {
+    width: 290px;
+  }
+  .select-level .btn {
+    font-size: 21px !important;
+  }
+}
 .select-level__item {
   margin: 0 auto;
   padding: 0;
-  width: 300px;
+  width: 350px;
 }
 .select-level__item .btn {
   margin: 5px 0;

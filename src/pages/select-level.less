@@ -16,11 +16,25 @@ body.page_select-level .page_select-level
         list-style-type: none;
     }
 
+
+    @media (max-width: 600px) 
+    {
+        .select-level__item
+        {
+            width: 290px; 
+        }
+
+        .btn 
+        {
+            font-size: 21px !important;
+        }
+    }
+    
     &__item
     {
         margin: 0 auto;
         padding: 0;
-        width: 300px;
+        width: 350px;
 
         .btn
         {
