@@ -167,9 +167,9 @@ body.input_mouse .back:hover {
   opacity: .8;
 }
 .btn {
-  -webkit-box-sizing: padding-box;
-     -moz-box-sizing: padding-box;
-          box-sizing: padding-box;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
   border-radius: 5px;
   padding: 15px 25px;
   font-size: 30px;
