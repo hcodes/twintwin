@@ -972,8 +972,27 @@ module.exports = {
             symbols: []
         },
         {
+            name: 'Accessories',
+            titleSymbol: '👛',
+            cols: 4,
+            rows: 3,
+            symbols: [
+                '👑',
+                '💼',
+                '👜',
+                '👝',
+                '👛',
+                '👓',
+                '🎀',
+                '🌂',
+                '💄'
+            ]
+        },
+        {
             name: 'Flowers and trees',
             titleSymbol: '💐',
+            cols: 4,
+            rows: 4,
             symbols: [
                 '💐',
                 '🌸',
@@ -999,6 +1018,8 @@ module.exports = {
         {
             name: 'Fruits and vegetables',
             titleSymbol: '🍏',
+            cols: 5,
+            rows: 4,
             symbols: [
                 '🌰',
                 '🌱',
@@ -1024,6 +1045,8 @@ module.exports = {
         {
             name: 'Zodiac Signs',
             titleSymbol: '♋',
+            cols: 6,
+            rows: 4,
             symbols: [
                 '♈',
                 '♉',
@@ -1038,21 +1061,6 @@ module.exports = {
                 '♒',
                 '♓',
                 '⛎'
-            ]
-        },
-        {
-            name: 'Accessories',
-            titleSymbol: '👛',
-            symbols: [
-                '👑',
-                '💼',
-                '👜',
-                '👝',
-                '👛',
-                '👓',
-                '🎀',
-                '🌂',
-                '💄'
             ]
         },
         {
@@ -1411,9 +1419,12 @@ $.on = function(el, type, callback) {
 
 $.delegate = function(root, el, type, callback) {
     $(root).addEventListener(type, function(e) {
-        var cls = el[0] === '.' ? el.substr(1) : el;
-        if (e.target.classList.contains(cls)) {
-            callback.call(e.target, e);
+        var node = e.target;
+        for (; node !== root; node = node.parentNode || root) {
+            var cls = el[0] === '.' ? el.substr(1) : el;
+            if (node.classList.contains(cls)) {
+                callback.call(node, e);
+            }
         }
     }, false);
 
@@ -1621,16 +1632,15 @@ module.exports = {
         this.elem = $('.game');
 
         this._levelData = levels.getLevel(Settings.get('level'));
-        
         this._field = new Field({
             elem: $('.field', this.elem),
-            cols: 6,
-            rows: 5,
+            cols: this._levelData.cols || 6,
+            rows: this._levelData.rows || 5,
             levelData: this._levelData,
             control: 'any',
             infoPanel: true
         });
-        
+
         this._onKeydown = this._onKeydown.bind(this);
     },
     _onKeydown: function(e) {
@@ -1685,7 +1695,7 @@ module.exports = {
         });
 
         $.on('.main-menu__new-game', 'click', function(e) {
-            Settings.set('level', 1);
+            Settings.set('maxLevel', 1);
             Page.show('select-level');
         }.bind(this));
 
@@ -1923,7 +1933,7 @@ module.exports = {
                 return;
             }
 
-            var level = parseInt(e.target.dataset['level']);
+            var level = parseInt(this.dataset['level'], 10);
             Settings.set('level', level);
             Page.show('game');
         });
@@ -1968,7 +1978,7 @@ module.exports = {
         
         for (var i = 0; i < btns.length; i++) {
             var btnCl = btns[i].classList;
-            if (i <= maxLevel) {
+            if (i < maxLevel) {
                 btnCl.remove(cl);
             } else {
                 btnCl.add(cl);
