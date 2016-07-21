@@ -34,7 +34,7 @@ module.exports = {
         });
 
         $.on('.main-menu__new-game', 'click', function(e) {
-            Settings.set('level', 1);
+            Settings.set('maxLevel', 1);
             Page.show('select-level');
         }.bind(this));
 
