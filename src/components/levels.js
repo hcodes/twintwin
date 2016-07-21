@@ -15,8 +15,27 @@
             symbols: []
         },
         {
+            name: 'Accessories',
+            titleSymbol: '👛',
+            cols: 4,
+            rows: 3,
+            symbols: [
+                '👑',
+                '💼',
+                '👜',
+                '👝',
+                '👛',
+                '👓',
+                '🎀',
+                '🌂',
+                '💄'
+            ]
+        },
+        {
             name: 'Flowers and trees',
             titleSymbol: '💐',
+            cols: 4,
+            rows: 4,
             symbols: [
                 '💐',
                 '🌸',
@@ -42,6 +61,8 @@
         {
             name: 'Fruits and vegetables',
             titleSymbol: '🍏',
+            cols: 5,
+            rows: 4,
             symbols: [
                 '🌰',
                 '🌱',
@@ -67,6 +88,8 @@
         {
             name: 'Zodiac Signs',
             titleSymbol: '♋',
+            cols: 6,
+            rows: 4,
             symbols: [
                 '♈',
                 '♉',
@@ -81,21 +104,6 @@
                 '♒',
                 '♓',
                 '⛎'
-            ]
-        },
-        {
-            name: 'Accessories',
-            titleSymbol: '👛',
-            symbols: [
-                '👑',
-                '💼',
-                '👜',
-                '👝',
-                '👛',
-                '👓',
-                '🎀',
-                '🌂',
-                '💄'
             ]
         },
         {
