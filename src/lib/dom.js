@@ -32,9 +32,12 @@ $.on = function(el, type, callback) {
 
 $.delegate = function(root, el, type, callback) {
     $(root).addEventListener(type, function(e) {
-        var cls = el[0] === '.' ? el.substr(1) : el;
-        if (e.target.classList.contains(cls)) {
-            callback.call(e.target, e);
+        var node = e.target;
+        for (; node !== root; node = node.parentNode || root) {
+            var cls = el[0] === '.' ? el.substr(1) : el;
+            if (node.classList.contains(cls)) {
+                callback.call(node, e);
+            }
         }
     }, false);
 
