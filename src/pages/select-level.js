@@ -17,7 +17,7 @@ module.exports = {
                 return;
             }
 
-            var level = parseInt(e.target.dataset['level']);
+            var level = parseInt(this.dataset['level'], 10);
             Settings.set('level', level);
             Page.show('game');
         });
@@ -62,7 +62,7 @@ module.exports = {
         
         for (var i = 0; i < btns.length; i++) {
             var btnCl = btns[i].classList;
-            if (i <= maxLevel) {
+            if (i < maxLevel) {
                 btnCl.remove(cl);
             } else {
                 btnCl.add(cl);

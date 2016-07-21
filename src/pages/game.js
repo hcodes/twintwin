@@ -11,16 +11,15 @@ module.exports = {
         this.elem = $('.game');
 
         this._levelData = levels.getLevel(Settings.get('level'));
-        
         this._field = new Field({
             elem: $('.field', this.elem),
-            cols: 6,
-            rows: 5,
+            cols: this._levelData.cols || 6,
+            rows: this._levelData.rows || 5,
             levelData: this._levelData,
             control: 'any',
             infoPanel: true
         });
-        
+
         this._onKeydown = this._onKeydown.bind(this);
     },
     _onKeydown: function(e) {
