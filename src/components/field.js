@@ -11,10 +11,11 @@ function Field(data) {
     this.elem = data.elem;
     this.cages = $('.field__cages', this.elem);
 
-    this.cols = data.cols;
-    this.rows = data.rows;
     this.padding = 5;
     this.levelData = data.levelData;
+
+    this.rows = data.rows;
+    this.cols = data.cols;
 
     this.field = [];
     this.cagesCount = this.cols * this.rows;
@@ -126,7 +127,9 @@ Field.prototype = {
             }.bind(this)
         );
     },
-    addCages: function() {
+    createCages: function() {
+        this.cages.innerHTML = '';
+
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
                 var cage = $.js2dom({
@@ -301,14 +304,27 @@ Field.prototype = {
 
         this.infoPanel.stop();
     },
-    show: function() {
-        this.cages.innerHTML = '';
+    show: function(data) {
+        this.field = [];
+
+        this.levelData = data.levelData;
+        this.cols = data.cols;
+        this.rows = data.rows;
+
+        this.cagesCount = this.cols * this.rows;
+
+
+        this.initField();
+        this.createCages();
+        this.resizeCages();
+
         this._openedCages = [];
 
         this.infoPanel.start(this.levelData);
-        this.initField();
-        this.addCages();
-        this.resizeCages();
+
+        this.fieldCursor.cols = this.cols;
+        this.fieldCursor.rows = this.rows;
+        this.fieldCursor.reset();
 
         /*for (var y = 0; y < this.rows; y++) {
             for (var x = 0; x < this.cols; x++) {

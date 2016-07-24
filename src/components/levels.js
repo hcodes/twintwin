@@ -1,4 +1,6 @@
 ﻿module.exports = {
+    defaultRows: 5,
+    defaultCols: 6,
     getTitle: function(levelData) {
         return levelData.titleSymbol + ' ' + levelData.name;
     },

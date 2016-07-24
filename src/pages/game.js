@@ -1,8 +1,8 @@
-var $ = require('dom').$,
-    Page = require('page'),
-    Settings = require('settings'),
-    Field = require('field'),
-    levels = require('levels');
+var $ = require('dom').$;
+var Page = require('page');
+var Settings = require('settings');
+var Field = require('field');
+var levels = require('levels');
 
 module.exports = {
     name: 'game',
@@ -10,17 +10,27 @@ module.exports = {
     init: function(data) {
         this.elem = $('.game');
 
-        this._levelData = levels.getLevel(Settings.get('level'));
+        var levelData = this.getLevelData();
+
         this._field = new Field({
             elem: $('.field', this.elem),
-            cols: this._levelData.cols || 6,
-            rows: this._levelData.rows || 5,
-            levelData: this._levelData,
+            rows: levelData.rows,
+            cols: levelData.cols,
+            levelData: levelData.data,
             control: 'any',
             infoPanel: true
         });
 
         this._onKeydown = this._onKeydown.bind(this);
+    },
+    getLevelData: function() {
+        var data = levels.getLevel(Settings.get('level'));
+
+        return {
+            data: data,
+            rows: data.rows || levels.defaultRows,
+            cols: data.cols || levels.defaultCols
+        };
     },
     _onKeydown: function(e) {
         if (e.key === 'Escape') {
@@ -28,7 +38,14 @@ module.exports = {
         }
     },
     show: function() {
-        this._field.show();
+        var levelData = this.getLevelData();
+
+        this._field.show({
+            levelData: levelData.data,
+            cols: levelData.cols,
+            rows: levelData.rows
+        });
+
         $.on(document, 'keydown', this._onKeydown);
     },
     hide: function() {

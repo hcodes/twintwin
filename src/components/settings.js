@@ -1,6 +1,6 @@
 module.exports = {
     set: function(name, value) {
-        this._buffer[name] = value;
+        this._buffer[name] = this._copy(value);
         this._save();
     },
     get: function(name, defaultValue) {
@@ -28,5 +28,8 @@ module.exports = {
         try {
             localStorage.setItem(this.lsName, JSON.stringify(this._buffer));
         } catch(e) {}
+    },
+    _copy: function(obj) {
+        return JSON.parse(JSON.stringify(obj));
     }
 };

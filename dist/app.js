@@ -344,10 +344,11 @@ function Field(data) {
     this.elem = data.elem;
     this.cages = $('.field__cages', this.elem);
 
-    this.cols = data.cols;
-    this.rows = data.rows;
     this.padding = 5;
     this.levelData = data.levelData;
+
+    this.rows = data.rows;
+    this.cols = data.cols;
 
     this.field = [];
     this.cagesCount = this.cols * this.rows;
@@ -459,7 +460,9 @@ Field.prototype = {
             }.bind(this)
         );
     },
-    addCages: function() {
+    createCages: function() {
+        this.cages.innerHTML = '';
+
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
                 var cage = $.js2dom({
@@ -634,14 +637,27 @@ Field.prototype = {
 
         this.infoPanel.stop();
     },
-    show: function() {
-        this.cages.innerHTML = '';
+    show: function(data) {
+        this.field = [];
+
+        this.levelData = data.levelData;
+        this.cols = data.cols;
+        this.rows = data.rows;
+
+        this.cagesCount = this.cols * this.rows;
+
+
+        this.initField();
+        this.createCages();
+        this.resizeCages();
+
         this._openedCages = [];
 
         this.infoPanel.start(this.levelData);
-        this.initField();
-        this.addCages();
-        this.resizeCages();
+
+        this.fieldCursor.cols = this.cols;
+        this.fieldCursor.rows = this.rows;
+        this.fieldCursor.reset();
 
         /*for (var y = 0; y < this.rows; y++) {
             for (var x = 0; x < this.cols; x++) {
@@ -956,6 +972,8 @@ module.exports = InfoPanel;
 
 },{"date-time":13,"dom":14,"levels":9}],9:[function(require,module,exports){
 module.exports = {
+    defaultRows: 5,
+    defaultCols: 6,
     getTitle: function(levelData) {
         return levelData.titleSymbol + ' ' + levelData.name;
     },
@@ -1295,7 +1313,7 @@ module.exports = {
 },{}],11:[function(require,module,exports){
 module.exports = {
     set: function(name, value) {
-        this._buffer[name] = value;
+        this._buffer[name] = this._copy(value);
         this._save();
     },
     get: function(name, defaultValue) {
@@ -1323,6 +1341,9 @@ module.exports = {
         try {
             localStorage.setItem(this.lsName, JSON.stringify(this._buffer));
         } catch(e) {}
+    },
+    _copy: function(obj) {
+        return JSON.parse(JSON.stringify(obj));
     }
 };
 
@@ -1619,11 +1640,11 @@ module.exports = {
 };
 
 },{}],19:[function(require,module,exports){
-var $ = require('dom').$,
-    Page = require('page'),
-    Settings = require('settings'),
-    Field = require('field'),
-    levels = require('levels');
+var $ = require('dom').$;
+var Page = require('page');
+var Settings = require('settings');
+var Field = require('field');
+var levels = require('levels');
 
 module.exports = {
     name: 'game',
@@ -1631,17 +1652,27 @@ module.exports = {
     init: function(data) {
         this.elem = $('.game');
 
-        this._levelData = levels.getLevel(Settings.get('level'));
+        var levelData = this.getLevelData();
+
         this._field = new Field({
             elem: $('.field', this.elem),
-            cols: this._levelData.cols || 6,
-            rows: this._levelData.rows || 5,
-            levelData: this._levelData,
+            rows: levelData.rows,
+            cols: levelData.cols,
+            levelData: levelData.data,
             control: 'any',
             infoPanel: true
         });
 
         this._onKeydown = this._onKeydown.bind(this);
+    },
+    getLevelData: function() {
+        var data = levels.getLevel(Settings.get('level'));
+
+        return {
+            data: data,
+            rows: data.rows || levels.defaultRows,
+            cols: data.cols || levels.defaultCols
+        };
     },
     _onKeydown: function(e) {
         if (e.key === 'Escape') {
@@ -1649,7 +1680,14 @@ module.exports = {
         }
     },
     show: function() {
-        this._field.show();
+        var levelData = this.getLevelData();
+
+        this._field.show({
+            levelData: levelData.data,
+            cols: levelData.cols,
+            rows: levelData.rows
+        });
+
         $.on(document, 'keydown', this._onKeydown);
     },
     hide: function() {
@@ -1914,8 +1952,9 @@ Object.assign(Page, customEvent.prototype);
 module.exports = Page;
 
 },{"dom":14,"event":15}],23:[function(require,module,exports){
-var $ = require('dom').$;
-var $$ = require('dom').$$;
+var dom = require('dom');
+var $ = dom.$;
+var $$ = dom.$$;
 var jstohtml = require('jstohtml');
 var levels = require('levels');
 var Settings = require('settings');
