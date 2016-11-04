@@ -75,6 +75,21 @@ $.css = function(el, props) {
     });
 };
 
+$.offset = function(el) {
+    var box = {top: 0, left: 0};
+
+    // If we don't have gBCR, just use 0,0 rather than error
+    // BlackBerry 5, iOS 3 (original iPhone)
+    if(el && typeof el.getBoundingClientRect !== 'undefined') {
+        box = el.getBoundingClientRect();
+    }
+    
+    return {
+        top: box.top  + (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || 0),
+        left: box.left + (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || 0)
+    };
+};
+
 var $$ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
 };
