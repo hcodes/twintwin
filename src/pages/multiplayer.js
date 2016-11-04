@@ -1,6 +1,7 @@
 var $ = require('dom').$,
     Field = require('field'),
     UserPanel = require('user-panel'),
+    Settings = require('settings'),
     levels = require('levels'),
     isMobile = require('is-mobile');
 
@@ -44,9 +45,25 @@ module.exports = {
             this._onExit();
         }
     },
+    getLevelData: function() {
+        var data = levels.getLevel(Settings.get('level'));
+
+        return {
+            data: data,
+            rows: data.rows || levels.defaultRows,
+            cols: data.cols || levels.defaultCols
+        };
+    },
     show: function() {
-        this._fieldOne.show();
-        this._fieldTwo.show();
+        var levelData = this.getLevelData(),
+            data = {
+                levelData: levelData.data,
+                cols: levelData.cols,
+                rows: levelData.rows
+            };
+
+        this._fieldOne.show(data);
+        this._fieldTwo.show(data);
 
         $.on(document, 'keydown', this._onKeydown);
     },
