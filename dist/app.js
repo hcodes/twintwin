@@ -126,16 +126,20 @@ var App = {
 
         body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
 
-        $.on(document, 'mousemove', function() {
-            this.setInputType('mouse');
-        }.bind(this));
+        if (isMobile) {
+            this.setInputType('touch');
+        } else {
+            $.on(document, 'mousemove', function() {
+                this.setInputType('mouse');
+            }.bind(this));
+
+            $.on(document, 'touchstart', function() {
+                this.setInputType('touch');
+            }.bind(this));
+        }
 
         $.on(document, 'keydown', function() {
             this.setInputType('keyboard');
-        }.bind(this));
-
-        $.on(document, 'touchstart', function() {
-            this.setInputType('touch');
         }.bind(this));
 
         this.setInputType('mouse');
@@ -1483,6 +1487,21 @@ $.css = function(el, props) {
     });
 };
 
+$.offset = function(el) {
+    var box = {top: 0, left: 0};
+
+    // If we don't have gBCR, just use 0,0 rather than error
+    // BlackBerry 5, iOS 3 (original iPhone)
+    if(el && typeof el.getBoundingClientRect !== 'undefined') {
+        box = el.getBoundingClientRect();
+    }
+    
+    return {
+        top: box.top  + (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || 0),
+        left: box.left + (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || 0)
+    };
+};
+
 var $$ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
 };
@@ -1804,6 +1823,7 @@ module.exports = {
 var $ = require('dom').$,
     Field = require('field'),
     UserPanel = require('user-panel'),
+    Settings = require('settings'),
     levels = require('levels'),
     isMobile = require('is-mobile');
 
@@ -1847,9 +1867,25 @@ module.exports = {
             this._onExit();
         }
     },
+    getLevelData: function() {
+        var data = levels.getLevel(Settings.get('level'));
+
+        return {
+            data: data,
+            rows: data.rows || levels.defaultRows,
+            cols: data.cols || levels.defaultCols
+        };
+    },
     show: function() {
-        this._fieldOne.show();
-        this._fieldTwo.show();
+        var levelData = this.getLevelData(),
+            data = {
+                levelData: levelData.data,
+                cols: levelData.cols,
+                rows: levelData.rows
+            };
+
+        this._fieldOne.show(data);
+        this._fieldTwo.show(data);
 
         $.on(document, 'keydown', this._onKeydown);
     },
@@ -1861,7 +1897,7 @@ module.exports = {
     }
 };
 
-},{"dom":14,"field":5,"is-mobile":16,"levels":9,"user-panel":12}],22:[function(require,module,exports){
+},{"dom":14,"field":5,"is-mobile":16,"levels":9,"settings":11,"user-panel":12}],22:[function(require,module,exports){
 var customEvent = require('event');
 var body = document.body;
 var $ = require('dom').$;
@@ -2014,7 +2050,7 @@ module.exports = {
         var maxLevel = Settings.get('maxLevel'),
             btns = $$('.select-level__list .btn', this.elem),
             cl ='btn_disabled';
-        
+
         for (var i = 0; i < btns.length; i++) {
             var btnCl = btns[i].classList;
             if (i < maxLevel) {
@@ -2023,6 +2059,9 @@ module.exports = {
                 btnCl.add(cl);
             }
         }
+
+        var maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
+        window.scrollTo(0, $.offset(maxBtn).top - 10);
     },
     hide: function() {}
 };
