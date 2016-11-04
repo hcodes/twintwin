@@ -60,7 +60,7 @@ module.exports = {
         var maxLevel = Settings.get('maxLevel'),
             btns = $$('.select-level__list .btn', this.elem),
             cl ='btn_disabled';
-        
+
         for (var i = 0; i < btns.length; i++) {
             var btnCl = btns[i].classList;
             if (i < maxLevel) {
@@ -69,6 +69,9 @@ module.exports = {
                 btnCl.add(cl);
             }
         }
+
+        var maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
+        window.scrollTo(0, $.offset(maxBtn).top - 10);
     },
     hide: function() {}
 };
