@@ -14,16 +14,20 @@ var App = {
 
         body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
 
-        $.on(document, 'mousemove', function() {
-            this.setInputType('mouse');
-        }.bind(this));
+        if (isMobile) {
+            this.setInputType('touch');
+        } else {
+            $.on(document, 'mousemove', function() {
+                this.setInputType('mouse');
+            }.bind(this));
+
+            $.on(document, 'touchstart', function() {
+                this.setInputType('touch');
+            }.bind(this));
+        }
 
         $.on(document, 'keydown', function() {
             this.setInputType('keyboard');
-        }.bind(this));
-
-        $.on(document, 'touchstart', function() {
-            this.setInputType('touch');
         }.bind(this));
 
         this.setInputType('mouse');
