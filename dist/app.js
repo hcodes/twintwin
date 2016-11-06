@@ -1,6 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
- * jstohtml v1.1.0
+ * jstohtml v1.1.2
  * Copyright 2014 Denis Seleznev
  * Released under the MIT license.
  *
@@ -183,7 +183,7 @@ $.on(document, 'DOMContentLoaded', function() {
     metrika.hit(35250605);
 });
 
-},{"back":3,"dom":14,"game":19,"gamepad":7,"gamepad-notice":6,"is-mobile":16,"main":20,"metrika":10,"multiplayer":21,"page":22,"select-level":23}],3:[function(require,module,exports){
+},{"back":3,"dom":17,"game":23,"gamepad":9,"gamepad-notice":8,"is-mobile":19,"main":24,"metrika":12,"multiplayer":25,"page":26,"select-level":27}],3:[function(require,module,exports){
 var $ = require('dom').$,
     Page = require('page');
 
@@ -212,7 +212,39 @@ Back.prototype = {
 
 module.exports = Back;
 
-},{"dom":14,"page":22}],4:[function(require,module,exports){
+},{"dom":17,"page":26}],4:[function(require,module,exports){
+var $ = require('dom').$;
+var Event = require('event');
+
+module.exports = {
+    create: function(obj) {
+        Object.assign(obj, Event.prototype);
+
+        Object.assign(obj, {
+            domEvents: [],
+            setDomEvents: function(events) {
+                events.forEach(function(item) {
+                    $.on.apply($, item);
+                }, this);
+
+                this.domEvents = this.domEvents.concat(events);
+            },
+            removeDomEvents: function() {
+                this.domEvents.forEach(function(item) {
+                    $.off.apply($, item);
+                });
+
+                this.domEvents = [];
+            }
+        });
+
+        obj.init && obj.init();
+
+        return obj;
+    }
+};
+
+},{"dom":17,"event":18}],5:[function(require,module,exports){
 var $ = require('dom').$;
 
 function FieldCursor(data) {
@@ -334,12 +366,11 @@ FieldCursor.prototype = {
 
 module.exports = FieldCursor;
 
-},{"dom":14}],5:[function(require,module,exports){
+},{"dom":17}],6:[function(require,module,exports){
 var dom = require('dom'),
     $ = dom.$,
     $$ = dom.$$,
     levels = require('levels'),
-    Settings = require('settings'),
     FieldCursor = require('field-cursor'),
     InfoPanel = require('info-panel'),
     Gamepad = require('gamepad');
@@ -522,7 +553,7 @@ Field.prototype = {
         return {
             width: width,
             height: height,
-            fontSize: Math.min(width, height) * 0.85
+            fontSize: Math.min(width, height) * 0.7
         };
     },
     findCage: function(x, y) {
@@ -609,7 +640,8 @@ Field.prototype = {
             }.bind(this), 200);
 
             if (!this.cagesCount) {
-                this.finish();
+                this.infoPanel.stop();
+                this.onFinish();
             }
         }
     },
@@ -634,12 +666,6 @@ Field.prototype = {
 
             this.field[y] = buf;
         }
-    },
-    finish: function() {
-        var maxLevel = Settings.get('maxLevel');
-        Settings.set('maxLevel', Math.max(maxLevel, Settings.get('level') + 1));
-
-        this.infoPanel.stop();
     },
     show: function(data) {
         this.field = [];
@@ -679,7 +705,51 @@ Field.prototype = {
 
 module.exports = Field;
 
-},{"dom":14,"field-cursor":4,"gamepad":7,"info-panel":8,"levels":9,"settings":11}],6:[function(require,module,exports){
+},{"dom":17,"field-cursor":5,"gamepad":9,"info-panel":10,"levels":11}],7:[function(require,module,exports){
+var $ = require('dom').$;
+var Event = require('event');
+var num = require('number');
+var Component = require('component');
+
+var gameOver = Component.create({
+    init: function() {
+        var that = this;
+        this.setDomEvents([
+            ['.game-over__restart', 'click', function() {
+                that.trigger('click', 'restart');
+            }],
+            ['.game-over__next', 'click', function() {
+                that.trigger('click', 'next');
+            }]
+        ]);
+    },
+    updateScore: function(value) {
+        $('.game-over__score-i').innerHTML = num.format(value);
+    },
+    show: function(data) {
+        $.show('.game-over');
+        this.calcScore(data);
+    },
+    hide: function() {
+        $.hide('.game-over');
+    },
+    calcScore: function(data) {
+        var value = Math.floor(1e6 /  data.errors / Math.log(data.time + 3));
+        var that = this;
+
+        for (var i = 0; i < 10; i++) {
+            (function(counter) {
+                setTimeout(function() {
+                    that.updateScore(Math.floor(value * counter / 10));
+                }, i * 100);
+            })(i);
+        }
+    }
+});
+
+module.exports = gameOver;
+
+},{"component":4,"dom":17,"event":18,"number":20}],8:[function(require,module,exports){
 var $ = require('dom').$,
     Gamepad = require('gamepad'),
     body = document.body;
@@ -756,7 +826,7 @@ module.exports = {
     }
 };
 
-},{"dom":14,"gamepad":7}],7:[function(require,module,exports){
+},{"dom":17,"gamepad":9}],9:[function(require,module,exports){
 var $ = require('dom').$,
     Event = require('event');
 
@@ -764,7 +834,7 @@ require('raf');
 
 module.exports = {
     init: function() {
-        $.extend(this, Event.prototype);
+        Object.assign(this, Event.prototype);
 
         if (!this.supported()) {
             return;
@@ -904,7 +974,7 @@ module.exports = {
     _pads: []
 };
 
-},{"dom":14,"event":15,"raf":17}],8:[function(require,module,exports){
+},{"dom":17,"event":18,"raf":21}],10:[function(require,module,exports){
 var $ = require('dom').$,
     levels = require('levels'),
     dtime = require('date-time');
@@ -974,7 +1044,7 @@ InfoPanel.prototype = {
 
 module.exports = InfoPanel;
 
-},{"date-time":13,"dom":14,"levels":9}],9:[function(require,module,exports){
+},{"date-time":16,"dom":17,"levels":11}],11:[function(require,module,exports){
 module.exports = {
     defaultRows: 5,
     defaultCols: 6,
@@ -1297,7 +1367,7 @@ module.exports = {
     ]
 };
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Yandex.Metrika
 function prepareParam(value) {
     return window.encodeURIComponent((value || '').substr(0, 512));
@@ -1314,7 +1384,130 @@ module.exports = {
     }
 };
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
+var dom = require('dom')
+var $ = dom.$;
+var $$ = dom.$$;
+var Event = require('event');
+var Component = require('component');
+var Settings = require('settings');
+
+var SelectControls = Component.create({
+    init: function() {
+        this.values = [];
+
+        var defaultValues = [
+            Settings.get('control1') || 'mouse',
+            Settings.get('control2') || 'keyboard',
+            Settings.get('control3') || 'gamepad1',
+            Settings.get('control4') || 'gamepad2'
+        ];
+
+        var events = [];
+
+        this.elems = Array.from($$('.select-controls'));
+        this.elems.forEach(function(el, i) {
+            var value = defaultValues[i];
+
+            this.values.push(value);
+
+            this.updateElem(i);
+
+            events.push([
+                el, 'click', function() {
+                    this.selectNext(i);
+                }.bind(this)
+            ]);
+        }, this);
+
+        this.setDomEvents(events);
+    },
+    getPlayerControl: function(playerNum) {
+        return this.values[playerNum];
+    },
+    selectNext: function(playerNum) {
+        var currentIndex = this.getIndex(this.values[playerNum]);
+        var index = currentIndex;
+        while(this.values.indexOf(this.controls[index].value) !== -1) {
+            index++;
+            if (index >= this.controls.length - 1) {
+                index = 0;
+            }
+        }
+
+        var value = this.controls[index].value;
+        this.values[playerNum] = value;
+        Settings.set('control' + playerNum, value);
+
+        this.trigger('change', {
+            playerNum: playerNum,
+            control: value
+        });
+
+        this.updateElem(playerNum);
+    },
+    updateElem: function(playerNum) {
+        var controlInfo = this.controls[this.getIndex(this.values[playerNum])];
+
+        var elem = this.elems[playerNum];
+        elem.innerHTML = controlInfo.text;
+        elem.title = controlInfo.title;
+    },
+    getIndex: function(value) {
+        var index = -1;
+
+        this.controls.some(function(item, i) {
+            if (item.value === value) {
+                index = i;
+                return true;
+            }
+
+            return false;
+        });
+
+        return index;
+    },
+    controls: [
+        {
+            value: 'keyboard',
+            text: '⌨',
+            title: 'Keyboard: Cursors + Space or Enter'
+        },
+        {
+            value: 'mouse',
+            text: '🖱',
+            title: 'Mouse'
+        },
+        {
+            value: 'touch',
+            text: '🤚',
+            title: 'Touch'
+        },
+        {
+            value: 'gamepad1',
+            text: '🎮 1',
+            title: 'Gamepad 1'
+        },
+        {
+            value: 'gamepad2',
+            text: '🎮 2',
+            title: 'Gamepad 2'
+        },
+        {
+            value: 'gamepad3',
+            text: '🎮 3',
+            title: 'Gamepad 3'
+        },
+        {
+            value: 'gamepad4',
+            text: '🎮 4',
+            title: 'Gamepad 4'
+        }
+    ]
+});
+
+module.exports = SelectControls;
+},{"component":4,"dom":17,"event":18,"settings":14}],14:[function(require,module,exports){
 module.exports = {
     set: function(name, value) {
         this._buffer[name] = this._copy(value);
@@ -1351,10 +1544,10 @@ module.exports = {
     }
 };
 
-},{}],12:[function(require,module,exports){
-var Settings = require('settings'),
-    $ = require('dom').$,
-    string = require('string');
+},{}],15:[function(require,module,exports){
+var Settings = require('settings');
+var $ = require('dom').$;
+var string = require('string');
 
 function UserPanel(container, data) {
     this.container = container;
@@ -1395,7 +1588,7 @@ UserPanel.prototype = {
 
 module.exports = UserPanel;
 
-},{"dom":14,"settings":11,"string":18}],13:[function(require,module,exports){
+},{"dom":17,"settings":14,"string":22}],16:[function(require,module,exports){
 module.exports = {
     leadZero: function(num) {
         return num < 10 ? '0' + num : num;
@@ -1409,7 +1602,7 @@ module.exports = {
     }
 };
 
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var jstohtml = require('jstohtml');
 
 var _$ = function(el, context) {
@@ -1462,16 +1655,6 @@ $.off = function(el, type, callback) {
     return $;
 };
 
-$.extend = function(dest, source) {
-    Object.keys(source).forEach(function(key) {
-        if (typeof dest[key] === 'undefined') {
-            dest[key] = source[key];
-        }
-    });
-
-    return dest;
-};
-
 $.move = function(elem, left, top) {
     $.css(elem, {left: left + 'px', top: top + 'px'});
 };
@@ -1485,6 +1668,14 @@ $.css = function(el, props) {
     Object.keys(props).forEach(function(key) {
         style[key] = props[key];
     });
+};
+
+$.show = function(el) {
+    $(el).style.display = 'block';
+};
+
+$.hide = function(el) {
+    $(el).style.display = 'none';
 };
 
 $.offset = function(el) {
@@ -1537,7 +1728,7 @@ module.exports = {
     hasSupportCss: hasSupportCss
 };
 
-},{"jstohtml":1}],15:[function(require,module,exports){
+},{"jstohtml":1}],18:[function(require,module,exports){
 function Event() {}
 
 Event.prototype = {
@@ -1601,7 +1792,7 @@ Event.prototype = {
 module.exports = Event;
 
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var ua = navigator.userAgent || navigator.vendor || window.opera;
 var re1 = /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i;
 var re2 = /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i;
@@ -1610,7 +1801,21 @@ var isMobile = re1.test(ua) || re2.test(ua.substr(0, 4));
 
 module.exports = isMobile;
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
+module.exports = {
+    format: function(n, separator) {
+        separator = separator || '\u202F';
+
+        n = n.toString()
+            .split('').reverse().join('')
+            .replace(/(\d{3})/g, '$1' + separator)
+            .split('').reverse().join('');
+
+        return n[0] == separator ? n.substr(1) : n;
+    }
+};
+
+},{}],21:[function(require,module,exports){
 'use strict';
 
 var lastTime = 0,
@@ -1641,7 +1846,7 @@ if (!window.cancelAnimationFrame) {
     };
 }
 
-},{}],18:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = {
     escapeHTML: function(text) {
         return text
@@ -1658,12 +1863,13 @@ module.exports = {
     }
 };
 
-},{}],19:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var $ = require('dom').$;
 var Page = require('page');
 var Settings = require('settings');
 var Field = require('field');
 var levels = require('levels');
+var gameOver = require('game-over');
 
 module.exports = {
     name: 'game',
@@ -1683,6 +1889,33 @@ module.exports = {
         });
 
         this._onKeydown = this._onKeydown.bind(this);
+
+        this._field.onFinish = function() {
+            var maxLevel = Settings.get('maxLevel');
+            Settings.set('maxLevel', Math.max(maxLevel, Settings.get('level') + 1));
+
+            var panel = this.infoPanel;
+            gameOver.show({
+                errors: panel.errors || 1,
+                time: Math.floor((Date.now() - panel.startTime) / 1000) || 1
+            });
+        };
+
+        gameOver.on('click', function(e, button) {
+            var level;
+
+            switch(button) {
+                case 'menu':
+                    Page.show('main');
+                    break;
+                case 'next':
+                    this.nextLevel();
+                    break;
+                case 'restart':
+                    this.restart();
+                    break;
+            }
+        }.bind(this));
     },
     getLevelData: function() {
         var data = levels.getLevel(Settings.get('level'));
@@ -1698,8 +1931,20 @@ module.exports = {
             Page.back();
         }
     },
+    restart: function() {
+        this.hide();
+        this.show();
+    },
+    nextLevel: function() {
+        Settings.set('level', Settings.get('level') + 1);
+
+        this.hide();
+        this.show();
+    },
     show: function() {
         var levelData = this.getLevelData();
+
+        gameOver.hide();
 
         this._field.show({
             levelData: levelData.data,
@@ -1715,7 +1960,7 @@ module.exports = {
     }
 };
 
-},{"dom":14,"field":5,"levels":9,"page":22,"settings":11}],20:[function(require,module,exports){
+},{"dom":17,"field":6,"game-over":7,"levels":11,"page":26,"settings":14}],24:[function(require,module,exports){
 var dom = require('dom'),
     $ = dom.$,
     $$ = dom.$$,
@@ -1819,32 +2064,35 @@ module.exports = {
     }
 };
 
-},{"dom":14,"jstohtml":1,"levels":9,"page":22,"settings":11}],21:[function(require,module,exports){
-var $ = require('dom').$,
-    Field = require('field'),
-    UserPanel = require('user-panel'),
-    Settings = require('settings'),
-    levels = require('levels'),
-    isMobile = require('is-mobile');
+},{"dom":17,"jstohtml":1,"levels":11,"page":26,"settings":14}],25:[function(require,module,exports){
+var $ = require('dom').$;
+var Field = require('field');
+var UserPanel = require('user-panel');
+var Settings = require('settings');
+var levels = require('levels');
+var isMobile = require('is-mobile');
+
+var SelectControls = require('select-controls');
 
 module.exports = {
     name: 'multiplayer',
     locationHash: 'multiplayer',
     init: function(data) {
         this.elem = $('.multiplayer');
-        
+
         this._levelData = levels.getRandomLevel();
-        
-        var rows = 5,
-            cols = 6;
-           
+
+        var rows = 5;
+        var cols = 6;
+
         var fieldOneElem = $('.field_one', this.elem);
         this._fieldOne = new Field({
             elem: fieldOneElem,
             cols: cols,
             rows: rows,
             levelData: this._levelData,
-            control: isMobile ? '*' : 'keyboard',
+            //control: isMobile ? '*' : 'keyboard',
+            control: SelectControls.getPlayerControl(0),
             infoPanel: false,
             userPanel: new UserPanel(fieldOneElem, {num: 1})
         });
@@ -1855,12 +2103,22 @@ module.exports = {
             cols: cols,
             rows: rows,
             levelData: this._levelData,
-            control: isMobile ? '*' : 'gamepad',
+            control: SelectControls.getPlayerControl(1),
             infoPanel: false,
             userPanel: new UserPanel(fieldTwoElem, {num: 2})
         });
 
         this._onKeydown = this._onKeydown.bind(this);
+
+        SelectControls.on('change', function(e, data) {
+            if (data.playerNum === 0) {
+                this._fieldOne.setControl(data.control);
+            }
+
+            if (data.playerNum === 1) {
+                this._fieldTwo.setControl(data.control);
+            }
+        }.bind(this));
     },
     _onKeydown: function(e) {
         if (e.key === 'Escape') {
@@ -1897,7 +2155,7 @@ module.exports = {
     }
 };
 
-},{"dom":14,"field":5,"is-mobile":16,"levels":9,"settings":11,"user-panel":12}],22:[function(require,module,exports){
+},{"dom":17,"field":6,"is-mobile":19,"levels":11,"select-controls":13,"settings":14,"user-panel":15}],26:[function(require,module,exports){
 var customEvent = require('event');
 var body = document.body;
 var $ = require('dom').$;
@@ -1987,7 +2245,7 @@ Object.assign(Page, customEvent.prototype);
 
 module.exports = Page;
 
-},{"dom":14,"event":15}],23:[function(require,module,exports){
+},{"dom":17,"event":18}],27:[function(require,module,exports){
 var dom = require('dom');
 var $ = dom.$;
 var $$ = dom.$$;
@@ -2066,4 +2324,4 @@ module.exports = {
     hide: function() {}
 };
 
-},{"dom":14,"jstohtml":1,"levels":9,"page":22,"settings":11}]},{},[2]);
+},{"dom":17,"jstohtml":1,"levels":11,"page":26,"settings":14}]},{},[2]);
