@@ -16,21 +16,21 @@
     "node": ">= 0.12"
   },
   "devDependencies": {
-    "browserify": "^12.0.0",
-    "vinyl-source-stream": "^1.1.0",
+    "browserify": "13.1.x",
     "gulp": "3.9.x",
     "gulp-autoprefixer": "3.1.x",
     "gulp-cleancss": "0.2.x",
     "gulp-concat": "2.6.x",
-    "gulp-less": "3.0.x",
+    "gulp-less": "3.2.x",
     "gulp-rename": "1.2.x",
-    "gulp-replace": "^0.5.4",
-    "gulp-uglify": "1.5.x",
-    "jquery": "^2.1.4",
-    "jstohtml": "^1.1.1",
-    "jscs": "2.x",
-    "jshint": "2.9.1",
-    "show-js-error": "1.x"
+    "gulp-replace": "0.5.x",
+    "gulp-uglify": "2.0.x",
+    "jquery": "3.1.x",
+    "jscs": "3.0.x",
+    "jshint": "2.9.x",
+    "jstohtml": "1.1.x",
+    "show-js-error": "1.x",
+    "vinyl-source-stream": "1.1.x"
   },
   "scripts": {
     "test": "npm run-script gulp && npm run-script jshint && npm run-script jscs && npm run-script mocha-phantomjs",
