@@ -5,7 +5,7 @@ require('raf');
 
 module.exports = {
     init: function() {
-        $.extend(this, Event.prototype);
+        Object.assign(this, Event.prototype);
 
         if (!this.supported()) {
             return;

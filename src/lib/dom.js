@@ -50,16 +50,6 @@ $.off = function(el, type, callback) {
     return $;
 };
 
-$.extend = function(dest, source) {
-    Object.keys(source).forEach(function(key) {
-        if (typeof dest[key] === 'undefined') {
-            dest[key] = source[key];
-        }
-    });
-
-    return dest;
-};
-
 $.move = function(elem, left, top) {
     $.css(elem, {left: left + 'px', top: top + 'px'});
 };
@@ -73,6 +63,14 @@ $.css = function(el, props) {
     Object.keys(props).forEach(function(key) {
         style[key] = props[key];
     });
+};
+
+$.show = function(el) {
+    $(el).style.display = 'block';
+};
+
+$.hide = function(el) {
+    $(el).style.display = 'none';
 };
 
 $.offset = function(el) {

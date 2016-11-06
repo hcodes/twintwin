@@ -1,6 +1,6 @@
-var Settings = require('settings'),
-    $ = require('dom').$,
-    string = require('string');
+var Settings = require('settings');
+var $ = require('dom').$;
+var string = require('string');
 
 function UserPanel(container, data) {
     this.container = container;
