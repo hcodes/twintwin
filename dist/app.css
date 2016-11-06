@@ -573,14 +573,19 @@ body.page_field .page_field {
   position: absolute;
   right: 20px;
   bottom: 10px;
+  opacity: 0.5;
+  -webkit-transition: opacity ease .3s;
+  transition: opacity ease .3s;
+}
+.qr-code:hover {
+  opacity: 1;
 }
 .device_mobile .qr-code {
   display: none;
 }
 .qr-code img {
-  width: 70px;
-  height: 70px;
-  border: 3px solid #fff;
+  width: 111px;
+  height: 111px;
 }
 .select-controls {
   position: absolute;

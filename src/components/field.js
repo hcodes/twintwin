@@ -1,4 +1,4 @@
-var dom = require('dom'),
+var dom = require('dom');
 var $ = dom.$;
 var $$ = dom.$$;
 var levels = require('levels');

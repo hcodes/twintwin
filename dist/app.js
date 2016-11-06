@@ -367,13 +367,13 @@ FieldCursor.prototype = {
 module.exports = FieldCursor;
 
 },{"dom":17}],6:[function(require,module,exports){
-var dom = require('dom'),
-    $ = dom.$,
-    $$ = dom.$$,
-    levels = require('levels'),
-    FieldCursor = require('field-cursor'),
-    InfoPanel = require('info-panel'),
-    Gamepad = require('gamepad');
+var dom = require('dom');
+var $ = dom.$;
+var $$ = dom.$$;
+var levels = require('levels');
+var FieldCursor = require('field-cursor');
+var InfoPanel = require('info-panel');
+var Gamepad = require('gamepad');
 
 function Field(data) {
     this.elem = data.elem;
