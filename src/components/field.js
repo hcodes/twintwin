@@ -1,11 +1,10 @@
 var dom = require('dom'),
-    $ = dom.$,
-    $$ = dom.$$,
-    levels = require('levels'),
-    Settings = require('settings'),
-    FieldCursor = require('field-cursor'),
-    InfoPanel = require('info-panel'),
-    Gamepad = require('gamepad');
+var $ = dom.$;
+var $$ = dom.$$;
+var levels = require('levels');
+var FieldCursor = require('field-cursor');
+var InfoPanel = require('info-panel');
+var Gamepad = require('gamepad');
 
 function Field(data) {
     this.elem = data.elem;
@@ -185,7 +184,7 @@ Field.prototype = {
         return {
             width: width,
             height: height,
-            fontSize: Math.min(width, height) * 0.85
+            fontSize: Math.min(width, height) * 0.7
         };
     },
     findCage: function(x, y) {
@@ -272,7 +271,8 @@ Field.prototype = {
             }.bind(this), 200);
 
             if (!this.cagesCount) {
-                this.finish();
+                this.infoPanel.stop();
+                this.onFinish();
             }
         }
     },
@@ -297,12 +297,6 @@ Field.prototype = {
 
             this.field[y] = buf;
         }
-    },
-    finish: function() {
-        var maxLevel = Settings.get('maxLevel');
-        Settings.set('maxLevel', Math.max(maxLevel, Settings.get('level') + 1));
-
-        this.infoPanel.stop();
     },
     show: function(data) {
         this.field = [];

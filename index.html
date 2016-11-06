@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title data-key="main.title">Double emojis</title>
+    <title data-key="main.title">Twintwin &mdash; amazing game for traning your memory!</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
     <link rel="icon" href="icons/favicon.png" />
@@ -11,7 +11,7 @@
 <body>
     <div class="page page_main">
         <div class="main-bg"></div>
-        <div class="main-logo" data-key="main-logo.title">Remember Emoji!</div>
+        <div class="main-logo" data-key="main-logo.title">TwinTwin</div>
         <div class="qr-code"><img src="dist/qr_logo.png" alt="" /></div>
         <ul class="main-menu">
             <li><div class="main-menu__continue btn btn_red btn_middle" data-key="main-menu.continue">➡ Continue</div></li>
@@ -34,17 +34,26 @@
                 <div class="field-cursor"></div>
                 <div class="info"></div>
             </div>
+            <div class="game-over dialog">
+                <div class="game-over__score"><div data-key="game-over.score">⭐️ Score:</div> <div class="game-over__score-i"></div></div>
+                <div class="game-over__controls">
+                    <div class="game-over__restart btn btn_blue btn_middle" data-key="game-over.restart">↶ Restart</div>
+                    <div class="game-over__next btn btn_green btn_middle" data-key="game-over.next">→ Next</div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="page page_multiplayer">
         <div class="multiplayer">
             <div class="level-title"></div>
             <div class="field field_one">
+                <div class="select-controls"></div>
                 <div class="field__cages"></div>
                 <div class="field-cursor"></div>
                 <div class="info"></div>
             </div>
             <div class="field field_two">
+                <div class="select-controls"></div>
                 <div class="field__cages"></div>
                 <div class="field-cursor"></div>
                 <div class="info"></div>
