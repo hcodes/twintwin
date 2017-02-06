@@ -119,32 +119,6 @@
   float: left;
   margin-right: 3px;
 }
-html,
-body {
-  font-family: Helvetica, sans-serif;
-  font-size: 16px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: black;
-  touch-action: manipulation;
-  /* IE11 */
-  -ms-touch-action: manipulation;
-  /* IE10 */
-}
-.page {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: none;
-  width: 100%;
-  height: 100%;
-}
 .back {
   font-size: 40px;
   line-height: 20px;
@@ -435,7 +409,7 @@ body.page_field .page_field {
 }
 .game-over__controls {
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 0;
   width: 100%;
   text-align: center;
@@ -729,4 +703,30 @@ body.page_select-level .page_select-level {
   display: inline-block;
   text-align: center;
   border-radius: 100%;
+}
+html,
+body {
+  font-family: Helvetica, sans-serif;
+  font-size: 16px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: black;
+  touch-action: manipulation;
+  /* IE11 */
+  -ms-touch-action: manipulation;
+  /* IE10 */
+}
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  width: 100%;
+  height: 100%;
 }

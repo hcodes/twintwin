@@ -437,27 +437,42 @@ Field.prototype = {
     },
     setKeyboardEvents: function() {
         $.on(document, 'keydown', function(e) {
-            if (!this.isControl('keyboard')) {
-                return;
+            if (this.isControl('keyboard1')) {
+                switch (e.key) {
+                    case 'ArrowUp':
+                        this.fieldCursor.up();
+                    break;
+                    case 'ArrowLeft':
+                        this.fieldCursor.left();
+                    break;
+                    case 'ArrowRight':
+                        this.fieldCursor.right();
+                    break;
+                    case 'ArrowDown':
+                        this.fieldCursor.down();
+                    break;
+                    case 'Enter':
+                        this.openCageWithCursor();
+                    break;
+                }
             }
 
-            switch (e.key) {
-                case 'ArrowUp':
-                    this.fieldCursor.up();
-                break;
-                case 'ArrowLeft':
-                    this.fieldCursor.left();
-                break;
-                case 'ArrowRight':
-                    this.fieldCursor.right();
-                break;
-                case 'ArrowDown':
-                    this.fieldCursor.down();
-                break;
-                case ' ':
-                case 'Enter':
-                    this.openCageWithCursor();
-                break;
+            if (this.isControl('keyboard2')) {
+                switch (e.key) {
+                    case 'W':
+                        this.fieldCursor.up();
+                    break;
+                    case 'A':
+                        this.fieldCursor.left();
+                    break;
+                    case 'D':
+                        this.fieldCursor.right();
+                    break;
+                    case 'S':
+                        this.fieldCursor.down();
+                    break;
+                    case ' ':
+                }
             }
         }.bind(this));
     },
@@ -1064,305 +1079,160 @@ module.exports = {
             symbols: []
         },
         {
+            name: 'Headwear',
+            titleSymbol: '👒',
+            cols: 2,
+            rows: 2,
+            symbols: [ '👑', '👒', '🎩', '🎓' ]
+        },
+        {
+            name: 'Shoes',
+            titleSymbol: '👠',
+            cols: 3,
+            rows: 2,
+            symbols: ['👟', '👞', '👡', '👠', '👢']
+        },
+        {
             name: 'Accessories',
             titleSymbol: '👛',
             cols: 4,
             rows: 3,
-            symbols: [
-                '👑',
-                '💼',
-                '👜',
-                '👝',
-                '👛',
-                '👓',
-                '🎀',
-                '🌂',
-                '💄'
-            ]
+            symbols: [ '👑', '💼', '👜', '👝', '👛', '👓', '🎀', '🌂', '💄' ]
+        },
+        {
+            name: 'Numerals',
+            titleSymbol: '3',
+            cols: 4,
+            rows: 3,
+            symbols: [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' ]
+        },
+        {
+            name: 'Vegetables',
+            titleSymbol: '🥕',
+            cols: 4,
+            rows: 4,
+            symbols: [ '🥑', '🍆', '🥔', '🥕', '🌽', '🌶', '🥒', '🌰' ]
+        },
+        {
+            name: 'Trains',
+            titleSymbol: '🚄',
+            cols: 4,
+            rows: 4,
+            symbols: [ '🚂', '🚊', '🚉', '🚞', '🚆', '🚄', '🚅', '🚈', '🚇', '🚝', '🚋', '🚃' ]
+        },
+        {
+            name: 'Drinks',
+            titleSymbol: '🍷',
+            cols: 5,
+            rows: 4,
+            symbols: [ '🍼', '🥛', '☕', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂' ]
+        },
+        {
+            name: 'Fruits',
+            titleSymbol: '🍏',
+            cols: 5,
+            rows: 4,
+            symbols: [ '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🥝' ]
         },
         {
             name: 'Flowers and trees',
             titleSymbol: '💐',
-            cols: 4,
+            cols: 6,
             rows: 4,
-            symbols: [
-                '💐',
-                '🌸',
-                '🌷',
-                '🍀',
-                '🌹',
-                '🌻',
-                '🌺',
-                '🍁',
-                '🍃',
-                '🍂',
-                '🌿',
-                '🌾',
-                '🌵',
-                '🌴',
-                '🌲',
-                '🌳',
-                '🌰',
-                '🌼',
-                '💮'
-            ]
-        },
-        {
-            name: 'Fruits and vegetables',
-            titleSymbol: '🍏',
-            cols: 5,
-            rows: 4,
-            symbols: [
-                '🌰',
-                '🌱',
-                '🍎',
-                '🍏',
-                '🍊',
-                '🍋',
-                '🍒',
-                '🍇',
-                '🍉',
-                '🍓',
-                '🍑',
-                '🍈',
-                '🍌',
-                '🍐',
-                '🍍',
-                '🍠',
-                '🍆',
-                '🍅',
-                '🌽'
-            ]
+            symbols: [ '💐', '🌸', '🌷', '🍀', '🌹', '🌻', '🌺', '🍁', '🍃', '🍂', '🌿', '🌾', '🌵', '🌴', '🌲', '🌳', '🌰', '🌼', '💮' ]
         },
         {
             name: 'Zodiac Signs',
             titleSymbol: '♋',
             cols: 6,
             rows: 4,
-            symbols: [
-                '♈',
-                '♉',
-                '♊',
-                '♋',
-                '♌',
-                '♍',
-                '♎',
-                '♏',
-                '♐',
-                '♑',
-                '♒',
-                '♓',
-                '⛎'
-            ]
+            symbols: [ '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '⛎' ]
+        },
+        {
+            name: 'Sweets',
+            titleSymbol: '♋',
+            cols: 6,
+            rows: 4,
+            symbols: [ '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🍫', '🍬', '🍭', '🍮', '🍯' ]
         },
         {
             name: 'Fashion',
             titleSymbol: '👗',
-            symbols: [
-                '🎩',
-                '👒',
-                '👟',
-                '👞',
-                '👡',
-                '👠',
-                '👢',
-                '👕',
-                '👔',
-                '👚',
-                '👗',
-                '🎽',
-                '👖',
-                '👘',
-                '👙'
-            ]
+            symbols: [ '🎩', '👒',  '👢', '👕', '👔', '👚', '👗', '🎽', '👖', '👘', '👙' ]
         },
         {
             name: 'Buildings',
             titleSymbol: '🏢',
-            symbols: [
-                '🏠',
-                '🏡',
-                '🏫',
-                '🏢',
-                '🏣',
-                '🏥',
-                '🏦',
-                '🏪',
-                '🏩',
-                '🏨',
-                '💒',
-                '⛪',
-                '🏬',
-                '🏤',
-                '🌇',
-                '🌆',
-                '🏯',
-                '🏰',
-                '⛺',
-                '🏭',
-                '🗼',
-                '🗾',
-                '🗻',
-                '🌄',
-                '🌅',
-                '🌃',
-                '🗽',
-                '🌉',
-                '🎠',
-                '🎡',
-                '⛲',
-                '🎢'
+            symbols: [ '🏠', '🏡', '🏫', '🏢', '🏣', '🏥', '🏦', '🏪', '🏩', '🏨', '💒', '⛪', '🏬', '🏤', '🌇', '🌆',
+                '🏯', '🏰', '⛺', '🏭', '🗼', '🗾', '🗻', '🌄', '🌅', '🌃', '🗽', '🌉', '🎠', '🎡', '⛲', '🎢'
             ]
         },
         {
-            name: 'Trains',
-            titleSymbol: '🚄',
+            name: 'People',
+            titleSymbol: '👨',
             symbols: [
-                '🚂',
-                '🚊',
-                '🚉',
-                '🚞',
-                '🚆',
-                '🚄',
-                '🚅',
-                '🚈',
-                '🚇',
-                '🚝',
-                '🚋',
-                '🚃'
+                '👦', '👧', '👨', '👩', '👴', '👵', '👶', '👼', '🎅', '🤶',
+                '👸', '🤴', '👰', '🤵', '🤰', '👲', '🙍', '💃', '🕺', '👪'
             ]
+        },
+        {
+            name: 'Currency',
+            titleSymbol: '€',
+            bg: false,
+            symbols: [ '₳', '฿', '₡', '₢', '€', '£', '₤', '₣', 'ƒ', '₲', '₭', 'Ł', '₥', '₦', '₽', '₱', '$', '₮', '₩', '￦', '¥', '¤' ]
+        },
+        {
+            name: 'Roman numbers',
+            titleSymbol: 'Ⅸ',
+            bg: false,
+            symbols: [ 'Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', 'Ⅵ', 'Ⅶ', 'Ⅷ', 'Ⅸ', 'Ⅹ', 'Ⅺ', 'Ⅻ', 'Ⅼ', 'Ⅽ', 'Ⅾ', 'Ⅿ', 'ↀ', 'ↁ', 'ↂ', 'ↇ', 'ↈ' ]
         },
         {
             name: 'Hand Signs',
             titleSymbol: '👌',
             bg: false,
-            symbols: [
-                '👍',
-                '👎',
-                '👌',
-                '👊',
-                '✊',
-                '✌',
-                '👋',
-                '✋',
-                '👐',
-                '👆',
-                '👇',
-                '👉',
-                '👈',
-                '🙌',
-                '🙏',
-                '☝',
-                '👏',
-                '💪'
-            ]
+            symbols: [ '👍', '👎', '👌', '👊', '✊', '✌', '👋', '✋', '👐', '👆', '👇', '👉', '👈', '🙌', '🙏', '☝', '👏', '💪' ]
         },
         {
             name: 'Arrows',
             titleSymbol: '↗',
             bg: false,
             symbols: [
-                '⬇',
-                '⬅',
-                '➡',
-                '↗',
-                '↖',
-                '↘',
-                '↙',
-                '↔',
-                '↕',
-                '🔄',
-                '◀',
-                '▶',
-                '🔼',
-                '🔽',
-                '↩',
-                '↪',
-                '⏪',
-                '⏩',
-                '⏫',
-                '⏬',
-                '⤵',
-                '⤴',
-                '🔀',
-                '🔃',
-                '🔺',
-                '🔻',
-                '⬆'
+                '⬇', '⬅', '➡', '↗', '↖', '↘', '↙','↔','↕', '🔄', '◀', '▶', '🔼', '🔽',
+                '↩', '↪', '⏪', '⏩', '⏫', '⏬', '⤵', '⤴', '🔀', '🔃', '🔺', '🔻', '⬆'
+            ]
+        },
+        {
+            name: 'Food',
+            titleSymbol: '🍞',
+            symbols: [
+                '🍞', '🥐', '🥖', '🥞', '🧀', '🍖', '🍗', '🥓', '🍔', '🍟', '🍕', '🌭', '🌮', '🌯', '🍳',
+                '🍲', '🥗', '🍿', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🍡'
+            ]
+        },
+        {
+            name: 'Stars',
+            titleSymbol: '✯',
+            bg: false,
+            symbols: [
+                '★', '☆', '✪', '✯', '✡', '✵', '❉', '❋', '✹', '✸', '✶', '✷', '✵', '✳', '✲', '✱',
+                '✧', '✦', '⍟', '⊛', '🔯', '🌠', '🌟', '﹡', '❃', '❂', '✻', '⍣', '✭', '≛', '*', '٭'
             ]
         },
         {
             name: 'Technology',
             titleSymbol: '📀',
-            symbols: [
-                '🎥',
-                '📷',
-                '📹',
-                '📼',
-                '💿',
-                '📀',
-                '💽',
-                '💾',
-                '💻',
-                '📱',
-                '☎',
-                '📞',
-                '📟',
-                '📠',
-                '📡',
-                '📺',
-                '📻'
-            ]
+            symbols: [ '🎥', '📷', '📹', '📼', '💿', '📀', '💽', '💾', '💻', '📱', '☎', '📞', '📟', '📠', '📡', '📺', '📻' ]
         },
         {
             name: 'Sport',
             titleSymbol: '🏀',
-            symbols: [
-                '🎯',
-                '🏈',
-                '🏀',
-                '⚽',
-                '⚾',
-                '🎾',
-                '🎱',
-                '🏉',
-                '🎳',
-                '⛳',
-                '🚵',
-                '🚴',
-                '🏁',
-                '🏇',
-                '🏆',
-                '🎿',
-                '🏂',
-                '🏊',
-                '🏄',
-                '🎣'
-            ]
+            symbols: [ '🎯', '🏈', '🏀', '⚽', '⚾', '🎾', '🎱', '🏉', '🎳', '⛳', '🚵', '🚴', '🏁', '🏇', '🏆', '🎿', '🏂', '🏊', '🏄', '🎣' ]
         },
         {
             name: 'Games and Hobbies',
             titleSymbol: '🎨',
-            symbols: [
-                '🎨',
-                '🎬',
-                '🎤',
-                '🎧',
-                '🎼',
-                '🎵',
-                '🎶',
-                '🎹',
-                '🎻',
-                '🎺',
-                '🎷',
-                '🎸',
-                '👾',
-                '🎮',
-                '🃏',
-                '🎴',
-                '🀄',
-                '🎲'
-            ]
+            symbols: [ '🎨', '🎬', '🎤', '🎧', '🎼', '🎵', '🎶', '🎹', '🎻', '🎺', '🎷', '🎸', '👾', '🎮', '🃏', '🎴', '🀄', '🎲' ]
         }
     ]
 };
@@ -1397,11 +1267,14 @@ var SelectControls = Component.create({
         this.values = [];
 
         var defaultValues = [
-            Settings.get('control1') || 'mouse',
-            Settings.get('control2') || 'keyboard',
-            Settings.get('control3') || 'gamepad1',
-            Settings.get('control4') || 'gamepad2'
-        ];
+            'mouse',
+            'keyboard1',
+            'keyboard2',
+            'gamepad1'
+        ].map(function(val, i) {
+            var control = Settings.get('control' + i);
+            return this.getIndex(control) === -1 ? val : control;
+        }, this);
 
         var events = [];
 
@@ -1450,6 +1323,7 @@ var SelectControls = Component.create({
         var controlInfo = this.controls[this.getIndex(this.values[playerNum])];
 
         var elem = this.elems[playerNum];
+
         elem.innerHTML = controlInfo.text;
         elem.title = controlInfo.title;
     },
@@ -1469,9 +1343,14 @@ var SelectControls = Component.create({
     },
     controls: [
         {
-            value: 'keyboard',
-            text: '⌨',
-            title: 'Keyboard: Cursors + Space or Enter'
+            value: 'keyboard1',
+            text: '⌨ 1',
+            title: 'Keyboard: Cursors + Enter'
+        },
+        {
+            value: 'keyboard2',
+            text: '⌨ 2',
+            title: 'Keyboard: W, A, D, S + Space'
         },
         {
             value: 'mouse',

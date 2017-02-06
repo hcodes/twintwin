@@ -10,11 +10,14 @@ var SelectControls = Component.create({
         this.values = [];
 
         var defaultValues = [
-            Settings.get('control1') || 'mouse',
-            Settings.get('control2') || 'keyboard',
-            Settings.get('control3') || 'gamepad1',
-            Settings.get('control4') || 'gamepad2'
-        ];
+            'mouse',
+            'keyboard1',
+            'keyboard2',
+            'gamepad1'
+        ].map(function(val, i) {
+            var control = Settings.get('control' + i);
+            return this.getIndex(control) === -1 ? val : control;
+        }, this);
 
         var events = [];
 
@@ -63,6 +66,7 @@ var SelectControls = Component.create({
         var controlInfo = this.controls[this.getIndex(this.values[playerNum])];
 
         var elem = this.elems[playerNum];
+
         elem.innerHTML = controlInfo.text;
         elem.title = controlInfo.title;
     },
@@ -82,9 +86,14 @@ var SelectControls = Component.create({
     },
     controls: [
         {
-            value: 'keyboard',
-            text: '⌨',
-            title: 'Keyboard: Cursors + Space or Enter'
+            value: 'keyboard1',
+            text: '⌨ 1',
+            title: 'Keyboard: Cursors + Enter'
+        },
+        {
+            value: 'keyboard2',
+            text: '⌨ 2',
+            title: 'Keyboard: W, A, D, S + Space'
         },
         {
             value: 'mouse',

@@ -68,27 +68,42 @@ Field.prototype = {
     },
     setKeyboardEvents: function() {
         $.on(document, 'keydown', function(e) {
-            if (!this.isControl('keyboard')) {
-                return;
+            if (this.isControl('keyboard1')) {
+                switch (e.key) {
+                    case 'ArrowUp':
+                        this.fieldCursor.up();
+                    break;
+                    case 'ArrowLeft':
+                        this.fieldCursor.left();
+                    break;
+                    case 'ArrowRight':
+                        this.fieldCursor.right();
+                    break;
+                    case 'ArrowDown':
+                        this.fieldCursor.down();
+                    break;
+                    case 'Enter':
+                        this.openCageWithCursor();
+                    break;
+                }
             }
 
-            switch (e.key) {
-                case 'ArrowUp':
-                    this.fieldCursor.up();
-                break;
-                case 'ArrowLeft':
-                    this.fieldCursor.left();
-                break;
-                case 'ArrowRight':
-                    this.fieldCursor.right();
-                break;
-                case 'ArrowDown':
-                    this.fieldCursor.down();
-                break;
-                case ' ':
-                case 'Enter':
-                    this.openCageWithCursor();
-                break;
+            if (this.isControl('keyboard2')) {
+                switch (e.key) {
+                    case 'W':
+                        this.fieldCursor.up();
+                    break;
+                    case 'A':
+                        this.fieldCursor.left();
+                    break;
+                    case 'D':
+                        this.fieldCursor.right();
+                    break;
+                    case 'S':
+                        this.fieldCursor.down();
+                    break;
+                    case ' ':
+                }
             }
         }.bind(this));
     },
