@@ -64,7 +64,8 @@ $.on(document, 'DOMContentLoaded', function() {
         require('main'),
         require('game'),
         require('multiplayer'),
-        require('select-level')
+        require('select-level'),
+        require('show-levels')
     ]);
     App.init();
 

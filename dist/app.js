@@ -176,14 +176,15 @@ $.on(document, 'DOMContentLoaded', function() {
         require('main'),
         require('game'),
         require('multiplayer'),
-        require('select-level')
+        require('select-level'),
+        require('show-levels')
     ]);
     App.init();
 
     metrika.hit(35250605);
 });
 
-},{"back":3,"dom":17,"game":23,"gamepad":9,"gamepad-notice":8,"is-mobile":19,"main":24,"metrika":12,"multiplayer":25,"page":26,"select-level":27}],3:[function(require,module,exports){
+},{"back":3,"dom":17,"game":23,"gamepad":9,"gamepad-notice":8,"is-mobile":19,"main":24,"metrika":12,"multiplayer":25,"page":26,"select-level":27,"show-levels":28}],3:[function(require,module,exports){
 var $ = require('dom').$,
     Page = require('page');
 
@@ -2203,4 +2204,41 @@ module.exports = {
     hide: function() {}
 };
 
-},{"dom":17,"jstohtml":1,"levels":11,"page":26,"settings":14}]},{},[2]);
+},{"dom":17,"jstohtml":1,"levels":11,"page":26,"settings":14}],28:[function(require,module,exports){
+// For debug
+
+var levels = require('levels');
+var $ = require('dom').$;
+var jstohtml = require('jstohtml');
+
+module.exports = {
+    name: 'show-levels',
+    locationHash: 'show-levels',
+    init: function(data) {
+        var container = $('.page_show-levels');
+
+        var obj = levels.data.map(function(item, i) {
+            return i ? [
+                {
+                    t: 'h4',
+                    c: [
+                        i + '. ' + item.name + ' ',
+                        { t: 'sup', c: + item.symbols.length }
+                    ]
+                },
+                {
+                    c: item.symbols.join(' ')
+                },
+                {
+                    t: 'br'
+                }
+            ] : null;
+        });
+
+        container.innerHTML = jstohtml(obj);
+    },
+    show: function() {},
+    hide: function() {}
+};
+
+},{"dom":17,"jstohtml":1,"levels":11}]},{},[2]);
