@@ -1,8 +1,6 @@
 var $ = require('dom').$,
     Event = require('event');
 
-require('raf');
-
 module.exports = {
     init: function() {
         Object.assign(this, Event.prototype);
@@ -70,7 +68,7 @@ module.exports = {
     buttonName: {
         green: 0,
         a: 0,
-        
+
         red: 1,
         b: 1,
 
@@ -128,6 +126,8 @@ module.exports = {
         }
 
         setEvent(button);
+
+        return this;
     },
     /*
      * Set events on buttons.
@@ -141,6 +141,8 @@ module.exports = {
         buttons.forEach(function(button) {
             this.onbutton(button, callback);
         }, this);
+
+        return this;
     },
     _pads: []
 };

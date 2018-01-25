@@ -1,27 +1,27 @@
-var $ = require('dom').$,
-    Page = require('page');
+import $ from '../lib/dom';
+import Page from '../pages/page';
 
-function Back(container) {
-    this.elem = $.js2dom({
-        cl: 'back',
-        c: '&times;'
-    });
+export class Back {
+    constructor(container) {
+        this.elem = $.js2dom({
+            cl: 'back',
+            c: '&times;'
+        });
 
-    container.appendChild(this.elem);
+        container.appendChild(this.elem);
 
-    $.on(this.elem, 'click', this.onclick.bind(this));
-}
+        $.on(this.elem, 'click', this.onclick.bind(this));
+    }
 
-Back.prototype = {
-    show: function() {
+    show() {
         this.elem.classList.add('back_visible');
-    },
-    hide: function() {
+    }
+
+    hide() {
         this.elem.classList.remove('back_visible');
-    },
-    onclick: function() {
+    }
+
+    onclick() {
         Page.back();
     }
 };
-
-module.exports = Back;

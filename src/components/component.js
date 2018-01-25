@@ -1,20 +1,20 @@
-var $ = require('dom').$;
-var Event = require('event');
+import $ from '../lib/dom';
+import Event from '../lib/event';
 
-module.exports = {
-    create: function(obj) {
+const Component = {
+    create(obj) {
         Object.assign(obj, Event.prototype);
 
         Object.assign(obj, {
             domEvents: [],
-            setDomEvents: function(events) {
+            setDomEvents(events) {
                 events.forEach(function(item) {
                     $.on.apply($, item);
                 }, this);
 
                 this.domEvents = this.domEvents.concat(events);
             },
-            removeDomEvents: function() {
+            removeDomEvents() {
                 this.domEvents.forEach(function(item) {
                     $.off.apply($, item);
                 });
@@ -28,3 +28,5 @@ module.exports = {
         return obj;
     }
 };
+
+export default Component;

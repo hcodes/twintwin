@@ -1,33 +1,31 @@
-var $ = require('dom').$;
-var Event = require('event');
-var num = require('number');
-var Component = require('component');
+import {$} from '../lib/dom';
+import Event from '../lib/event';
+import num from '../lib/number';
+import Component from '../component';
 
-var gameOver = Component.create({
-    init: function() {
-        var that = this;
+const gameOver = Component.create({
+    init() {
         this.setDomEvents([
-            ['.game-over__restart', 'click', function() {
+            ['.game-over__restart', 'click', () => {
                 that.trigger('click', 'restart');
             }],
-            ['.game-over__next', 'click', function() {
+            ['.game-over__next', 'click', () => {
                 that.trigger('click', 'next');
             }]
         ]);
     },
-    updateScore: function(value) {
+    updateScore(value) {
         $('.game-over__score-i').innerHTML = num.format(value);
     },
-    show: function(data) {
+    show(data) {
         $.show('.game-over');
         this.calcScore(data);
     },
-    hide: function() {
+    hide() {
         $.hide('.game-over');
     },
-    calcScore: function(data) {
-        var value = Math.floor(1e6 /  data.errors / Math.log(data.time + 3));
-        var that = this;
+    calcScore(data) {
+        const value = Math.floor(1e6 /  data.errors / Math.log(data.time + 3));
 
         for (var i = 0; i < 10; i++) {
             (function(counter) {
@@ -38,5 +36,3 @@ var gameOver = Component.create({
         }
     }
 });
-
-module.exports = gameOver;
