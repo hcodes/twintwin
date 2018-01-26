@@ -21,18 +21,18 @@ const MainPage = {
     setEvents() {
         $
             .on(window, 'resize', this.resizeEmoji.bind())
-            .on('.main-menu__continue', 'click', function(e) {
+            .on('.main-menu__continue', 'click', () => {
                 if (this.classList.contains('btn_disabled')) {
                     return;
                 }
 
                 Page.show('select-level');
             })
-            .on('.main-menu__new-game', 'click', e => {
+            .on('.main-menu__new-game', 'click', () => {
                 Settings.set('maxLevel', 1);
                 Page.show('select-level');
             })
-            .on('.main-menu__multiplayer', 'click', e => {
+            .on('.main-menu__multiplayer', 'click', () => {
                 Page.show('multiplayer');
             });
     },
@@ -95,3 +95,5 @@ const MainPage = {
         this.setOpacity(0);
     }
 };
+
+export default MainPage;

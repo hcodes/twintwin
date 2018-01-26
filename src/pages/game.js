@@ -5,10 +5,10 @@ import Field from './components/field';
 import levels from './components/levels';
 import gameOver from './components/game-over';
 
-const Game = {
+const GamePage = {
     name: 'game',
     locationHash: 'game',
-    init(data) {
+    init() {
         this.elem = $('.game');
 
         const levelData = this.getLevelData();
@@ -36,9 +36,7 @@ const Game = {
         };
 
         gameOver.on('click', (e, button) => {
-            let level;
-
-            switch(button) {
+            switch (button) {
                 case 'menu':
                     Page.show('main');
                     break;
@@ -93,3 +91,5 @@ const Game = {
         $.off(document, 'keydown', this._onKeydown);
     }
 };
+
+export default GamePage;

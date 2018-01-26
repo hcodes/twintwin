@@ -1,11 +1,10 @@
-export function format(n, separator) {
-        separator = separator || '\u202F';
+export function format(num, separator) {
+    separator = separator || '\u202F';
 
-        n = n.toString()
-            .split('').reverse().join('')
-            .replace(/(\d{3})/g, '$1' + separator)
-            .split('').reverse().join('');
+    num = num.toString()
+        .split('').reverse().join('')
+        .replace(/(\d{3})/g, '$1' + separator)
+        .split('').reverse().join('');
 
-        return n[0] == separator ? n.substr(1) : n;
-    }
-};
+    return num[0] == separator ? num.substr(1) : num;
+}

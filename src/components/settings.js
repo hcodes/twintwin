@@ -18,7 +18,9 @@ const Settings = {
         var buffer = {};
         try {
             buffer = JSON.parse(localStorage.getItem(this.lsName)) || {};
-        } catch(e) {}
+        } catch (e) {
+            console.log('Settings from localStorage: parse error.');
+        }
 
         buffer.level = buffer.level || 1;
         buffer.maxLevel = buffer.maxLevel || 1;
@@ -27,7 +29,9 @@ const Settings = {
     _save() {
         try {
             localStorage.setItem(this.lsName, JSON.stringify(this._buffer));
-        } catch(e) {}
+        } catch (e) {
+            console.log('localStorage.setItem error.');
+        }
     },
     _copy(obj) {
         return JSON.parse(JSON.stringify(obj));

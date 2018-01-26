@@ -7,7 +7,7 @@ export default class Gamepad {
         this._pads = [];
 
         // Gamepad: XBox360
-        this.buttonName: {
+        this.buttonName = {
             green: 0,
             a: 0,
 
@@ -41,24 +41,24 @@ export default class Gamepad {
             return;
         }
 
-        $.on(window, 'gamepadconnected', e => {
-            this.search();
-            this.trigger('connected');
+        $
+            .on(window, 'gamepadconnected', () => {
+                this.search();
+                this.trigger('connected');
 
-            if (!this._rafId) {
-                this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
-            }
-        });
+                if (!this._rafId) {
+                    this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
+                }
+            })
+            .on(window, 'gamepaddisconnected', () => {
+                this.search();
+                this.trigger('disconnected');
 
-        $.on(window, 'gamepaddisconnected', e => {
-            this.search();
-            this.trigger('disconnected');
-
-            if (!this.get().length && this._rafId) {
-                window.cancelAnimationFrame(this._rafId);
-                this._rafId = null;
-            }
-        });
+                if (!this.get().length && this._rafId) {
+                    window.cancelAnimationFrame(this._rafId);
+                    this._rafId = null;
+                }
+            });
     }
 
     checkButtons() {
@@ -156,4 +156,4 @@ export default class Gamepad {
 
         return this;
     }
-};
+}

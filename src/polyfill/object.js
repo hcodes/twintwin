@@ -3,7 +3,7 @@ if (!Object.assign) {
         enumerable: false,
         configurable: true,
         writable: true,
-        value: function(target, firstSource) {
+        value: function(target) {
             'use strict';
             if (target === undefined || target === null) {
                 throw new TypeError('Cannot convert first argument to object');

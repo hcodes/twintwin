@@ -13,10 +13,10 @@ const i18n = {
             texts[keyset + '.' + key] = keys[key];
         });
     },
-    get lang: function() {
+    get lang() {
         return lang;
     },
-    set lang: function(val) {
+    set lang(val) {
         lang = val;
     }
 };

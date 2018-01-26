@@ -1,57 +1,42 @@
-import dom from './lib/dom';
-const $ = dom.$;
-
 import Gamepad from './components/gamepad';
 import GamepadNotice from './components/gamepad-notice';
-import Page from './pages/page';
+import Page from './components/page';
 import Back from './components/back';
+
+import Pages from './pages/pages';
+
+import {$, hasSupportCss} from './lib/dom';
 import isMobile from './lib/is-mobile';
-
-import mainPage from './pages/main';
-import gamePage from './pages/game';
-import multiplayerPage from './pages/multiplayer';
-import selectLevelPage from './pages/select-level';
-import showLevels from './pages/show-levels';
-
 import metrika from './lib/metrika';
 metrika.hit(35250605);
 
-const body = document.body;
+class App {
+    constructor() {
+        const body = document.body;
 
-const App = {
-    init() {
         new Gamepad();
         new GamepadNotice();
 
-        Page.add([
-            mainPage,
-            gamePage,
-            multiplayerPage,
-            selectLevelPage,
-            showLevels
-        ]);
-
-        body.classList.add('support_transform3d_' + dom.hasSupportCss('perspective'));
-
+        body.classList.add('support_transform3d_' + hasSupportCss('perspective'));
         body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
 
-        if (isMobile) {
-            this.setInputType('touch');
-        } else {
-            $.on(document, 'mousemove', function() {
-                this.setInputType('mouse');
-            }.bind(this));
+        this.inputType = 'mouse';
 
-            $.on(document, 'touchstart', function() {
-                this.setInputType('touch');
-            }.bind(this));
+        if (isMobile) {
+            this.inputType = 'touch';
+        } else {
+            $.on(document, 'mousemove', () => {
+                this.inputType = 'mouse';
+            });
+
+            $.on(document, 'touchstart', () => {
+                this.inputType = 'touch';
+            });
         }
 
-        $.on(document, 'keydown', function() {
-            this.setInputType('keyboard');
-        }.bind(this));
-
-        this.setInputType('mouse');
+        $.on(document, 'keydown', () => {
+            this.inputType = 'keyboard';
+        });
 
         this._back = new Back(body);
 
@@ -67,15 +52,21 @@ const App = {
         window.addEventListener('hashchange', () => {
             Page.showByLocationHash();
         }, false);
-    },
-    inputType: null,
-    setInputType(type) {
-        if (type !== this.inputType) {
-            body.classList.remove('input_' + this.inputType);
-            body.classList.add('input_' + type);
-            this.inputType = type;
+
+        Page.add(Pages);
+    }
+
+    get inputType() {
+        return this._inputType;
+    }
+
+    set inputType(type) {
+        if (type !== this._inputType) {
+            document.body.classList.remove('input_' + this.inputType);
+            document.body.classList.add('input_' + type);
+            this._inputType = type;
         }
     }
-};
+}
 
-$.on(document, 'DOMContentLoaded', App.init.bind(this));
+new App();

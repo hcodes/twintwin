@@ -7,7 +7,7 @@ import jstohtml from 'jstohtml';
 const ShowLevelsPage = {
     name: 'show-levels',
     locationHash: 'show-levels',
-    init(data) {
+    init() {
         const container = $('.page_show-levels');
         const obj = levels.data.map(function(item, i) {
             return i ? [
@@ -15,7 +15,7 @@ const ShowLevelsPage = {
                     t: 'h4',
                     c: [
                         i + '. ' + item.name + ' ',
-                        { t: 'sup', c: + item.symbols.length }
+                        { t: 'sup', c: +item.symbols.length }
                     ]
                 },
                 {

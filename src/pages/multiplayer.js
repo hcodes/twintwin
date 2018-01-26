@@ -1,16 +1,15 @@
 import {$} from './lib/dom';
 import Field from './components/field';
-import UserPanel './components/user-panel';
+import UserPanel from './components/user-panel';
 import Settings from './components/settings';
 import levels from './components/levels';
-import isMobile from './lib/is-mobile';
 
 import SelectControls from './components/elect-controls';
 
 const MultiplayerPage = {
     name: 'multiplayer',
     locationHash: 'multiplayer',
-    init(data) {
+    init() {
         this.elem = $('.multiplayer');
 
         this._levelData = levels.getRandomLevel();

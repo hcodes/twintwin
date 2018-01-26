@@ -1,8 +1,4 @@
-import dom from '../lib/dom';
-const $ = dom.$;
-const $$ = dom.$$;
-
-import levels from './levels';
+import {$, $$} from '../lib/dom';
 import FieldCursor from './field-cursor';
 import InfoPanel from './info-panel';
 import Gamepad from './gamepad';
@@ -78,19 +74,19 @@ export default class Field {
                 switch (e.key) {
                     case 'ArrowUp':
                         this.fieldCursor.up();
-                    break;
+                        break;
                     case 'ArrowLeft':
                         this.fieldCursor.left();
-                    break;
+                        break;
                     case 'ArrowRight':
                         this.fieldCursor.right();
-                    break;
+                        break;
                     case 'ArrowDown':
                         this.fieldCursor.down();
-                    break;
+                        break;
                     case 'Enter':
                         this.openCageWithCursor();
-                    break;
+                        break;
                 }
             }
 
@@ -98,16 +94,16 @@ export default class Field {
                 switch (e.key) {
                     case 'W':
                         this.fieldCursor.up();
-                    break;
+                        break;
                     case 'A':
                         this.fieldCursor.left();
-                    break;
+                        break;
                     case 'D':
                         this.fieldCursor.right();
-                    break;
+                        break;
                     case 'S':
                         this.fieldCursor.down();
-                    break;
+                        break;
                     case ' ':
                 }
             }
@@ -189,8 +185,9 @@ export default class Field {
         const
             syms = this.levelData.symbols,
             size = this.cols * this.rows,
-            halfSize = size / 2,
-            buf = [];
+            halfSize = size / 2;
+            
+        let buf = [];
 
         while (halfSize > buf.length) {
             buf = buf.concat(syms);
@@ -246,7 +243,7 @@ export default class Field {
 
         switch (len) {
             case 0:
-            break;
+                break;
             case 1:
                 var sym1 = this.field[y][x],
                     sym2 = this.field[this._openedCages[0].y][this._openedCages[0].x];
@@ -256,7 +253,7 @@ export default class Field {
                 } else {
                     this.infoPanel.errors++;
 
-                    var openedCages = [xy].concat(this._openedCages);
+                    var openedCages = [ xy ].concat(this._openedCages);
                     this._openedCages = [];
                     setTimeout(function() {
                         this.closeOpenedCages(openedCages);
@@ -264,11 +261,11 @@ export default class Field {
                 }
 
                 xy = null;
-            break;
+                break;
             case 2:
                 this.closeOpenedCages();
                 this._openedCages = [];
-            break;
+                break;
         }
 
         this.infoPanel.update();

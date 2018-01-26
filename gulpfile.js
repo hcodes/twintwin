@@ -31,11 +31,11 @@ var paths = {
 
 gulp.task('js', function() {
     return browserify('./src/app.js', {
-            paths: paths.js
-        })
+        paths: paths.js
+    })
         .bundle()
         .pipe(source('app.js'))
-/*        .pipe(uglify({
+    /*        .pipe(uglify({
             output: {ascii_only: true},
             preserveComments: 'some'
         }))*/

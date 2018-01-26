@@ -37,7 +37,7 @@ export default class FieldCursor {
         }
     }
 
-    update: function() {
+    update() {
         this.size(this.width, this.height, this.padding);
     }
 

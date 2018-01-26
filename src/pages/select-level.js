@@ -7,11 +7,11 @@ import Page from './components/page';
 const SelectLevelPage = {
     name: 'select-level',
     locationHash: 'select-level',
-    init(data) {
+    init() {
         const el = $('.select-level__list');
         el.innerHTML = this.getList();
 
-        $.delegate(el, '.btn', 'click', function(e) {
+        $.delegate(el, '.btn', 'click', () => {
             if (this.classList.contains('btn_disabled')) {
                 return;
             }
@@ -58,7 +58,7 @@ const SelectLevelPage = {
         const
             maxLevel = Settings.get('maxLevel'),
             btns = $$('.select-level__list .btn', this.elem),
-            cl ='btn_disabled';
+            cl = 'btn_disabled';
 
         for (let i = 0; i < btns.length; i++) {
             let btnCl = btns[i].classList;

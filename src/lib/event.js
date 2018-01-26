@@ -1,4 +1,4 @@
-export default class Event {
+export default class CustomEvent {
     /*
      * Attach a handler to an custom event.
      * @param {string} type

@@ -1,7 +1,7 @@
-import $ from '../lib/dom';
-import Page from '../pages/page';
+import {$} from '../lib/dom';
+import Page from './page';
 
-export class Back {
+export class BackButton {
     constructor(container) {
         this.elem = $.js2dom({
             cl: 'back',
@@ -24,4 +24,4 @@ export class Back {
     onclick() {
         Page.back();
     }
-};
+}

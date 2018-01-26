@@ -1,16 +1,15 @@
 import {$} from '../lib/dom';
-import Event from '../lib/event';
 import num from '../lib/number';
 import Component from '../component';
 
-const gameOver = Component.create({
+export default Component.create({
     init() {
         this.setDomEvents([
             ['.game-over__restart', 'click', () => {
-                that.trigger('click', 'restart');
+                this.trigger('click', 'restart');
             }],
             ['.game-over__next', 'click', () => {
-                that.trigger('click', 'next');
+                this.trigger('click', 'next');
             }]
         ]);
     },

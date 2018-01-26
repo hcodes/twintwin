@@ -1,5 +1,4 @@
-﻿import {$, $$} from './lib/dom';
-import Event from './lib/event';
+﻿import {$$} from './lib/dom';
 import Component from './component';
 import Settings from './settings';
 
@@ -42,14 +41,14 @@ const SelectControls = Component.create({
     selectNext(playerNum) {
         const currentIndex = this.getIndex(this.values[playerNum]);
         let index = currentIndex;
-        while(this.values.indexOf(this.controls[index].value) !== -1) {
+        while (this.values.indexOf(this.controls[index].value) !== -1) {
             index++;
             if (index >= this.controls.length - 1) {
                 index = 0;
             }
         }
 
-        consr value = this.controls[index].value;
+        const value = this.controls[index].value;
         this.values[playerNum] = value;
         Settings.set('control' + playerNum, value);
 

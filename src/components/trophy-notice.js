@@ -1,13 +1,12 @@
 import {$} from './lib/dom';
 import Page from './pages/page';
-const body = document.body;
 
 /*var tp = new TrophyNotice({
     title: 'Hello world!',
     type: '🏆'
 }).open();*/
 
-class TrophyNotice {
+export default class TrophyNotice {
     constructor(data) {
         this._data = data;
         this._onclick = function() {
@@ -28,7 +27,7 @@ class TrophyNotice {
             }]
         });
 
-        body.appendChild(this._el);
+        document.body.appendChild(this._el);
 
         setTimeout(() => {
             this._el.classList.add('trophy-notice_open');
@@ -48,7 +47,7 @@ class TrophyNotice {
     }
 
     remove() {
-        body.removeChild(this._el);
+        document.body.removeChild(this._el);
         delete this._el;
     }
 }

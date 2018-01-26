@@ -1,6 +1,5 @@
 import customEvent from './lib/event';
 import {$} from './lib/dom';
-const body = document.body;
 
 const Page =  {
     back() {
@@ -27,6 +26,7 @@ const Page =  {
     },
     show(name, data) {
         let oldName = null;
+        const body = document.body;
 
         if (this.current) {
             oldName = this.current.name;
