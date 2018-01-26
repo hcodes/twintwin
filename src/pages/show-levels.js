@@ -1,22 +1,23 @@
 // For debug
 
-var levels = require('levels');
-var $ = require('dom').$;
-var jstohtml = require('jstohtml');
+import jstohtml from 'jstohtml';
 
-module.exports = {
+import {$} from '../lib/dom';
+
+import Levels from '../components/levels';
+
+const ShowLevelsPage = {
     name: 'show-levels',
     locationHash: 'show-levels',
-    init: function(data) {
-        var container = $('.page_show-levels');
-
-        var obj = levels.data.map(function(item, i) {
+    init() {
+        const container = $('.page_show-levels');
+        const obj = Levels.data.map(function(item, i) {
             return i ? [
                 {
                     t: 'h4',
                     c: [
                         i + '. ' + item.name + ' ',
-                        { t: 'sup', c: + item.symbols.length }
+                        { t: 'sup', c: +item.symbols.length }
                     ]
                 },
                 {
@@ -30,6 +31,8 @@ module.exports = {
 
         container.innerHTML = jstohtml(obj);
     },
-    show: function() {},
-    hide: function() {}
+    show() {},
+    hide() {}
 };
+
+export default ShowLevelsPage;

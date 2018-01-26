@@ -1,44 +1,47 @@
-﻿var $ = require('dom').$;
+import {$} from '../lib/dom';
 
-function FieldCursor(data) {
-    this.elem = data.elem;
+export default class FieldCursor {
+    constructor(data) {
+        this.elem = data.elem;
 
-    this.width = data.width;
-    this.height = data.height;
+        this.width = data.width;
+        this.height = data.height;
 
-    this.padding = data.padding;
+        this.padding = data.padding;
 
-    this.cols = data.cols;
-    this.rows = data.rows;
+        this.cols = data.cols;
+        this.rows = data.rows;
 
-    this.x = data.x || 0;
-    this.y = data.y || 0;
+        this.x = data.x || 0;
+        this.y = data.y || 0;
 
-    if (data.hidden) {
-        this.hide();
-    } else {
-        this.show();
+        if (data.hidden) {
+            this.hide();
+        } else {
+            this.show();
+        }
     }
-}
 
-FieldCursor.prototype = {
-    hide: function() {
+    hide() {
         if (this.hidden !== true) {
             this.hidden = true;
             this.elem.classList.add('field-cursor_hidden');
         }
-    },
-    show: function() {
+    }
+
+    show() {
         if (this.hidden !== false) {
             this.hidden = false;
             this.elem.classList.remove('field-cursor_hidden');
             this.update();
         }
-    },
-    update: function() {
+    }
+
+    update() {
         this.size(this.width, this.height, this.padding);
-    },
-    size: function(width, height, padding) {
+    }
+
+    size(width, height, padding) {
         this.width = width;
         this.height = height;
         this.padding = padding;
@@ -46,9 +49,10 @@ FieldCursor.prototype = {
         $.size(this.elem, width, height);
 
         this.move(this.x, this.y);
-    },
-    move: function(kx, ky) {
-        var x = this.x,
+    }
+
+    move(kx, ky) {
+        let x = this.x,
             y = this.y;
 
         if (kx) {
@@ -83,38 +87,43 @@ FieldCursor.prototype = {
             x * (this.width + this.padding),
             y * (this.height + this.padding)
         );
-    },
-    left: function() {
+    }
+
+    left() {
         this.show();
         this.move(-1, 0);
-    },
-    right: function() {
+    }
+
+    right() {
         this.show();
         this.move(1, 0);
-    },
-    up: function() {
+    }
+
+    up() {
         this.show();
         this.move(0, -1);
-    },
-    down: function() {
+    }
+
+    down() {
         this.show();
         this.move(0, 1);
-    },
-    getXY: function() {
+    }
+
+    getXY() {
         return {
             x: this.x,
             y: this.y
         };
-    },
-    reset: function() {
+    }
+
+    reset() {
         this.x = 0;
         this.y = 0;
 
         !this.hidden && this.update();
-    },
-    destroy: function() {
+    }
+
+    destroy() {
         this.elem = null;
     }
-};
-
-module.exports = FieldCursor;
+}

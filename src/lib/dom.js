@@ -1,6 +1,6 @@
-﻿var jstohtml = require('jstohtml');
+﻿import jstohtml from 'jstohtml';
 
-var _$ = function(el, context) {
+const _$ = function(el, context) {
     if (typeof context === 'string') {
         context = document.querySelector(context);
     }
@@ -8,17 +8,17 @@ var _$ = function(el, context) {
     return typeof el === 'string' ? (context || document).querySelector(el) : el;
 };
 
-var $ = function(el, context) {
-    var res = _$(el, context);
+export function $(el, context) {
+    const res = _$(el, context);
     if (!res) {
         console.error('Can\'t find DOM element "' + el + '"', context);
     }
-    
+
     return res;
-};
+}
 
 $.js2dom = function(data) {
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.innerHTML = jstohtml(data);
 
     return div.firstChild;
@@ -32,9 +32,9 @@ $.on = function(el, type, callback) {
 
 $.delegate = function(root, el, type, callback) {
     $(root).addEventListener(type, function(e) {
-        var node = e.target;
+        let node = e.target;
         for (; node !== root; node = node.parentNode || root) {
-            var cls = el[0] === '.' ? el.substr(1) : el;
+            let cls = el[0] === '.' ? el.substr(1) : el;
             if (node.classList.contains(cls)) {
                 callback.call(node, e);
             }
@@ -59,7 +59,7 @@ $.size = function(elem, width, height) {
 };
 
 $.css = function(el, props) {
-    var style = el.style;
+    const style = el.style;
     Object.keys(props).forEach(function(key) {
         style[key] = props[key];
     });
@@ -74,31 +74,32 @@ $.hide = function(el) {
 };
 
 $.offset = function(el) {
-    var box = {top: 0, left: 0};
+    let box = {top: 0, left: 0};
 
     // If we don't have gBCR, just use 0,0 rather than error
     // BlackBerry 5, iOS 3 (original iPhone)
-    if(el && typeof el.getBoundingClientRect !== 'undefined') {
+    if (el && typeof el.getBoundingClientRect !== 'undefined') {
         box = el.getBoundingClientRect();
     }
-    
+
     return {
         top: box.top  + (window.pageYOffset || document.scrollTop || 0) - (document.clientTop  || 0),
         left: box.left + (window.pageXOffset || document.scrollLeft || 0) - (document.clientLeft || 0)
     };
 };
 
-var $$ = function(el, context) {
+export function $$(el, context) {
     return typeof el === 'string' ? (context || document).querySelectorAll(el) : el;
-};
+}
 
-var hasSupportCss = (function() {
-    var div = document.createElement('div'),
-        vendors = 'Khtml ms O Moz Webkit'.split(' '),
-        len = vendors.length;
+export const hasSupportCss = (function() {
+    const
+        div = document.createElement('div'),
+        vendors = 'Khtml ms O Moz Webkit'.split(' ');
+
+    let len = vendors.length;
 
     return function(prop) {
-
         if (prop in div.style) {
             return true;
         }
@@ -116,9 +117,3 @@ var hasSupportCss = (function() {
         return false;
     };
 })();
-
-module.exports = {
-    $: $,
-    $$: $$,
-    hasSupportCss: hasSupportCss
-};

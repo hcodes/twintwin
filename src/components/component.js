@@ -1,20 +1,26 @@
-var $ = require('dom').$;
-var Event = require('event');
+import {$} from '../lib/dom';
+import CustomEvent from '../lib/custom-event';
 
-module.exports = {
-    create: function(obj) {
-        Object.assign(obj, Event.prototype);
+class EmptyComponent extends CustomEvent {
+    constructor() {
+        super();
+    }
+}
 
-        Object.assign(obj, {
+const Component = {
+    create(obj) {
+        const emptyComponentObj = new EmptyComponent();
+
+        Object.assign(emptyComponentObj, {
             domEvents: [],
-            setDomEvents: function(events) {
+            setDomEvents(events) {
                 events.forEach(function(item) {
                     $.on.apply($, item);
                 }, this);
 
                 this.domEvents = this.domEvents.concat(events);
             },
-            removeDomEvents: function() {
+            removeDomEvents() {
                 this.domEvents.forEach(function(item) {
                     $.off.apply($, item);
                 });
@@ -23,8 +29,12 @@ module.exports = {
             }
         });
 
-        obj.init && obj.init();
+        Object.assign(emptyComponentObj, obj);
 
-        return obj;
+        emptyComponentObj.init && emptyComponentObj.init();
+
+        return emptyComponentObj;
     }
 };
+
+export default Component;

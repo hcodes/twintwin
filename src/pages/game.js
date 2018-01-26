@@ -1,17 +1,18 @@
-var $ = require('dom').$;
-var Page = require('page');
-var Settings = require('settings');
-var Field = require('field');
-var levels = require('levels');
-var gameOver = require('game-over');
+import {$} from '../lib/dom';
 
-module.exports = {
+import Page from '../components/page';
+import Settings from '../components/settings';
+import Field from '../components/field';
+import Levels from '../components/levels';
+import gameOver from '../components/game-over';
+
+const GamePage = {
     name: 'game',
     locationHash: 'game',
-    init: function(data) {
+    init() {
         this.elem = $('.game');
 
-        var levelData = this.getLevelData();
+        const levelData = this.getLevelData();
 
         this._field = new Field({
             elem: $('.field', this.elem),
@@ -25,20 +26,18 @@ module.exports = {
         this._onKeydown = this._onKeydown.bind(this);
 
         this._field.onFinish = function() {
-            var maxLevel = Settings.get('maxLevel');
+            const maxLevel = Settings.get('maxLevel');
             Settings.set('maxLevel', Math.max(maxLevel, Settings.get('level') + 1));
 
-            var panel = this.infoPanel;
+            const panel = this.infoPanel;
             gameOver.show({
                 errors: panel.errors || 1,
                 time: Math.floor((Date.now() - panel.startTime) / 1000) || 1
             });
         };
 
-        gameOver.on('click', function(e, button) {
-            var level;
-
-            switch(button) {
+        gameOver.on('click', (e, button) => {
+            switch (button) {
                 case 'menu':
                     Page.show('main');
                     break;
@@ -49,34 +48,34 @@ module.exports = {
                     this.restart();
                     break;
             }
-        }.bind(this));
+        });
     },
-    getLevelData: function() {
-        var data = levels.getLevel(Settings.get('level'));
+    getLevelData() {
+        const data = Levels.getLevel(Settings.get('level'));
 
         return {
-            data: data,
-            rows: data.rows || levels.defaultRows,
-            cols: data.cols || levels.defaultCols
+            data,
+            rows: data.rows || Levels.defaultRows,
+            cols: data.cols || Levels.defaultCols
         };
     },
-    _onKeydown: function(e) {
+    _onKeydown(e) {
         if (e.key === 'Escape') {
             Page.back();
         }
     },
-    restart: function() {
+    restart() {
         this.hide();
         this.show();
     },
-    nextLevel: function() {
+    nextLevel() {
         Settings.set('level', Settings.get('level') + 1);
 
         this.hide();
         this.show();
     },
-    show: function() {
-        var levelData = this.getLevelData();
+    show() {
+        const levelData = this.getLevelData();
 
         gameOver.hide();
 
@@ -88,8 +87,10 @@ module.exports = {
 
         $.on(document, 'keydown', this._onKeydown);
     },
-    hide: function() {
+    hide() {
         this._field.hide();
         $.off(document, 'keydown', this._onKeydown);
     }
 };
+
+export default GamePage;

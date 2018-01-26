@@ -22,18 +22,18 @@
     background: rgba(255, 255, 255, .1);
 
     -webkit-tap-highlight-color: transparent;
-    
+
     display: none;
-    
+
     z-index: 20;
+
+    &_visible
+    {
+        display: block;
+    }
 }
 
-.back_visible
-{
-    display: block;
-}
-
-.device_mobile .back
+body.device_mobile .back
 {
     display: none;
 }

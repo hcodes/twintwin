@@ -5,15 +5,15 @@ if (!Function.prototype.bind) {
             throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
         }
 
-        var aArgs = Array.prototype.slice.call(arguments, 1),
+        var
+            aArgs = Array.prototype.slice.call(arguments, 1),
             fToBind = this,
-            NOP = function() {
-            },
+            NOP = function() {},
             fBound = function() {
                 return fToBind.apply(this instanceof NOP && oThis
-                        ? this
-                        : oThis,
-                    aArgs.concat(Array.prototype.slice.call(arguments)));
+                    ? this
+                    : oThis,
+                aArgs.concat(Array.prototype.slice.call(arguments)));
             };
 
         NOP.prototype = this.prototype;

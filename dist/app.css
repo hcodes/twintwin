@@ -171,7 +171,7 @@ body {
 .back_visible {
   display: block;
 }
-.device_mobile .back {
+body.device_mobile .back {
   display: none;
 }
 body.input_mouse .back:hover {
@@ -232,15 +232,6 @@ body.input_mouse .back:hover {
   -webkit-box-shadow: 0 5px 0 0 #3323CE;
           box-shadow: 0 5px 0 0 #3323CE;
 }
-body.input_mouse .btn_red:hover {
-  background-color: #ff6656;
-}
-body.input_mouse .btn_green:hover {
-  background-color: #66df56;
-}
-body.input_mouse .btn_blue:hover {
-  background-color: #6656ff;
-}
 .btn_small {
   border-radius: 3px;
   padding: 2px 6px;
@@ -273,6 +264,15 @@ body.input_mouse .btn_blue:hover {
   -webkit-box-shadow: 0 5px 0 0 #a0a0a0;
           box-shadow: 0 5px 0 0 #a0a0a0;
 }
+body.input_mouse .btn_red:hover {
+  background-color: #ff6656;
+}
+body.input_mouse .btn_green:hover {
+  background-color: #66df56;
+}
+body.input_mouse .btn_blue:hover {
+  background-color: #6656ff;
+}
 body.input_mouse .btn_disabled:hover {
   background-color: #c0c0c0;
 }
@@ -290,6 +290,31 @@ body.input_mouse .btn_disabled:hover {
           user-select: none;
   -moz-user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+.cage__front,
+.cage__back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.cage__front {
+  z-index: 2;
+  background: #c0c0c0;
+  -webkit-transition: 0.2s opacity;
+  transition: 0.2s opacity;
+}
+.cage__back {
+  vertical-align: middle;
+  text-align: center;
+  cursor: default;
+}
+.cage_opened .cage__back {
+  background: white;
+}
+.cage_removed {
+  opacity: 0.6;
 }
 body.support_transform3d_true .cage {
   -webkit-transform-style: preserve-3d;
@@ -332,34 +357,9 @@ body.support_transform3d_false .cage_opened .cage__front {
 body.support_transform3d_false .cage_opened .cage__back {
   display: block;
 }
-.cage__front,
-.cage__back {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-}
-.cage__front {
-  z-index: 2;
-  background: #c0c0c0;
-  -webkit-transition: 0.2s opacity;
-  transition: 0.2s opacity;
-}
-.cage__back {
-  vertical-align: middle;
-  text-align: center;
-  cursor: default;
-}
-.cage_opened .cage__back {
-  background: white;
-}
 body.input_mouse .field[data-control="any"] .cage__front:hover,
 body.input_mouse .field[data-control="mouse"] .cage__front:hover {
   opacity: 0.8;
-}
-.cage_removed {
-  opacity: 0.6;
 }
 .dialog {
   position: fixed;

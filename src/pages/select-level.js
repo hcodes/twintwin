@@ -1,34 +1,34 @@
-var dom = require('dom');
-var $ = dom.$;
-var $$ = dom.$$;
-var jstohtml = require('jstohtml');
-var levels = require('levels');
-var Settings = require('settings');
-var Page = require('page');
+import jstohtml from 'jstohtml';
 
-module.exports = {
+import {$, $$} from '../lib/dom';
+
+import Levels from '../components/levels';
+import Settings from '../components/settings';
+import Page from '../components/page';
+
+const SelectLevelPage = {
     name: 'select-level',
     locationHash: 'select-level',
-    init: function(data) {
-        var el = $('.select-level__list');
+    init() {
+        const el = $('.select-level__list');
         el.innerHTML = this.getList();
 
-        $.delegate(el, '.btn', 'click', function(e) {
+        $.delegate(el, '.btn', 'click', function() {
             if (this.classList.contains('btn_disabled')) {
                 return;
             }
 
-            var level = parseInt(this.dataset['level'], 10);
+            const level = parseInt(this.dataset['level'], 10);
             Settings.set('level', level);
             Page.show('game');
         });
 
         return this;
     },
-    getList: function() {
-        var html = [];
+    getList() {
+        const html = [];
 
-        levels.data.forEach(function(levelData, i) {
+        Levels.data.forEach(function(levelData, i) {
             if (!i) {
                 return;
             }
@@ -56,13 +56,14 @@ module.exports = {
 
         return jstohtml(html);
     },
-    show: function() {
-        var maxLevel = Settings.get('maxLevel'),
+    show() {
+        const
+            maxLevel = Settings.get('maxLevel'),
             btns = $$('.select-level__list .btn', this.elem),
-            cl ='btn_disabled';
+            cl = 'btn_disabled';
 
-        for (var i = 0; i < btns.length; i++) {
-            var btnCl = btns[i].classList;
+        for (let i = 0; i < btns.length; i++) {
+            let btnCl = btns[i].classList;
             if (i < maxLevel) {
                 btnCl.remove(cl);
             } else {
@@ -70,8 +71,10 @@ module.exports = {
             }
         }
 
-        var maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
+        const maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
         window.scrollTo(0, $.offset(maxBtn).top - 10);
     },
-    hide: function() {}
+    hide() {}
 };
+
+export default SelectLevelPage;

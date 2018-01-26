@@ -1,15 +1,16 @@
-var $ = require('dom').$,
-    levels = require('levels'),
-    dtime = require('date-time');
+import {$} from '../lib/dom';
+import {formatTime} from '../lib/date-time';
 
-function InfoPanel(container) {
-    this.container = container;
-    this.elem = $.js2dom(this.build());
-    this.container.appendChild(this.elem);
-}
+import Levels from './levels';
 
-InfoPanel.prototype = {
-    build: function() {
+export default class InfoPanel {
+    constructor(container) {
+        this.container = container;
+        this.elem = $.js2dom(this.build());
+        this.container.appendChild(this.elem);
+    }
+
+    build() {
         return {
             cl: 'info-panel',
             c: [
@@ -37,32 +38,32 @@ InfoPanel.prototype = {
                 }
             ]
         };
-    },
-    update: function() {
+    }
+
+    update() {
         this.currentTime = Date.now();
 
         this.updatePart('errors-num', this.errors);
-        this.updatePart('time-num', dtime.formatTime(this.currentTime - this.startTime));
-    },
-    updatePart: function(name, value) {
+        this.updatePart('time-num', formatTime(this.currentTime - this.startTime));
+    }
+
+    updatePart(name, value) {
         $('.info-panel__' + name, this.elem).innerHTML = value;
-    },
-    start: function(levelData) {
+    }
+
+    start(levelData) {
         this.stop();
 
         this.errors = 0;
-        this.levelTitle = levels.getTitle(levelData);
+        this.levelTitle = Levels.getTitle(levelData);
         this.startTime = Date.now();
 
         this.update();
-        this._timer = setInterval(function() {
-            this.update();
-        }.bind(this), 500);
-    },
-    stop: function() {
+        this._timer = setInterval(this.update.bind(this), 500);
+    }
+
+    stop() {
         this._timer && clearInterval(this._timer);
         this._timer = null;
     }
-};
-
-module.exports = InfoPanel;
+}

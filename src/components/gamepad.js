@@ -1,106 +1,115 @@
-var $ = require('dom').$,
-    Event = require('event');
+import {$} from '../lib/dom';
+import CustomEvent from '../lib/custom-event';
 
-require('raf');
+class Gamepad extends CustomEvent {
+    constructor() {
+        super();
 
-module.exports = {
-    init: function() {
-        Object.assign(this, Event.prototype);
+        this._pressedBuffer = {};
+        this._pads = [];
+
+        // Gamepad: XBox360
+        this.buttonName = {
+            green: 0,
+            a: 0,
+
+            red: 1,
+            b: 1,
+
+            yellow: 3,
+            v: 3,
+
+            blue: 2,
+            x: 2,
+
+            left: 14,
+            right: 15,
+            up: 12,
+            down: 13,
+
+            back: 8,
+            start: 9,
+
+            lt: 6,
+            lb: 4,
+
+            rt: 7,
+            rb: 5
+        };
 
         if (!this.supported()) {
             return;
         }
 
-        $.on(window, 'gamepadconnected', function(e) {
-            this.search();
-            this.trigger('connected');
+        $
+            .on(window, 'gamepadconnected', () => {
+                this.search();
+                this.trigger('connected');
 
-            if (!this._rafId) {
-                this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
-            }
+                if (!this._rafId) {
+                    this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
+                }
+            })
+            .on(window, 'gamepaddisconnected', () => {
+                this.search();
+                this.trigger('disconnected');
 
-        }.bind(this));
+                if (!this.get().length && this._rafId) {
+                    window.cancelAnimationFrame(this._rafId);
+                    this._rafId = null;
+                }
+            });
+    }
 
-        $.on(window, 'gamepaddisconnected', function(e) {
-            this.search();
-            this.trigger('disconnected');
-
-            if (!this.get().length && this._rafId) {
-                window.cancelAnimationFrame(this._rafId);
-                this._rafId = null;
-            }
-        }.bind(this));
-    },
-    pressedBuffer: {},
-    checkButtons: function() {
+    checkButtons() {
         this.get().forEach(function(pad) {
-            var padIndex = pad.index;
-            this.pressedBuffer[padIndex] = this.pressedBuffer[padIndex] || {};
+            const padIndex = pad.index;
+            this._pressedBuffer[padIndex] = this._pressedBuffer[padIndex] || {};
 
             pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
-                    if (this.pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
+                    if (this._pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
                         this.trigger(this.getButtonEventName(buttonIndex));
                         this.trigger(this.getButtonEventName(buttonIndex, pad.index));
                     }
 
-                    this.pressedBuffer[padIndex][buttonIndex] = button.pressed;
+                    this._pressedBuffer[padIndex][buttonIndex] = button.pressed;
                 }
             }, this);
         }, this);
 
         this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
-    },
-    supported: function() {
+    }
+
+    supported() {
         return typeof navigator.getGamepads === 'function';
-    },
-    get: function() {
+    }
+
+    get() {
         return this._pads;
-    },
-    item: function(num) {
+    }
+
+    item(num) {
         return this.get()[num];
-    },
-    count: function() {
+    }
+
+    count() {
         return this.get().length;
-    },
-    search: function() {
+    }
+
+    search() {
         this._pads = this.supported() ? navigator.getGamepads() : [];
-    },
-    // Gamepad: XBox360
-    buttonName: {
-        green: 0,
-        a: 0,
-        
-        red: 1,
-        b: 1,
+    }
 
-        yellow: 3,
-        v: 3,
-
-        blue: 2,
-        x: 2,
-
-        left: 14,
-        right: 15,
-        up: 12,
-        down: 13,
-
-        back: 8,
-        start: 9,
-
-        lt: 6,
-        lb: 4,
-
-        rt: 7,
-        rb: 5
-    },
-    getButtonId: function(name) {
+    getButtonId(name) {
         return this.buttonName[name];
-    },
-    getButtonEventName: function(button, gamepadIndex) {
-        var index = typeof gamepadIndex === 'undefined' ? '*' : gamepadIndex;
+    }
+
+    getButtonEventName(button, gamepadIndex) {
+        const index = typeof gamepadIndex === 'undefined' ? '*' : gamepadIndex;
         return 'gamepad:button-' + button + ':index-' + index;
-    },
+    }
+
     /*
      * Set a event on a button.
      * @param {number|string} button - button id or name of button ('start', 'yellow')
@@ -110,9 +119,9 @@ module.exports = {
      * .onbutton('green:0', function() {}); // gamepad 0, button "green"
      * .onbutton('lb', function() {}); //  button "lb", any gamepad
      */
-    onbutton: function(button, callback) {
-        var self = this,
-            gamepadIndex;
+    onbutton(button, callback) {
+        const self = this;
+        let gamepadIndex;
 
         if (typeof button === 'string') {
             gamepadIndex = button.split(':')[1];
@@ -128,7 +137,10 @@ module.exports = {
         }
 
         setEvent(button);
-    },
+
+        return this;
+    }
+
     /*
      * Set events on buttons.
      * @param {Array} buttons
@@ -137,10 +149,13 @@ module.exports = {
      * @example
      * .onbuttons(['green:0', 'red:0'], function() {});
      */
-    onbuttons: function(buttons, callback) {
+    onbuttons(buttons, callback) {
         buttons.forEach(function(button) {
             this.onbutton(button, callback);
         }, this);
-    },
-    _pads: []
-};
+
+        return this;
+    }
+}
+
+export default new Gamepad();

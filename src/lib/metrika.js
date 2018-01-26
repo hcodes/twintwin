@@ -1,10 +1,10 @@
 ﻿// Yandex.Metrika
 function prepareParam(value) {
     return window.encodeURIComponent((value || '').substr(0, 512));
-};
+}
 
-module.exports = {
-    hit: function(id) {
+const Metrika = {
+    hit(id) {
         var pageUrl = prepareParam(window.location.href),
             pageRef = prepareParam(document.referrer);
 
@@ -13,3 +13,5 @@ module.exports = {
             '&page-ref=' + pageRef;
     }
 };
+
+export default Metrika;

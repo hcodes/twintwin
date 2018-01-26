@@ -1,73 +1,66 @@
-var dom = require('dom'),
-    $ = dom.$,
-    Gamepad = require('gamepad'),
-    GamepadNotice = require('gamepad-notice'),
-    Page = require('page'),
-    Back = require('back'),
-    metrika = require('metrika'),
-    isMobile = require('is-mobile'),
-    body = document.body;
+import {$, hasSupportCss} from './lib/dom';
+import isMobile from './lib/is-mobile';
+import metrika from './lib/metrika';
+metrika.hit(35250605);
 
-var App = {
-    init: function() {
-        body.classList.add('support_transform3d_' + dom.hasSupportCss('perspective'));
+import Page from './components/page';
+import BackButton from './components/back-button';
 
+import Pages from './pages/pages';
+
+class App {
+    constructor() {
+        const body = document.body;
+        body.classList.add('support_transform3d_' + hasSupportCss('perspective'));
         body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
 
-        if (isMobile) {
-            this.setInputType('touch');
-        } else {
-            $.on(document, 'mousemove', function() {
-                this.setInputType('mouse');
-            }.bind(this));
+        this.inputType = 'mouse';
 
-            $.on(document, 'touchstart', function() {
-                this.setInputType('touch');
-            }.bind(this));
+        if (isMobile) {
+            this.inputType = 'touch';
+        } else {
+            $
+                .on(document, 'mousemove', () => {
+                    this.inputType = 'mouse';
+                })
+                .on(document, 'touchstart', () => {
+                    this.inputType = 'touch';
+                });
         }
 
-        $.on(document, 'keydown', function() {
-            this.setInputType('keyboard');
-        }.bind(this));
+        $.on(document, 'keydown', () => {
+            this.inputType = 'keyboard';
+        });
 
-        this.setInputType('mouse');
+        Page.add(Pages);
 
-        this._back = new Back(body);
+        this._back = new BackButton(body);
 
-        Page.on('show', function(e, page) {
+        Page.on('show', (e, page) => {
             if (page.name === 'main') {
                 this._back.hide();
             } else {
                 this._back.show();
             }
-        }.bind(this));
+        });
 
         Page.showByLocationHash();
-        window.addEventListener('hashchange', function() {
+        window.addEventListener('hashchange', () => {
             Page.showByLocationHash();
-        }.bind(this), false);
-    },
-    inputType: null,
-    setInputType: function(type) {
-        if (type !== this.inputType) {
-            body.classList.remove('input_' + this.inputType);
-            body.classList.add('input_' + type);
-            this.inputType = type;
+        }, false);
+    }
+
+    get inputType() {
+        return this._inputType;
+    }
+
+    set inputType(type) {
+        if (type !== this._inputType) {
+            document.body.classList.remove('input_' + this.inputType);
+            document.body.classList.add('input_' + type);
+            this._inputType = type;
         }
     }
-};
+}
 
-$.on(document, 'DOMContentLoaded', function() {
-    Gamepad.init();
-    GamepadNotice.init();
-    Page.add([
-        require('main'),
-        require('game'),
-        require('multiplayer'),
-        require('select-level'),
-        require('show-levels')
-    ]);
-    App.init();
-
-    metrika.hit(35250605);
-});
+new App();

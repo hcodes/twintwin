@@ -1,17 +1,21 @@
-var $ = require('dom').$,
-    Page = require('page'),
-    body = document.body;
+import {$} from '../lib/dom';
+import Page from '../pages/page';
 
-var TrophyNotice = function(data) {
-    this._data = data;
-    this._onclick = function() {
-        this.close();
-        Page.show('trophies');
-    }.bind(this);
-};
+/*var tp = new TrophyNotice({
+    title: 'Hello world!',
+    type: '🏆'
+}).open();*/
 
-TrophyNotice.prototype = {
-    open: function() {
+export default class TrophyNotice {
+    constructor(data) {
+        this._data = data;
+        this._onclick = function() {
+            this.close();
+            Page.show('trophies');
+        }.bind(this);
+    }
+
+    open() {
         this._el = $.js2dom({
             cl: 'trophy-notice',
             c: [{
@@ -23,32 +27,27 @@ TrophyNotice.prototype = {
             }]
         });
 
-        body.appendChild(this._el);
+        document.body.appendChild(this._el);
 
-        setTimeout(function() {
+        setTimeout(() => {
             this._el.classList.add('trophy-notice_open');
             $.on(this._el, 'click', this._onclick);
-        }.bind(this), 50);
+        }, 50);
 
         return this;
-    },
-    close: function() {
+    }
+
+    close() {
         this._el.classList.remove('trophy-notice_open');
         $.off(this._el, 'click', this._onclick);
 
         setTimeout(this.remove.bind(this), 200);
 
         return this;
-    },
-    remove: function() {
-        body.removeChild(this._el);
+    }
+
+    remove() {
+        document.body.removeChild(this._el);
         delete this._el;
     }
-};
-
-/*var tp = new TrophyNotice({
-    title: 'Hello world!',
-    type: '🏆'
-}).open();*/
-
-module.exports = TrophyNotice;
+}

@@ -1,35 +1,41 @@
-module.exports = {
-    set: function(name, value) {
+const Settings = {
+    set(name, value) {
         this._buffer[name] = this._copy(value);
         this._save();
     },
-    get: function(name, defaultValue) {
+    get(name, defaultValue) {
         if (!this._isLoaded) {
             this._load();
             this._isLoaded = true;
         }
 
-        var value = this._buffer[name];
+        const value = this._buffer[name];
         return value === undefined ? defaultValue : value;
     },
-    lsName: 'de',
+    lsName: 'twintwin',
     _buffer: {},
-    _load: function() {
+    _load() {
         var buffer = {};
         try {
             buffer = JSON.parse(localStorage.getItem(this.lsName)) || {};
-        } catch(e) {}
+        } catch (e) {
+            console.log('Settings from localStorage: parse error.');
+        }
 
         buffer.level = buffer.level || 1;
         buffer.maxLevel = buffer.maxLevel || 1;
         this._buffer = buffer;
     },
-    _save: function() {
+    _save() {
         try {
             localStorage.setItem(this.lsName, JSON.stringify(this._buffer));
-        } catch(e) {}
+        } catch (e) {
+            console.log('localStorage.setItem error.');
+        }
     },
-    _copy: function(obj) {
+    _copy(obj) {
         return JSON.parse(JSON.stringify(obj));
     }
 };
+
+export default Settings;
