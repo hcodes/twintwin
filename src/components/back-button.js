@@ -1,7 +1,8 @@
 import {$} from '../lib/dom';
+
 import Page from './page';
 
-export class BackButton {
+export default class BackButton {
     constructor(container) {
         this.elem = $.js2dom({
             cl: 'back',

@@ -1,8 +1,10 @@
-import {$, $$} from './dom';
 import jstohtml from 'jstohtml';
-import levels from './components/levels';
-import Settings from './components/settings';
-import Page from './components/page';
+
+import {$, $$} from '../lib/dom';
+
+import Levels from '../components/levels';
+import Settings from '../components/settings';
+import Page from '../components/page';
 
 const SelectLevelPage = {
     name: 'select-level',
@@ -11,7 +13,7 @@ const SelectLevelPage = {
         const el = $('.select-level__list');
         el.innerHTML = this.getList();
 
-        $.delegate(el, '.btn', 'click', () => {
+        $.delegate(el, '.btn', 'click', function() {
             if (this.classList.contains('btn_disabled')) {
                 return;
             }
@@ -26,7 +28,7 @@ const SelectLevelPage = {
     getList() {
         const html = [];
 
-        levels.data.forEach(function(levelData, i) {
+        Levels.data.forEach(function(levelData, i) {
             if (!i) {
                 return;
             }

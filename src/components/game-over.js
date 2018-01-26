@@ -1,6 +1,7 @@
 import {$} from '../lib/dom';
-import num from '../lib/number';
-import Component from '../component';
+import {format} from '../lib/number';
+
+import Component from './component';
 
 export default Component.create({
     init() {
@@ -14,7 +15,7 @@ export default Component.create({
         ]);
     },
     updateScore(value) {
-        $('.game-over__score-i').innerHTML = num.format(value);
+        $('.game-over__score-i').innerHTML = format(value);
     },
     show(data) {
         $.show('.game-over');

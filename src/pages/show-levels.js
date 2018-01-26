@@ -1,15 +1,17 @@
 // For debug
 
-import levels from './components/levels';
-import {$} from './dom';
 import jstohtml from 'jstohtml';
+
+import {$} from '../lib/dom';
+
+import Levels from '../components/levels';
 
 const ShowLevelsPage = {
     name: 'show-levels',
     locationHash: 'show-levels',
     init() {
         const container = $('.page_show-levels');
-        const obj = levels.data.map(function(item, i) {
+        const obj = Levels.data.map(function(item, i) {
             return i ? [
                 {
                     t: 'h4',

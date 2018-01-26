@@ -1,13 +1,17 @@
 import {$} from '../lib/dom';
-import Event from '../lib/event';
+import CustomEvent from '../lib/custom-event';
+
+class EmptyComponent extends CustomEvent {
+    constructor() {
+        super();
+    }
+}
 
 const Component = {
-    create(cl) {
-        const obj = new cl();
+    create(obj) {
+        const emptyComponentObj = new EmptyComponent();
 
-        Object.assign(obj, Event.prototype);
-
-        Object.assign(obj, {
+        Object.assign(emptyComponentObj, {
             domEvents: [],
             setDomEvents(events) {
                 events.forEach(function(item) {
@@ -25,9 +29,11 @@ const Component = {
             }
         });
 
-        obj.init && obj.init();
+        Object.assign(emptyComponentObj, obj);
 
-        return obj;
+        emptyComponentObj.init && emptyComponentObj.init();
+
+        return emptyComponentObj;
     }
 };
 

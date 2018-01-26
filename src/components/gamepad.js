@@ -1,8 +1,10 @@
-import {$} from './lib/dom';
-import Event from './lib/event';
+import {$} from '../lib/dom';
+import CustomEvent from '../lib/custom-event';
 
-export default class Gamepad {
+class Gamepad extends CustomEvent {
     constructor() {
+        super();
+
         this._pressedBuffer = {};
         this._pads = [];
 
@@ -34,8 +36,6 @@ export default class Gamepad {
             rt: 7,
             rb: 5
         };
-
-        Object.assign(this, Event.prototype);
 
         if (!this.supported()) {
             return;
@@ -157,3 +157,5 @@ export default class Gamepad {
         return this;
     }
 }
+
+export default new Gamepad();

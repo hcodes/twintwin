@@ -1,9 +1,10 @@
-import {$} from './lib/dom';
-import Page from './components/page';
-import Settings from './components/settings';
-import Field from './components/field';
-import levels from './components/levels';
-import gameOver from './components/game-over';
+import {$} from '../lib/dom';
+
+import Page from '../components/page';
+import Settings from '../components/settings';
+import Field from '../components/field';
+import Levels from '../components/levels';
+import gameOver from '../components/game-over';
 
 const GamePage = {
     name: 'game',
@@ -50,12 +51,12 @@ const GamePage = {
         });
     },
     getLevelData() {
-        const data = levels.getLevel(Settings.get('level'));
+        const data = Levels.getLevel(Settings.get('level'));
 
         return {
             data,
-            rows: data.rows || levels.defaultRows,
-            cols: data.cols || levels.defaultCols
+            rows: data.rows || Levels.defaultRows,
+            cols: data.cols || Levels.defaultCols
         };
     },
     _onKeydown(e) {

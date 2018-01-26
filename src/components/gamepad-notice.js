@@ -1,9 +1,7 @@
-import {$} from './lib/dom';
+import {$} from '../lib/dom';
 import Gamepad from './gamepad';
 
-const body = document.body;
-
-export default class GamepadNotice {
+class GamepadNotice {
     constructor() {
         this.build();
         this.setEvents();
@@ -38,8 +36,8 @@ export default class GamepadNotice {
             .on('connected', this.showConnected.bind(this))
             .on('disconnected', this.showDisconnected.bind(this));
 
-        body.appendChild(this._elemConnected);
-        body.appendChild(this._elemDisconnected);
+        document.body.appendChild(this._elemConnected);
+        document.body.appendChild(this._elemDisconnected);
     }
 
     showDisconnected() {
@@ -78,3 +76,5 @@ export default class GamepadNotice {
         }, this.timeout);
     }
 }
+
+export default new GamepadNotice();

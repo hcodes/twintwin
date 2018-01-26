@@ -1,4 +1,5 @@
 import {$, $$} from '../lib/dom';
+
 import FieldCursor from './field-cursor';
 import InfoPanel from './info-panel';
 import Gamepad from './gamepad';
@@ -186,7 +187,7 @@ export default class Field {
             syms = this.levelData.symbols,
             size = this.cols * this.rows,
             halfSize = size / 2;
-            
+
         let buf = [];
 
         while (halfSize > buf.length) {

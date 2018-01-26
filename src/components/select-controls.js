@@ -1,4 +1,5 @@
-﻿import {$$} from './lib/dom';
+﻿import {$$} from '../lib/dom';
+
 import Component from './component';
 import Settings from './settings';
 

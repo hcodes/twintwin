@@ -1,22 +1,16 @@
-import Gamepad from './components/gamepad';
-import GamepadNotice from './components/gamepad-notice';
-import Page from './components/page';
-import Back from './components/back';
-
-import Pages from './pages/pages';
-
 import {$, hasSupportCss} from './lib/dom';
 import isMobile from './lib/is-mobile';
 import metrika from './lib/metrika';
 metrika.hit(35250605);
 
+import Page from './components/page';
+import BackButton from './components/back-button';
+
+import Pages from './pages/pages';
+
 class App {
     constructor() {
         const body = document.body;
-
-        new Gamepad();
-        new GamepadNotice();
-
         body.classList.add('support_transform3d_' + hasSupportCss('perspective'));
         body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
 
@@ -25,20 +19,22 @@ class App {
         if (isMobile) {
             this.inputType = 'touch';
         } else {
-            $.on(document, 'mousemove', () => {
-                this.inputType = 'mouse';
-            });
-
-            $.on(document, 'touchstart', () => {
-                this.inputType = 'touch';
-            });
+            $
+                .on(document, 'mousemove', () => {
+                    this.inputType = 'mouse';
+                })
+                .on(document, 'touchstart', () => {
+                    this.inputType = 'touch';
+                });
         }
 
         $.on(document, 'keydown', () => {
             this.inputType = 'keyboard';
         });
 
-        this._back = new Back(body);
+        Page.add(Pages);
+
+        this._back = new BackButton(body);
 
         Page.on('show', (e, page) => {
             if (page.name === 'main') {
@@ -52,8 +48,6 @@ class App {
         window.addEventListener('hashchange', () => {
             Page.showByLocationHash();
         }, false);
-
-        Page.add(Pages);
     }
 
     get inputType() {

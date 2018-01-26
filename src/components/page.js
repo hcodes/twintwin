@@ -1,11 +1,19 @@
-import customEvent from './lib/event';
-import {$} from './lib/dom';
+import CustomEvent from '../lib/custom-event';
+import {$} from '../lib/dom';
 
-const Page =  {
+class Page extends CustomEvent {
+    constructor() {
+        super();
+
+        this._current = null;
+        this._buffer = {};
+    }
+
     back() {
         window.history.back();
         this.showByLocationHash();
-    },
+    }
+
     add(pages) {
         if (Array.isArray(pages)) {
             pages.forEach(function(page) {
@@ -14,27 +22,31 @@ const Page =  {
         } else {
             this._add(pages);
         }
-    },
+    }
+
     _add(page) {
-        this.buffer[page.name] = page;
-    },
+        this._buffer[page.name] = page;
+    }
+
     get(name) {
-        return this.buffer[name];
-    },
+        return this._buffer[name];
+    }
+
     has(name) {
         return Boolean(this.get(name));
-    },
+    }
+
     show(name, data) {
         let oldName = null;
         const body = document.body;
 
-        if (this.current) {
-            oldName = this.current.name;
+        if (this._current) {
+            oldName = this._current.name;
             if (oldName === name) {
                 return;
             }
 
-            this.current.hide();
+            this._current.hide();
             body.classList.remove('page_' + oldName);
         }
 
@@ -52,22 +64,25 @@ const Page =  {
             window.location.hash = page.locationHash;
         }
 
-        this.current = page;
+        this._current = page;
 
         this.trigger('show', page);
-    },
+    }
+
     hide(name) {
         this.get(name).hide();
-    },
+    }
+
     showByLocationHash() {
         this.show(this. getNameByLocationHash(window.location.hash));
-    },
+    }
+
     getNameByLocationHash(hash) {
         let name;
         hash = (hash || '').replace(/#/, '');
 
-        Object.keys(this.buffer).some(function(key) {
-            const page = this.buffer[key];
+        Object.keys(this._buffer).some(function(key) {
+            const page = this._buffer[key];
 
             if (page.locationHash === hash) {
                 name = page.name;
@@ -78,11 +93,7 @@ const Page =  {
         }, this);
 
         return name || 'main';
-    },
-    current: null,
-    buffer: {}
-};
+    }
+}
 
-Object.assign(Page, customEvent.prototype);
-
-export default Page;
+export default new Page();

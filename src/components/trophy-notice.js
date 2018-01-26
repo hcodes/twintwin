@@ -1,5 +1,5 @@
-import {$} from './lib/dom';
-import Page from './pages/page';
+import {$} from '../lib/dom';
+import Page from '../pages/page';
 
 /*var tp = new TrophyNotice({
     title: 'Hello world!',

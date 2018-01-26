@@ -1,8 +1,10 @@
-import {$, $$} from './lib/dom';
-import levels from './components/levels';
-import Settings from './components/settings';
-import Page from './components/page';
 import jstohtml from 'jstohtml';
+
+import {$, $$} from '../lib/dom';
+
+import Levels from '../components/levels';
+import Settings from '../components/settings';
+import Page from '../components/page';
 
 const MainPage = {
     name: 'main',
@@ -20,8 +22,8 @@ const MainPage = {
     },
     setEvents() {
         $
-            .on(window, 'resize', this.resizeEmoji.bind())
-            .on('.main-menu__continue', 'click', () => {
+            .on(window, 'resize', this.resizeEmoji.bind(this))
+            .on('.main-menu__continue', 'click', function() {
                 if (this.classList.contains('btn_disabled')) {
                     return;
                 }
@@ -44,7 +46,7 @@ const MainPage = {
     },
     getBackground() {
         let symbols = [];
-        levels.data.forEach(function(level) {
+        Levels.data.forEach(function(level) {
             if (level.bg !== false) {
                 symbols = symbols.concat(level.symbols);
             }

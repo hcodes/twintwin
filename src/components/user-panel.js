@@ -1,6 +1,7 @@
+import {$} from '../lib/dom';
+import {escapeHTML} from '../lib/string';
+
 import Settings from './settings';
-import {$} from './lib/dom';
-import string from 'string';
 
 export default class UserPanel {
     constructor(container, data) {
@@ -35,7 +36,7 @@ export default class UserPanel {
         const result = window.prompt('Player name:');
         if (result) {
             this.name = this.getUserName(result);
-            this.elem.innerHTML = string.escapeHTML(this.name);
+            this.elem.innerHTML = escapeHTML(this.name);
             Settings.set(this.settingName, this.name);
         }
     }

@@ -1,6 +1,7 @@
-import {$} from './lib/dom';
-import levels from './levels';
-import {formatTime} from './lib/date-time';
+import {$} from '../lib/dom';
+import {formatTime} from '../lib/date-time';
+
+import Levels from './levels';
 
 export default class InfoPanel {
     constructor(container) {
@@ -54,7 +55,7 @@ export default class InfoPanel {
         this.stop();
 
         this.errors = 0;
-        this.levelTitle = levels.getTitle(levelData);
+        this.levelTitle = Levels.getTitle(levelData);
         this.startTime = Date.now();
 
         this.update();

@@ -1,10 +1,10 @@
-import {$} from './lib/dom';
-import Field from './components/field';
-import UserPanel from './components/user-panel';
-import Settings from './components/settings';
-import levels from './components/levels';
+import {$} from '../lib/dom';
 
-import SelectControls from './components/elect-controls';
+import Field from '../components/field';
+import Levels from '../components/levels';
+import SelectControls from '../components/select-controls';
+import Settings from '../components/settings';
+import UserPanel from '../components/user-panel';
 
 const MultiplayerPage = {
     name: 'multiplayer',
@@ -12,7 +12,7 @@ const MultiplayerPage = {
     init() {
         this.elem = $('.multiplayer');
 
-        this._levelData = levels.getRandomLevel();
+        this._levelData = Levels.getRandomLevel();
 
         const rows = 5;
         const cols = 6;
@@ -58,12 +58,12 @@ const MultiplayerPage = {
         }
     },
     getLevelData() {
-        const data = levels.getLevel(Settings.get('level'));
+        const data = Levels.getLevel(Settings.get('level'));
 
         return {
             data,
-            rows: data.rows || levels.defaultRows,
-            cols: data.cols || levels.defaultCols
+            rows: data.rows || Levels.defaultRows,
+            cols: data.cols || Levels.defaultCols
         };
     },
     show() {
