@@ -1,15 +1,36 @@
-var dom = require('dom'),
-    $ = dom.$,
-    Gamepad = require('gamepad'),
-    GamepadNotice = require('gamepad-notice'),
-    Page = require('page'),
-    Back = require('back'),
-    metrika = require('metrika'),
-    isMobile = require('is-mobile'),
-    body = document.body;
+import dom from './lib/dom';
+const $ = dom.$;
 
-var App = {
-    init: function() {
+import Gamepad from './components/gamepad';
+import GamepadNotice from './components/gamepad-notice';
+import Page from './pages/page';
+import Back from './components/back';
+import isMobile from './lib/is-mobile';
+
+import mainPage from './pages/main';
+import gamePage from './pages/game';
+import multiplayerPage from './pages/multiplayer';
+import selectLevelPage from './pages/select-level';
+import showLevels from './pages/show-levels';
+
+import metrika from './lib/metrika';
+metrika.hit(35250605);
+
+const body = document.body;
+
+const App = {
+    init() {
+        new Gamepad();
+        new GamepadNotice();
+
+        Page.add([
+            mainPage,
+            gamePage,
+            multiplayerPage,
+            selectLevelPage,
+            showLevels
+        ]);
+
         body.classList.add('support_transform3d_' + dom.hasSupportCss('perspective'));
 
         body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
@@ -34,21 +55,21 @@ var App = {
 
         this._back = new Back(body);
 
-        Page.on('show', function(e, page) {
+        Page.on('show', (e, page) => {
             if (page.name === 'main') {
                 this._back.hide();
             } else {
                 this._back.show();
             }
-        }.bind(this));
+        });
 
         Page.showByLocationHash();
-        window.addEventListener('hashchange', function() {
+        window.addEventListener('hashchange', () => {
             Page.showByLocationHash();
-        }.bind(this), false);
+        }, false);
     },
     inputType: null,
-    setInputType: function(type) {
+    setInputType(type) {
         if (type !== this.inputType) {
             body.classList.remove('input_' + this.inputType);
             body.classList.add('input_' + type);
@@ -57,17 +78,4 @@ var App = {
     }
 };
 
-$.on(document, 'DOMContentLoaded', function() {
-    Gamepad.init();
-    GamepadNotice.init();
-    Page.add([
-        require('main'),
-        require('game'),
-        require('multiplayer'),
-        require('select-level'),
-        require('show-levels')
-    ]);
-    App.init();
-
-    metrika.hit(35250605);
-});
+$.on(document, 'DOMContentLoaded', App.init.bind(this));

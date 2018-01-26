@@ -1,13 +1,13 @@
-var customEvent = require('event');
-var body = document.body;
-var $ = require('dom').$;
+import customEvent from './lib/event';
+import {$} from './lib/dom';
+const body = document.body;
 
-var Page =  {
-    back: function() {
+const Page =  {
+    back() {
         window.history.back();
         this.showByLocationHash();
     },
-    add: function(pages) {
+    add(pages) {
         if (Array.isArray(pages)) {
             pages.forEach(function(page) {
                 this._add(page);
@@ -16,17 +16,17 @@ var Page =  {
             this._add(pages);
         }
     },
-    _add: function(page) {
+    _add(page) {
         this.buffer[page.name] = page;
     },
-    get: function(name) {
+    get(name) {
         return this.buffer[name];
     },
-    has: function(name) {
+    has(name) {
         return Boolean(this.get(name));
     },
-    show: function(name, data) {
-        var oldName = null;
+    show(name, data) {
+        let oldName = null;
 
         if (this.current) {
             oldName = this.current.name;
@@ -38,7 +38,7 @@ var Page =  {
             body.classList.remove('page_' + oldName);
         }
 
-        var page = this.get(name);
+        const page = this.get(name);
         if (!page._isInited) {
             page.elem = $('.page_' + name);
             page.init();
@@ -56,18 +56,18 @@ var Page =  {
 
         this.trigger('show', page);
     },
-    hide: function(name) {
+    hide(name) {
         this.get(name).hide();
     },
-    showByLocationHash: function() {
+    showByLocationHash() {
         this.show(this. getNameByLocationHash(window.location.hash));
     },
-    getNameByLocationHash: function(hash) {
-        var name;
+    getNameByLocationHash(hash) {
+        let name;
         hash = (hash || '').replace(/#/, '');
 
         Object.keys(this.buffer).some(function(key) {
-            var page = this.buffer[key];
+            const page = this.buffer[key];
 
             if (page.locationHash === hash) {
                 name = page.name;
@@ -85,4 +85,4 @@ var Page =  {
 
 Object.assign(Page, customEvent.prototype);
 
-module.exports = Page;
+export default Page;

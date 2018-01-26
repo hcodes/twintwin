@@ -2,7 +2,9 @@ import $ from '../lib/dom';
 import Event from '../lib/event';
 
 const Component = {
-    create(obj) {
+    create(cl) {
+        const obj = new cl();
+
         Object.assign(obj, Event.prototype);
 
         Object.assign(obj, {

@@ -1,12 +1,17 @@
-var $ = require('dom').$,
-    Gamepad = require('gamepad'),
-    body = document.body;
-module.exports = {
-    init: function() {
+import {$} from './lib/dom';
+import Gamepad from './gamepad';
+
+const body = document.body;
+
+export default class GamepadNotice {
+    constructor() {
         this.build();
         this.setEvents();
-    },
-    build: function() {
+
+        this.timeout = 3000;
+    }
+
+    build() {
         this._elemConnected = $.js2dom({
             cl: 'gamepad-notice-connected',
             c: [
@@ -26,22 +31,20 @@ module.exports = {
                 }
             ]
         });
-    },
-    setEvents: function() {
-        Gamepad.on('connected', function() {
-            this.showConnected();
-        }.bind(this));
+    }
 
-        Gamepad.on('disconnected', function() {
-            this.showDisconnected();
-        }.bind(this));
+    setEvents() {
+        Gamepad
+            .on('connected', this.showConnected.bind(this))
+            .on('disconnected', this.showDisconnected.bind(this));
 
         body.appendChild(this._elemConnected);
         body.appendChild(this._elemDisconnected);
-    },
-    timeout: 3000,
-    showDisconnected: function() {
-        var cl = 'gamepad-notice-disconnected_show',
+    }
+
+    showDisconnected() {
+        const
+            cl = 'gamepad-notice-disconnected_show',
             el = this._elemDisconnected;
 
         el.classList.add(cl);
@@ -51,13 +54,15 @@ module.exports = {
             this._disTimer = null;
         }
 
-        this._disTimer = setTimeout(function() {
+        this._disTimer = setTimeout(() => {
             el.classList.remove(cl);
             this._disTimer = null;
-        }.bind(this), this.timeout);
-    },
-    showConnected: function() {
-        var cl = 'gamepad-notice-connected_show',
+        }, this.timeout);
+    }
+
+    showConnected() {
+        const
+            cl = 'gamepad-notice-connected_show',
             el = this._elemConnected;
 
         el.classList.add(cl);
@@ -67,9 +72,9 @@ module.exports = {
             this._timer = null;
         }
 
-        this._timer = setTimeout(function() {
+        this._timer = setTimeout(() => {
             el.classList.remove(cl);
             this._timer = null;
-        }.bind(this), this.timeout);
+        }, this.timeout);
     }
-};
+}

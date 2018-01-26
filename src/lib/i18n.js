@@ -1,21 +1,18 @@
-﻿var texts = {};
-var lang;
+const texts = {};
 
-function get(key) {
-    var val = texts[key];
-    
-    return val && val[lang];
-}
+let lang;
 
-function set(keyset, keys) {
-    Object.keys(keys).forEach(function(key) {
-        texts[keyset + '.' + key] = keys[key];
-    });
-}
+const i18n = {
+    get(key) {
+        const val = texts[key];
 
-module.exports = {
-    get: get,
-    set: set,
+        return val && val[lang];
+    },
+    set(keyset, keys) {
+        Object.keys(keys).forEach(function(key) {
+            texts[keyset + '.' + key] = keys[key];
+        });
+    },
     get lang: function() {
         return lang;
     },
@@ -23,3 +20,5 @@ module.exports = {
         lang = val;
     }
 };
+
+export default i18n;

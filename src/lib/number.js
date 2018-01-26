@@ -1,5 +1,4 @@
-module.exports = {
-    format: function(n, separator) {
+export function format(n, separator) {
         separator = separator || '\u202F';
 
         n = n.toString()

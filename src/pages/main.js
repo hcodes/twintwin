@@ -1,15 +1,13 @@
-var dom = require('dom'),
-    $ = dom.$,
-    $$ = dom.$$,
-    levels = require('levels'),
-    Settings = require('settings'),
-    Page = require('page'),
-    jstohtml = require('jstohtml');
+import {$, $$} from './lib/dom';
+import levels from './components/levels';
+import Settings from './components/settings';
+import Page from './components/page';
+import jstohtml from 'jstohtml';
 
-module.exports = {
+const MainPage = {
     name: 'main',
     locationHash: '',
-    init: function() {
+    init() {
         this._bg = $('.main-bg');
         this._bg.innerHTML = this.getBackground();
 
@@ -20,36 +18,32 @@ module.exports = {
 
         return this;
     },
-    setEvents: function() {
-        $.on(window, 'resize', function() {
-            this.resizeEmoji();
-        }.bind(this));
+    setEvents() {
+        $
+            .on(window, 'resize', this.resizeEmoji.bind())
+            .on('.main-menu__continue', 'click', function(e) {
+                if (this.classList.contains('btn_disabled')) {
+                    return;
+                }
 
-        $.on('.main-menu__continue', 'click', function(e) {
-            if (this.classList.contains('btn_disabled')) {
-                return;
-            }
-
-            Page.show('select-level');
-        });
-
-        $.on('.main-menu__new-game', 'click', function(e) {
-            Settings.set('maxLevel', 1);
-            Page.show('select-level');
-        }.bind(this));
-
-        $.on('.main-menu__multiplayer', 'click', function(e) {
-            Page.show('multiplayer');
-        }.bind(this));
+                Page.show('select-level');
+            })
+            .on('.main-menu__new-game', 'click', e => {
+                Settings.set('maxLevel', 1);
+                Page.show('select-level');
+            })
+            .on('.main-menu__multiplayer', 'click', e => {
+                Page.show('multiplayer');
+            });
     },
-    initLogo: function() {
-        var el  = $('.main-logo');
+    initLogo() {
+        const el = $('.main-logo');
         setTimeout(function() {
             el.classList.add('main-logo_visible');
         }, 500);
     },
-    getBackground: function() {
-        var symbols = [];
+    getBackground() {
+        let symbols = [];
         levels.data.forEach(function(level) {
             if (level.bg !== false) {
                 symbols = symbols.concat(level.symbols);
@@ -65,14 +59,15 @@ module.exports = {
             };
         }));
     },
-    resizeEmoji: function() {
-        var width = Math.floor(document.documentElement.clientWidth / 12),
+    resizeEmoji() {
+        const
+            width = Math.floor(document.documentElement.clientWidth / 12),
             bgStyle = this._bg.style;
 
         bgStyle.fontSize = width + 'px';
         bgStyle.lineHeight =  width + 'px';
     },
-    show: function() {
+    show() {
         var cont = $('.main-menu__continue');
         if (Settings.get('level')) {
             cont.classList.remove('btn_disabled');
@@ -80,20 +75,20 @@ module.exports = {
             cont.classList.add('btn_disabled');
         }
 
-        this._timer = setInterval(function() {
+        this._timer = setInterval(() => {
             this.setOpacity(function() {
                 return 0.1 + Math.random() * 0.4;
             });
-        }.bind(this), 1000);
+        }, 1000);
     },
-    setOpacity: function(callback) {
-        var elems = $$('.main-emoji');
+    setOpacity(callback) {
+        const elems = $$('.main-emoji');
 
-        for (var i = 0; i < elems.length; i++) {
+        for (let i = 0; i < elems.length; i++) {
             elems[i].style.opacity = typeof callback === 'function' ? callback() : callback;
         }
     },
-    hide: function() {
+    hide() {
         this._timer && clearInterval(this._timer);
         this._timer = null;
 

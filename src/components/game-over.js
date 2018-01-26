@@ -25,14 +25,13 @@ const gameOver = Component.create({
         $.hide('.game-over');
     },
     calcScore(data) {
-        const value = Math.floor(1e6 /  data.errors / Math.log(data.time + 3));
+        const value = Math.floor(1e6 / data.errors / Math.log(data.time + 3));
 
-        for (var i = 0; i < 10; i++) {
-            (function(counter) {
-                setTimeout(function() {
-                    that.updateScore(Math.floor(value * counter / 10));
-                }, i * 100);
-            })(i);
+        for (let i = 0; i < 10; i++) {
+            let score = Math.floor(value * i / 10);
+            setTimeout(() => {
+                this.updateScore(score);
+            }, i * 100);
         }
     }
 });

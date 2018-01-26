@@ -1,15 +1,15 @@
-﻿module.exports = {
+﻿export default {
     defaultRows: 5,
     defaultCols: 6,
-    getTitle: function(levelData) {
+    getTitle(levelData) {
         return levelData.titleSymbol + ' ' + levelData.name;
     },
-    getLevel: function(n) {
+    getLevel(n) {
         return this.data[n];
     },
-    getRandomLevel: function() {
-        var n = Math.floor(1 + Math.random() * (this.data.length - 1));
-        return this.getLevel(n);
+    getRandomLevel() {
+        const num = Math.floor(1 + Math.random() * (this.data.length - 1));
+        return this.getLevel(num);
     },
     data: [
         {
