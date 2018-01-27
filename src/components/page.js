@@ -1,17 +1,31 @@
 import CustomEvent from '../lib/custom-event';
 import {$} from '../lib/dom';
 
+import Back from './back';
+
 class Page extends CustomEvent {
     constructor() {
         super();
 
         this._current = null;
         this._buffer = {};
+
+        this._back = new Back(document.body);
+
+        this.on('show', (e, page) => {
+            if (page.name === 'main') {
+                this._back.hide();
+            } else {
+                this._back.show();
+            }
+        });
     }
 
     back() {
         window.history.back();
         this.showByLocationHash();
+
+        return this;
     }
 
     add(pages) {
@@ -22,6 +36,8 @@ class Page extends CustomEvent {
         } else {
             this._add(pages);
         }
+
+        return this;
     }
 
     _add(page) {
@@ -47,17 +63,19 @@ class Page extends CustomEvent {
             }
 
             this._current.hide();
+            this._current.elem.classList.remove('page_show');
             body.classList.remove('page_' + oldName);
         }
 
         const page = this.get(name);
         if (!page._isInited) {
             page.elem = $('.page_' + name);
-            page.init();
+            page.init && page.init();
             page._isInited = true;
         }
 
         body.classList.add('page_' + name);
+        page.elem.classList.add('page_show');
         page.show(data);
 
         if (page.locationHash !== undefined && window.location.hash !== '#' + page.locationHash) {
@@ -67,14 +85,20 @@ class Page extends CustomEvent {
         this._current = page;
 
         this.trigger('show', page);
+
+        return this;
     }
 
     hide(name) {
         this.get(name).hide();
+
+        return this;
     }
 
     showByLocationHash() {
-        this.show(this. getNameByLocationHash(window.location.hash));
+        this.show(this.getNameByLocationHash(window.location.hash));
+
+        return this;
     }
 
     getNameByLocationHash(hash) {

@@ -10,14 +10,14 @@ const MultiplayerPage = {
     name: 'multiplayer',
     locationHash: 'multiplayer',
     init() {
-        this.elem = $('.multiplayer');
+        this.el = $('.multiplayer');
 
         this._levelData = Levels.getRandomLevel();
 
         const rows = 5;
         const cols = 6;
 
-        const fieldOneElem = $('.field_one', this.elem);
+        const fieldOneElem = $('.field_one', this.el);
         this._fieldOne = new Field({
             elem: fieldOneElem,
             cols,
@@ -25,18 +25,16 @@ const MultiplayerPage = {
             levelData: this._levelData,
             //control: isMobile ? '*' : 'keyboard',
             control: SelectControls.getPlayerControl(0),
-            infoPanel: false,
             userPanel: new UserPanel(fieldOneElem, {num: 1})
         });
 
-        const fieldTwoElem = $('.field_two', this.elem);
+        const fieldTwoElem = $('.field_two', this.el);
         this._fieldTwo = new Field({
             elem: fieldTwoElem,
             cols,
             rows,
             levelData: this._levelData,
             control: SelectControls.getPlayerControl(1),
-            infoPanel: false,
             userPanel: new UserPanel(fieldTwoElem, {num: 2})
         });
 

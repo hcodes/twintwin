@@ -40,9 +40,9 @@
     "show-js-error": "1.x"
   },
   "scripts": {
-    "test": "npm run-script gulp && npm run-script eslint && npm run-script",
+    "build": "gulp",
+    "test": "npm run-script gulp && npm run-script eslint",
     "eslint": "eslint .",
-    "gulp": "./node_modules/.bin/gulp",
     "start": "gulp && start http-server . && gulp watch"
   },
   "private": true

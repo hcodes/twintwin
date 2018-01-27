@@ -10,12 +10,12 @@ const GamePage = {
     name: 'game',
     locationHash: 'game',
     init() {
-        this.elem = $('.game');
+        this.el = $('.game');
 
         const levelData = this.getLevelData();
 
         this._field = new Field({
-            elem: $('.field', this.elem),
+            elem: $('.field', this.el),
             rows: levelData.rows,
             cols: levelData.cols,
             levelData: levelData.data,

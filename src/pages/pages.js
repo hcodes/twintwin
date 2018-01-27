@@ -4,12 +4,12 @@ import MultiplayerPage from './multiplayer';
 import SelectLevelPage from './select-level';
 import ShowLevelPage from './show-levels';
 
-const Pages = [
+import Page from '../components/page';
+
+Page.add([
     GamePage,
     MainPage,
     MultiplayerPage,
     SelectLevelPage,
     ShowLevelPage
-];
-
-export default Pages;
+]);

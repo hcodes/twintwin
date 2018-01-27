@@ -252,6 +252,8 @@ var Metrika = {
     }
 };
 
+Metrika.hit(35250605);
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -336,6 +338,44 @@ var _createClass$1 = function () { function defineProperties(target, props) { fo
 
 function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var Back = function () {
+    function Back(container) {
+        _classCallCheck$1(this, Back);
+
+        this.elem = $.js2dom({
+            cl: 'back',
+            c: '&times;'
+        });
+
+        container.appendChild(this.elem);
+
+        $.on(this.elem, 'click', this.onclick.bind(this));
+    }
+
+    _createClass$1(Back, [{
+        key: 'show',
+        value: function show() {
+            this.elem.classList.add('back_visible');
+        }
+    }, {
+        key: 'hide',
+        value: function hide() {
+            this.elem.classList.remove('back_visible');
+        }
+    }, {
+        key: 'onclick',
+        value: function onclick() {
+            Page$1.back();
+        }
+    }]);
+
+    return Back;
+}();
+
+var _createClass$2 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -344,20 +384,32 @@ var Page = function (_CustomEvent) {
     _inherits(Page, _CustomEvent);
 
     function Page() {
-        _classCallCheck$1(this, Page);
+        _classCallCheck$2(this, Page);
 
         var _this = _possibleConstructorReturn(this, (Page.__proto__ || Object.getPrototypeOf(Page)).call(this));
 
         _this._current = null;
         _this._buffer = {};
+
+        _this._back = new Back(document.body);
+
+        _this.on('show', function (e, page) {
+            if (page.name === 'main') {
+                _this._back.hide();
+            } else {
+                _this._back.show();
+            }
+        });
         return _this;
     }
 
-    _createClass$1(Page, [{
+    _createClass$2(Page, [{
         key: 'back',
         value: function back() {
             window.history.back();
             this.showByLocationHash();
+
+            return this;
         }
     }, {
         key: 'add',
@@ -369,6 +421,8 @@ var Page = function (_CustomEvent) {
             } else {
                 this._add(pages);
             }
+
+            return this;
         }
     }, {
         key: '_add',
@@ -398,17 +452,19 @@ var Page = function (_CustomEvent) {
                 }
 
                 this._current.hide();
+                this._current.elem.classList.remove('page_show');
                 body.classList.remove('page_' + oldName);
             }
 
             var page = this.get(name);
             if (!page._isInited) {
                 page.elem = $('.page_' + name);
-                page.init();
+                page.init && page.init();
                 page._isInited = true;
             }
 
             body.classList.add('page_' + name);
+            page.elem.classList.add('page_show');
             page.show(data);
 
             if (page.locationHash !== undefined && window.location.hash !== '#' + page.locationHash) {
@@ -418,16 +474,22 @@ var Page = function (_CustomEvent) {
             this._current = page;
 
             this.trigger('show', page);
+
+            return this;
         }
     }, {
         key: 'hide',
         value: function hide(name) {
             this.get(name).hide();
+
+            return this;
         }
     }, {
         key: 'showByLocationHash',
         value: function showByLocationHash() {
             this.show(this.getNameByLocationHash(window.location.hash));
+
+            return this;
         }
     }, {
         key: 'getNameByLocationHash',
@@ -454,44 +516,6 @@ var Page = function (_CustomEvent) {
 }(CustomEvent);
 
 var Page$1 = new Page();
-
-var _createClass$2 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var BackButton = function () {
-    function BackButton(container) {
-        _classCallCheck$2(this, BackButton);
-
-        this.elem = $.js2dom({
-            cl: 'back',
-            c: '&times;'
-        });
-
-        container.appendChild(this.elem);
-
-        $.on(this.elem, 'click', this.onclick.bind(this));
-    }
-
-    _createClass$2(BackButton, [{
-        key: 'show',
-        value: function show() {
-            this.elem.classList.add('back_visible');
-        }
-    }, {
-        key: 'hide',
-        value: function hide() {
-            this.elem.classList.remove('back_visible');
-        }
-    }, {
-        key: 'onclick',
-        value: function onclick() {
-            Page$1.back();
-        }
-    }]);
-
-    return BackButton;
-}();
 
 var Settings = {
     set: function set(name, value) {
@@ -1577,12 +1601,12 @@ var GamePage = {
     init: function init() {
         var _this = this;
 
-        this.elem = $('.game');
+        this.el = $('.game');
 
         var levelData = this.getLevelData();
 
         this._field = new Field({
-            elem: $('.field', this.elem),
+            elem: $('.field', this.el),
             rows: levelData.rows,
             cols: levelData.cols,
             levelData: levelData.data,
@@ -1660,22 +1684,90 @@ var GamePage = {
     }
 };
 
+var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MainBg = function () {
+    function MainBg() {
+        _classCallCheck$8(this, MainBg);
+
+        this.elem = $('.main-bg');
+        this.elem.innerHTML = this.getBackground();
+
+        this.resize();
+    }
+
+    _createClass$7(MainBg, [{
+        key: 'getBackground',
+        value: function getBackground() {
+            var symbols = [];
+            Levels.data.forEach(function (level) {
+                if (level.bg !== false) {
+                    symbols = symbols.concat(level.symbols);
+                }
+            });
+
+            symbols.shuffle();
+
+            return jstohtml(symbols.map(function (sym) {
+                return {
+                    cl: ['main-emoji', 'emoji'],
+                    c: sym
+                };
+            }));
+        }
+    }, {
+        key: 'resize',
+        value: function resize() {
+            var width = Math.floor(document.documentElement.clientWidth / 12),
+                bgStyle = this.elem.style;
+
+            bgStyle.fontSize = width + 'px';
+            bgStyle.lineHeight = width + 'px';
+        }
+    }, {
+        key: 'setOpacity',
+        value: function setOpacity(callback) {
+            var elems = $$('.main-emoji', this.elem);
+
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].style.opacity = typeof callback === 'function' ? callback() : callback;
+            }
+        }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            if (this.elem) {
+                this.elem.innerHTML = '';
+                delete this.elem;
+            }
+        }
+    }]);
+
+    return MainBg;
+}();
+
+var elem = $('.main-logo');
+
+setTimeout(function () {
+    elem.classList.add('main-logo_visible');
+}, 1000);
+
 var MainPage = {
     name: 'main',
     locationHash: '',
     init: function init() {
-        this._bg = $('.main-bg');
-        this._bg.innerHTML = this.getBackground();
+        this._mainBg = new MainBg();
 
         this.setEvents();
-
-        this.resizeEmoji();
-        this.initLogo();
-
-        return this;
     },
     setEvents: function setEvents() {
-        $.on(window, 'resize', this.resizeEmoji.bind(this)).on('.main-menu__continue', 'click', function () {
+        var _this = this;
+
+        $.on(window, 'resize', function () {
+            _this._mainBg.resize();
+        }).on('.main-menu__continue', 'click', function () {
             if (this.classList.contains('btn_disabled')) {
                 return;
             }
@@ -1688,38 +1780,8 @@ var MainPage = {
             Page$1.show('multiplayer');
         });
     },
-    initLogo: function initLogo() {
-        var el = $('.main-logo');
-        setTimeout(function () {
-            el.classList.add('main-logo_visible');
-        }, 500);
-    },
-    getBackground: function getBackground() {
-        var symbols = [];
-        Levels.data.forEach(function (level) {
-            if (level.bg !== false) {
-                symbols = symbols.concat(level.symbols);
-            }
-        });
-
-        symbols.shuffle();
-
-        return jstohtml(symbols.map(function (sym) {
-            return {
-                cl: ['main-emoji', 'emoji'],
-                c: sym
-            };
-        }));
-    },
-    resizeEmoji: function resizeEmoji() {
-        var width = Math.floor(document.documentElement.clientWidth / 12),
-            bgStyle = this._bg.style;
-
-        bgStyle.fontSize = width + 'px';
-        bgStyle.lineHeight = width + 'px';
-    },
     show: function show() {
-        var _this = this;
+        var _this2 = this;
 
         var cont = $('.main-menu__continue');
         if (Settings.get('level')) {
@@ -1729,23 +1791,16 @@ var MainPage = {
         }
 
         this._timer = setInterval(function () {
-            _this.setOpacity(function () {
+            _this2._mainBg.setOpacity(function () {
                 return 0.1 + Math.random() * 0.4;
             });
         }, 1000);
-    },
-    setOpacity: function setOpacity(callback) {
-        var elems = $$('.main-emoji');
-
-        for (var i = 0; i < elems.length; i++) {
-            elems[i].style.opacity = typeof callback === 'function' ? callback() : callback;
-        }
     },
     hide: function hide() {
         this._timer && clearInterval(this._timer);
         this._timer = null;
 
-        this.setOpacity(0);
+        this._mainBg.setOpacity(0);
     }
 };
 
@@ -1860,13 +1915,13 @@ function escapeHTML(text) {
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$8 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var UserPanel = function () {
     function UserPanel(container, data) {
-        _classCallCheck$8(this, UserPanel);
+        _classCallCheck$9(this, UserPanel);
 
         this.container = container;
 
@@ -1877,7 +1932,7 @@ var UserPanel = function () {
         this.init();
     }
 
-    _createClass$7(UserPanel, [{
+    _createClass$8(UserPanel, [{
         key: 'init',
         value: function init() {
             this.elem = $.js2dom({
@@ -1919,14 +1974,14 @@ var MultiplayerPage = {
     init: function init() {
         var _this = this;
 
-        this.elem = $('.multiplayer');
+        this.el = $('.multiplayer');
 
         this._levelData = Levels.getRandomLevel();
 
         var rows = 5;
         var cols = 6;
 
-        var fieldOneElem = $('.field_one', this.elem);
+        var fieldOneElem = $('.field_one', this.el);
         this._fieldOne = new Field({
             elem: fieldOneElem,
             cols: cols,
@@ -1934,18 +1989,16 @@ var MultiplayerPage = {
             levelData: this._levelData,
             //control: isMobile ? '*' : 'keyboard',
             control: SelectControls.getPlayerControl(0),
-            infoPanel: false,
             userPanel: new UserPanel(fieldOneElem, { num: 1 })
         });
 
-        var fieldTwoElem = $('.field_two', this.elem);
+        var fieldTwoElem = $('.field_two', this.el);
         this._fieldTwo = new Field({
             elem: fieldTwoElem,
             cols: cols,
             rows: rows,
             levelData: this._levelData,
             control: SelectControls.getPlayerControl(1),
-            infoPanel: false,
             userPanel: new UserPanel(fieldTwoElem, { num: 2 })
         });
 
@@ -1996,14 +2049,20 @@ var MultiplayerPage = {
     }
 };
 
-var SelectLevelPage = {
-    name: 'select-level',
-    locationHash: 'select-level',
-    init: function init() {
-        var el = $('.select-level__list');
-        el.innerHTML = this.getList();
+var _createClass$9 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-        $.delegate(el, '.btn', 'click', function () {
+function _classCallCheck$10(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SelectLevel = function () {
+    function SelectLevel() {
+        var _this = this;
+
+        _classCallCheck$10(this, SelectLevel);
+
+        this.elem = $('.select-level__list', this.elem);
+        this.elem.innerHTML = this.getList();
+
+        $.delegate(this.elem, '.btn', 'click', function () {
             if (this.classList.contains('btn_disabled')) {
                 return;
             }
@@ -2013,51 +2072,64 @@ var SelectLevelPage = {
             Page$1.show('game');
         });
 
-        return this;
-    },
-    getList: function getList() {
-        var html = [];
-
-        Levels.data.forEach(function (levelData, i) {
-            if (!i) {
-                return;
+        Page$1.on('show', function (e, p) {
+            if (p.name === 'select-level') {
+                _this.update();
             }
+        });
+    }
 
-            html.push({
-                t: 'li',
-                cl: 'select-level__item',
-                c: {
-                    t: 'span',
-                    cl: ['btn btn_red btn_middle'],
-                    'data-level': i,
-                    c: [{
-                        t: 'span',
-                        cl: 'select-level__emoji emoji',
-                        c: levelData.titleSymbol
-                    }, levelData.name]
+    _createClass$9(SelectLevel, [{
+        key: 'getList',
+        value: function getList() {
+            var html = [],
+                maxLevel = Settings.get('maxLevel');
+
+            Levels.data.forEach(function (levelData, i) {
+                if (!levelData.name) {
+                    return;
                 }
+
+                html.push({
+                    t: 'li',
+                    cl: 'select-level__item',
+                    c: {
+                        t: 'span',
+                        cl: ['btn btn_red btn_middle' + (i < maxLevel ? '' : ' btn_disabled')],
+                        'data-level': i,
+                        c: [{
+                            t: 'span',
+                            cl: 'select-level__emoji emoji',
+                            c: levelData.titleSymbol
+                        }, levelData.name]
+                    }
+                });
             });
-        }, this);
 
-        return jstohtml(html);
-    },
-    show: function show() {
-        var maxLevel = Settings.get('maxLevel'),
-            btns = $$('.select-level__list .btn', this.elem),
-            cl = 'btn_disabled';
-
-        for (var i = 0; i < btns.length; i++) {
-            var btnCl = btns[i].classList;
-            if (i < maxLevel) {
-                btnCl.remove(cl);
-            } else {
-                btnCl.add(cl);
-            }
+            return jstohtml(html);
         }
+    }, {
+        key: 'update',
+        value: function update() {
+            this.elem.innerHTML = this.getList();
 
-        var maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
-        window.scrollTo(0, $.offset(maxBtn).top - 10);
-    },
+            var maxLevel = Settings.get('maxLevel'),
+                btns = $$('.select-level__list .btn', this.elem);
+
+            var maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
+            window.scrollTo(0, $.offset(maxBtn).top - 10);
+        }
+    }]);
+
+    return SelectLevel;
+}();
+
+new SelectLevel();
+
+var SelectLevelPage = {
+    name: 'select-level',
+    locationHash: 'select-level',
+    show: function show() {},
     hide: function hide() {}
 };
 
@@ -2085,75 +2157,42 @@ var ShowLevelsPage = {
     hide: function hide() {}
 };
 
-var Pages = [GamePage, MainPage, MultiplayerPage, SelectLevelPage, ShowLevelsPage];
+Page$1.add([GamePage, MainPage, MultiplayerPage, SelectLevelPage, ShowLevelsPage]);
 
-var _createClass$8 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var inputType = void 0;
+var body = document.body;
 
-function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-Metrika.hit(35250605);
-
-var App = function () {
-    function App() {
-        var _this = this;
-
-        _classCallCheck$9(this, App);
-
-        var body = document.body;
-        body.classList.add('support_transform3d_' + hasSupportCss('perspective'));
-        body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
-
-        this.inputType = 'mouse';
-
-        if (isMobile) {
-            this.inputType = 'touch';
-        } else {
-            $.on(document, 'mousemove', function () {
-                _this.inputType = 'mouse';
-            }).on(document, 'touchstart', function () {
-                _this.inputType = 'touch';
-            });
-        }
-
-        $.on(document, 'keydown', function () {
-            _this.inputType = 'keyboard';
-        });
-
-        Page$1.add(Pages);
-
-        this._back = new BackButton(body);
-
-        Page$1.on('show', function (e, page) {
-            if (page.name === 'main') {
-                _this._back.hide();
-            } else {
-                _this._back.show();
-            }
-        });
-
-        Page$1.showByLocationHash();
-        window.addEventListener('hashchange', function () {
-            Page$1.showByLocationHash();
-        }, false);
+function setInputType(type) {
+    if (type !== inputType) {
+        document.body.classList.remove('input_' + inputType);
+        document.body.classList.add('input_' + type);
+        inputType = type;
     }
+}
 
-    _createClass$8(App, [{
-        key: 'inputType',
-        get: function get() {
-            return this._inputType;
-        },
-        set: function set(type) {
-            if (type !== this._inputType) {
-                document.body.classList.remove('input_' + this.inputType);
-                document.body.classList.add('input_' + type);
-                this._inputType = type;
-            }
-        }
-    }]);
+body.classList.add('support_transform3d_' + hasSupportCss('perspective'));
+body.classList.add('device_' + (isMobile ? 'mobile' : 'desktop'));
 
-    return App;
-}();
+setInputType('mouse');
 
-new App();
+if (isMobile) {
+    setInputType('touch');
+} else {
+    $.on(document, 'mousemove', function () {
+        setInputType('mouse');
+    }).on(document, 'touchstart', function () {
+        setInputType('touch');
+    });
+}
+
+$.on(document, 'keydown', function () {
+    setInputType('keyboard');
+});
+
+Page$1.showByLocationHash();
+
+window.addEventListener('hashchange', function () {
+    Page$1.showByLocationHash();
+}, false);
 
 }());

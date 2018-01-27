@@ -515,6 +515,13 @@ body.page_field .page_field {
       -ms-transform: rotate(-90deg);
           transform: rotate(-90deg);
 }
+.main-bg {
+  position: absolute;
+  left: -10%;
+  top: 0;
+  width: 120%;
+  height: 100%;
+}
 .main-emoji {
   display: block;
   float: left;
@@ -569,6 +576,9 @@ body.page_field .page_field {
   width: 220px;
   margin: 5px 0;
 }
+.page_show {
+  display: block;
+}
 .qr-code {
   position: absolute;
   right: 20px;
@@ -593,6 +603,47 @@ body.page_field .page_field {
   top: -25px;
   color: white;
   cursor: pointer;
+}
+.select-level {
+  margin: 0;
+  padding: 0;
+}
+.select-level__list {
+  padding: 0;
+  margin: 20px 0 20px 0;
+  list-style-type: none;
+}
+@media (max-width: 600px) {
+  .select-level .select-level__item {
+    width: 290px;
+  }
+  .select-level .btn {
+    font-size: 21px !important;
+  }
+}
+.select-level__item {
+  margin: 0 auto;
+  padding: 0;
+  width: 350px;
+}
+.select-level__item .btn {
+  margin: 5px 0;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.select-level__item .btn_disabled .emoji {
+  opacity: 0.4;
+}
+.select-level .emoji {
+  margin-right: 10px;
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.5);
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  text-align: center;
+  border-radius: 100%;
 }
 .trophy-notice {
   position: fixed;
@@ -644,9 +695,6 @@ body.page_field .page_field {
   color: #fff;
   cursor: pointer;
 }
-body.page_game .page_game {
-  display: block;
-}
 .game {
   position: absolute;
   left: 30px;
@@ -654,21 +702,8 @@ body.page_game .page_game {
   right: 30px;
   bottom: 30px;
 }
-body.page_main .page_main {
-  display: block;
-}
 .page_main {
   overflow: hidden;
-}
-.main-bg {
-  position: absolute;
-  left: -10%;
-  top: 0;
-  width: 120%;
-  height: 100%;
-}
-body.page_multiplayer .page_multiplayer {
-  display: block;
 }
 .multiplayer {
   position: absolute;
@@ -686,51 +721,6 @@ body.page_multiplayer .page_multiplayer {
 .multiplayer .info-panel {
   display: none;
 }
-body.page_select-level .page_select-level {
-  display: block;
-}
-.select-level {
-  margin: 0;
-  padding: 0;
-}
-.select-level__list {
-  padding: 0;
-  margin: 20px 0 20px 0;
-  list-style-type: none;
-}
-@media (max-width: 600px) {
-  .select-level .select-level__item {
-    width: 290px;
-  }
-  .select-level .btn {
-    font-size: 21px !important;
-  }
-}
-.select-level__item {
-  margin: 0 auto;
-  padding: 0;
-  width: 350px;
-}
-.select-level__item .btn {
-  margin: 5px 0;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-}
-.select-level__item .btn_disabled .emoji {
-  opacity: 0.4;
-}
-.select-level .emoji {
-  margin-right: 10px;
-  padding: 2px;
-  background: rgba(0, 0, 0, 0.5);
-  width: 40px;
-  height: 40px;
-  display: inline-block;
-  text-align: center;
-  border-radius: 100%;
-}
-body.page_show-levels .page_show-levels {
-  display: block;
+.page_show-levels {
   color: #fff;
 }
