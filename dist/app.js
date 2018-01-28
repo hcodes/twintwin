@@ -13,9 +13,9 @@ function createCommonjsModule(fn, module) {
 
 var jstohtml = createCommonjsModule(function (module, exports) {
     /*!
-     * jstohtml v1.1.2
-     * Copyright 2014 Denis Seleznev
-     * Released under the MIT license.
+     * jstohtml v2.0.0
+     * © 2017 Denis Seleznev
+     * License: MIT
      *
      * https://github.com/hcodes/jstohtml/
     */
@@ -27,9 +27,7 @@ var jstohtml = createCommonjsModule(function (module, exports) {
             module.exports = factory();
         }
     })(commonjsGlobal, function () {
-        var noClosingTag = ['img', 'input', 'br', 'embed', 'source', 'link', 'meta', 'area', 'command', 'base', 'col', 'param', 'wbr', 'hr', 'keygen'],
-            ignoredKeys = ['c', 'cl', 't', 'class'],
-            isArray = Array.isArray,
+        var isArray = Array.isArray,
             toString = Object.prototype.toString,
             entityMap = {
             '&': '&amp;',
@@ -39,79 +37,210 @@ var jstohtml = createCommonjsModule(function (module, exports) {
             '\'': '&#39;',
             '/': '&#x2F;'
         },
-            escapeRE = /[&<>"'\/]/g;
-
-        function escapeHtml(str) {
+            escapeRE = /[&<>"'/]/g,
+            escapeHtml = function escapeHtml(str) {
             return str.replace(escapeRE, function (s) {
                 return entityMap[s];
             });
-        }
+        };
 
-        function isPlainObj(obj) {
-            return toString.call(obj) === '[object Object]';
-        }
+        var Engine = {
+            noClosingTag: ['img', 'input', 'br', 'embed', 'source', 'link', 'meta', 'area', 'command', 'base', 'col', 'param', 'wbr', 'hr', 'keygen'],
 
-        function buildItem(data) {
-            if (data === null || data === undefined) {
-                return '';
-            }
+            ignoredKeys: ['b', // block
+            'e', // element
+            'm', // modifier
+            'c', // content
+            't', // tagName
+            'cl', // class
+            'class' // class
+            ],
 
-            var buf = [];
+            /**
+             * Is plain object?
+             *
+             * @param {*} obj
+             * @returns {boolean}
+             */
+            isPlainObj: function isPlainObj(obj) {
+                return toString.call(obj) === '[object Object]';
+            },
 
-            if (isPlainObj(data)) {
-                return tag(data);
-            } else if (isArray(data)) {
-                for (var i = 0, len = data.length; i < len; i++) {
-                    buf.push(buildItem(data[i]));
+            /**
+             * Build a item.
+             *
+             * @param {*} data
+             * @returns {string}
+             */
+            build: function build(data) {
+                if (data === null || data === undefined) {
+                    return '';
                 }
 
-                return buf.join('');
-            } else {
-                return '' + data;
-            }
-        }
+                var buf = [];
 
-        function tag(data) {
-            var t = data.t || 'div',
-                text = '<' + t + attrs(data);
+                if (this.isPlainObj(data)) {
+                    return this.tag(data);
+                } else if (isArray(data)) {
+                    for (var i = 0, len = data.length; i < len; i++) {
+                        buf.push(this.build(data[i]));
+                    }
 
-            if (noClosingTag.indexOf(t) !== -1) {
-                return text + '/>';
-            }
-
-            text += '>';
-
-            if (data.c) {
-                text += buildItem(data.c);
-            }
-
-            text += '</' + t + '>';
-
-            return text;
-        }
-
-        function attrs(data) {
-            var cl = data['cl'] || data['class'],
-                text = cl ? attr('class', cl) : '';
-
-            for (var key in data) {
-                if (data.hasOwnProperty(key) && ignoredKeys.indexOf(key) === -1) {
-                    text += attr(key, data[key]);
+                    return buf.join('');
+                } else {
+                    return '' + data;
                 }
+            },
+
+            /**
+             * Build a tag.
+             *
+             * @param {*} data
+             * @returns {string}
+             */
+            tag: function tag(data) {
+                var t = data.t || 'div',
+                    text = '<' + t + this.attrs(data);
+
+                if (this.noClosingTag.indexOf(t) !== -1) {
+                    return text + '/>';
+                }
+
+                text += '>';
+
+                if (data.c) {
+                    text += this.build(data.c);
+                }
+
+                text += '</' + t + '>';
+
+                return text;
+            },
+
+            /**
+             * Build attrs.
+             *
+             * @param {Object} data
+             * @returns {string}
+             */
+            attrs: function attrs(data) {
+                var b = data.b,
+                    e = data.e,
+                    m = data.m,
+                    buf = [],
+                    cl = [],
+                    result,
+                    key;
+
+                if (b || e) {
+                    b = b || this._currentBlock;
+                    if (e) {
+                        buf.push(this.elem(b, e));
+                    } else {
+                        buf.push(this.block(b));
+                    }
+
+                    if (this.isPlainObj(m)) {
+                        for (key in m) {
+                            if (m.hasOwnProperty(key)) {
+                                buf.push(this.elem(b, e, key, m[key]));
+                            }
+                        }
+
+                        buf.sort();
+                        for (var i = 0, len = buf.length; i < len; i++) {
+                            if (buf[i] !== buf[i - 1]) {
+                                cl.push(buf[i]);
+                            }
+                        }
+                    } else {
+                        cl = buf;
+                    }
+
+                    result = this.attr('class', cl);
+                    this._currentBlock = b;
+                } else {
+                    cl = data['cl'] || data['class'];
+                    result = cl ? this.attr('class', cl) : '';
+                }
+
+                for (key in data) {
+                    if (data.hasOwnProperty(key) && this.ignoredKeys.indexOf(key) === -1) {
+                        result += this.attr(key, data[key]);
+                    }
+                }
+
+                return result;
+            },
+
+            /**
+             * Build a attr.
+             *
+             * @param {string} name
+             * @param {*} value
+             * @returns {string}
+             */
+            attr: function attr(name, value) {
+                if (value === undefined || value === null || value === false) {
+                    return '';
+                }
+
+                return ' ' + name + '="' + escapeHtml(isArray(value) ? value.join(' ') : '' + value) + '"';
+            },
+
+            /**
+             * Build a block.
+             *
+             * @param {string} block
+             * @param {string} [modName]
+             * @param {*} [modVal]
+             * @returns {string}
+             */
+            block: function block(_block, modName, modVal) {
+                return _block + this.mod(modName, modVal);
+            },
+
+            /**
+             * Build a elem.
+             *
+             * @param {string} block
+             * @param {string} [elemName]
+             * @param {string} [modName]
+             * @param {*} [modVal]
+             * @returns {string}
+             */
+            elem: function elem(block, elemName, modName, modVal) {
+
+                return block + (elemName ? '__' + elemName : '') + this.mod(modName, modVal);
+            },
+
+            /**
+             * Build a mod.
+             *
+             * @param {string} modName
+             * @param {*} [modVal]
+             * @returns {string}
+             */
+            mod: function mod(modName, modVal) {
+                if (modVal === false || modVal === null || modVal === undefined) {
+                    return '';
+                }
+
+                return '_' + modName + (modVal === '' || modVal === true ? '' : '_' + modVal);
+            },
+
+            /**
+             * Reset inner properties.
+             */
+            reset: function reset() {
+                this._currentBlock = '';
+                return this;
             }
+        };
 
-            return text;
-        }
-
-        function attr(name, value) {
-            if (value === undefined || value === null || value === false) {
-                return '';
-            }
-
-            return ' ' + name + '="' + escapeHtml(isArray(value) ? value.join(' ') : '' + value) + '"';
-        }
-
-        return buildItem;
+        return function (data) {
+            return Engine.reset().build(data);
+        };
     });
 });
 
@@ -517,6 +646,299 @@ var Page = function (_CustomEvent) {
 
 var Page$1 = new Page();
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass$3 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn$1(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits$1(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Gamepad = function (_CustomEvent) {
+    _inherits$1(Gamepad, _CustomEvent);
+
+    function Gamepad() {
+        _classCallCheck$3(this, Gamepad);
+
+        var _this = _possibleConstructorReturn$1(this, (Gamepad.__proto__ || Object.getPrototypeOf(Gamepad)).call(this));
+
+        _this._pressedBuffer = {};
+        _this._pads = [];
+
+        // Gamepad: XBox360
+        _this.buttonName = {
+            green: 0,
+            a: 0,
+
+            red: 1,
+            b: 1,
+
+            yellow: 3,
+            v: 3,
+
+            blue: 2,
+            x: 2,
+
+            left: 14,
+            right: 15,
+            up: 12,
+            down: 13,
+
+            back: 8,
+            start: 9,
+
+            lt: 6,
+            lb: 4,
+
+            rt: 7,
+            rb: 5
+        };
+
+        if (!_this.supported()) {
+            return _possibleConstructorReturn$1(_this);
+        }
+
+        $.on(window, 'gamepadconnected', function () {
+            _this.search();
+            _this.trigger('connected');
+
+            if (!_this._rafId) {
+                _this._rafId = window.requestAnimationFrame(_this.checkButtons.bind(_this));
+            }
+        }).on(window, 'gamepaddisconnected', function () {
+            _this.search();
+            _this.trigger('disconnected');
+
+            if (!_this.get().length && _this._rafId) {
+                window.cancelAnimationFrame(_this._rafId);
+                _this._rafId = null;
+            }
+        });
+        return _this;
+    }
+
+    _createClass$3(Gamepad, [{
+        key: 'checkButtons',
+        value: function checkButtons() {
+            var _this2 = this;
+
+            var list = this.get();
+
+            var _loop = function _loop(i) {
+                var pad = list[i];
+                if (!pad) {
+                    return 'continue';
+                }
+
+                var padIndex = pad.index;
+                _this2._pressedBuffer[padIndex] = _this2._pressedBuffer[padIndex] || {};
+
+                pad.buttons.forEach(function (button, buttonIndex) {
+                    if ((typeof button === 'undefined' ? 'undefined' : _typeof(button)) === 'object') {
+                        console.log(this._pressedBuffer[padIndex][buttonIndex], button.pressed);
+                        if (this._pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
+                            console.log(buttonIndex);
+                            this.trigger(this.getButtonEventName(buttonIndex));
+                            this.trigger(this.getButtonEventName(buttonIndex, pad.index));
+                        }
+
+                        this._pressedBuffer[padIndex][buttonIndex] = button.pressed;
+                    }
+                }, _this2);
+            };
+
+            for (var i = 0; i < list.length; i++) {
+                var _ret = _loop(i);
+
+                if (_ret === 'continue') continue;
+            }
+
+            this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
+        }
+    }, {
+        key: 'supported',
+        value: function supported() {
+            return typeof navigator.getGamepads === 'function';
+        }
+    }, {
+        key: 'get',
+        value: function get() {
+            return this._pads;
+        }
+    }, {
+        key: 'item',
+        value: function item(num) {
+            return this.get()[num];
+        }
+    }, {
+        key: 'count',
+        value: function count() {
+            return this.get().length;
+        }
+    }, {
+        key: 'search',
+        value: function search() {
+            this._pads = this.supported() ? navigator.getGamepads() : [];
+        }
+    }, {
+        key: 'getButtonId',
+        value: function getButtonId(name) {
+            return this.buttonName[name];
+        }
+    }, {
+        key: 'getButtonEventName',
+        value: function getButtonEventName(button, gamepadIndex) {
+            var index = typeof gamepadIndex === 'undefined' ? '*' : gamepadIndex;
+            return 'gamepad:button-' + button + ':index-' + index;
+        }
+
+        /*
+         * Set a event on a button.
+         * @param {number|string} button - button id or name of button ('start', 'yellow')
+         * @param {Function} callback
+         *
+         * @example
+         * .onbutton('green:0', function() {}); // gamepad 0, button "green"
+         * .onbutton('lb', function() {}); //  button "lb", any gamepad
+         */
+
+    }, {
+        key: 'onbutton',
+        value: function onbutton(button, callback) {
+            var self = this;
+            var gamepadIndex = void 0;
+
+            if (typeof button === 'string') {
+                gamepadIndex = button.split(':')[1];
+
+                if (typeof gamepadIndex !== 'undefined') {
+                    gamepadIndex = +gamepadIndex;
+                }
+            }
+
+            function setEvent(b) {
+                var buttonId = typeof b === 'number' ? b : self.getButtonId(b);
+                self.on(self.getButtonEventName(buttonId, gamepadIndex), callback);
+            }
+
+            setEvent(button);
+
+            return this;
+        }
+
+        /*
+         * Set events on buttons.
+         * @param {Array} buttons
+         * @param {Function} callback
+         *
+         * @example
+         * .onbuttons(['green:0', 'red:0'], function() {});
+         */
+
+    }, {
+        key: 'onbuttons',
+        value: function onbuttons(buttons, callback) {
+            buttons.forEach(function (button) {
+                this.onbutton(button, callback);
+            }, this);
+
+            return this;
+        }
+    }]);
+
+    return Gamepad;
+}(CustomEvent);
+
+var Gamepad$1 = new Gamepad();
+
+var _createClass$4 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var GamepadNotice = function () {
+    function GamepadNotice() {
+        _classCallCheck$4(this, GamepadNotice);
+
+        this.build();
+        this.setEvents();
+
+        this.timeout = 3000;
+    }
+
+    _createClass$4(GamepadNotice, [{
+        key: 'build',
+        value: function build() {
+            this._elemConnected = $.js2dom({
+                cl: 'gamepad-notice-connected',
+                c: ['✔ 🎮', {
+                    cl: 'gamepad-notice-connected__num'
+                }]
+            });
+
+            this._elemDisconnected = $.js2dom({
+                cl: 'gamepad-notice-disconnected',
+                c: ['✖ 🎮', {
+                    cl: 'gamepad-notice-disconnected__num'
+                }]
+            });
+        }
+    }, {
+        key: 'setEvents',
+        value: function setEvents() {
+            Gamepad$1.on('connected', this.showConnected.bind(this)).on('disconnected', this.showDisconnected.bind(this));
+
+            document.body.appendChild(this._elemConnected);
+            document.body.appendChild(this._elemDisconnected);
+        }
+    }, {
+        key: 'showDisconnected',
+        value: function showDisconnected() {
+            var _this = this;
+
+            var cl = 'gamepad-notice-disconnected_show',
+                el = this._elemDisconnected;
+
+            el.classList.add(cl);
+
+            if (this._disTimer) {
+                clearTimeout(this._disTimer);
+                this._disTimer = null;
+            }
+
+            this._disTimer = setTimeout(function () {
+                el.classList.remove(cl);
+                _this._disTimer = null;
+            }, this.timeout);
+        }
+    }, {
+        key: 'showConnected',
+        value: function showConnected() {
+            var _this2 = this;
+
+            var cl = 'gamepad-notice-connected_show',
+                el = this._elemConnected;
+
+            el.classList.add(cl);
+
+            if (this._timer) {
+                clearTimeout(this._timer);
+                this._timer = null;
+            }
+
+            this._timer = setTimeout(function () {
+                el.classList.remove(cl);
+                _this2._timer = null;
+            }, this.timeout);
+        }
+    }]);
+
+    return GamepadNotice;
+}();
+
+new GamepadNotice();
+
 var Settings = {
     set: function set(name, value) {
         this._buffer[name] = this._copy(value);
@@ -558,13 +980,13 @@ var Settings = {
     }
 };
 
-var _createClass$3 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$5 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var FieldCursor = function () {
     function FieldCursor(data) {
-        _classCallCheck$3(this, FieldCursor);
+        _classCallCheck$5(this, FieldCursor);
 
         this.elem = data.elem;
 
@@ -586,7 +1008,7 @@ var FieldCursor = function () {
         }
     }
 
-    _createClass$3(FieldCursor, [{
+    _createClass$5(FieldCursor, [{
         key: 'hide',
         value: function hide() {
             if (this.hidden !== true) {
@@ -855,20 +1277,20 @@ var Levels = {
     }]
 };
 
-var _createClass$4 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$6 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var InfoPanel = function () {
     function InfoPanel(container) {
-        _classCallCheck$4(this, InfoPanel);
+        _classCallCheck$6(this, InfoPanel);
 
         this.container = container;
         this.elem = $.js2dom(this.build());
         this.container.appendChild(this.elem);
     }
 
-    _createClass$4(InfoPanel, [{
+    _createClass$6(InfoPanel, [{
         key: 'build',
         value: function build() {
             return {
@@ -926,203 +1348,13 @@ var InfoPanel = function () {
     return InfoPanel;
 }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _createClass$5 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn$1(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits$1(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Gamepad = function (_CustomEvent) {
-    _inherits$1(Gamepad, _CustomEvent);
-
-    function Gamepad() {
-        _classCallCheck$5(this, Gamepad);
-
-        var _this = _possibleConstructorReturn$1(this, (Gamepad.__proto__ || Object.getPrototypeOf(Gamepad)).call(this));
-
-        _this._pressedBuffer = {};
-        _this._pads = [];
-
-        // Gamepad: XBox360
-        _this.buttonName = {
-            green: 0,
-            a: 0,
-
-            red: 1,
-            b: 1,
-
-            yellow: 3,
-            v: 3,
-
-            blue: 2,
-            x: 2,
-
-            left: 14,
-            right: 15,
-            up: 12,
-            down: 13,
-
-            back: 8,
-            start: 9,
-
-            lt: 6,
-            lb: 4,
-
-            rt: 7,
-            rb: 5
-        };
-
-        if (!_this.supported()) {
-            return _possibleConstructorReturn$1(_this);
-        }
-
-        $.on(window, 'gamepadconnected', function () {
-            _this.search();
-            _this.trigger('connected');
-
-            if (!_this._rafId) {
-                _this._rafId = window.requestAnimationFrame(_this.checkButtons.bind(_this));
-            }
-        }).on(window, 'gamepaddisconnected', function () {
-            _this.search();
-            _this.trigger('disconnected');
-
-            if (!_this.get().length && _this._rafId) {
-                window.cancelAnimationFrame(_this._rafId);
-                _this._rafId = null;
-            }
-        });
-        return _this;
-    }
-
-    _createClass$5(Gamepad, [{
-        key: 'checkButtons',
-        value: function checkButtons() {
-            this.get().forEach(function (pad) {
-                var padIndex = pad.index;
-                this._pressedBuffer[padIndex] = this._pressedBuffer[padIndex] || {};
-
-                pad.buttons.forEach(function (button, buttonIndex) {
-                    if ((typeof button === 'undefined' ? 'undefined' : _typeof(button)) === 'object') {
-                        if (this._pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
-                            this.trigger(this.getButtonEventName(buttonIndex));
-                            this.trigger(this.getButtonEventName(buttonIndex, pad.index));
-                        }
-
-                        this._pressedBuffer[padIndex][buttonIndex] = button.pressed;
-                    }
-                }, this);
-            }, this);
-
-            this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
-        }
-    }, {
-        key: 'supported',
-        value: function supported() {
-            return typeof navigator.getGamepads === 'function';
-        }
-    }, {
-        key: 'get',
-        value: function get() {
-            return this._pads;
-        }
-    }, {
-        key: 'item',
-        value: function item(num) {
-            return this.get()[num];
-        }
-    }, {
-        key: 'count',
-        value: function count() {
-            return this.get().length;
-        }
-    }, {
-        key: 'search',
-        value: function search() {
-            this._pads = this.supported() ? navigator.getGamepads() : [];
-        }
-    }, {
-        key: 'getButtonId',
-        value: function getButtonId(name) {
-            return this.buttonName[name];
-        }
-    }, {
-        key: 'getButtonEventName',
-        value: function getButtonEventName(button, gamepadIndex) {
-            var index = typeof gamepadIndex === 'undefined' ? '*' : gamepadIndex;
-            return 'gamepad:button-' + button + ':index-' + index;
-        }
-
-        /*
-         * Set a event on a button.
-         * @param {number|string} button - button id or name of button ('start', 'yellow')
-         * @param {Function} callback
-         *
-         * @example
-         * .onbutton('green:0', function() {}); // gamepad 0, button "green"
-         * .onbutton('lb', function() {}); //  button "lb", any gamepad
-         */
-
-    }, {
-        key: 'onbutton',
-        value: function onbutton(button, callback) {
-            var self = this;
-            var gamepadIndex = void 0;
-
-            if (typeof button === 'string') {
-                gamepadIndex = button.split(':')[1];
-
-                if (typeof gamepadIndex !== 'undefined') {
-                    gamepadIndex = +gamepadIndex;
-                }
-            }
-
-            function setEvent(b) {
-                var buttonId = typeof b === 'number' ? b : self.getButtonId(b);
-                self.on(self.getButtonEventName(buttonId, gamepadIndex), callback);
-            }
-
-            setEvent(button);
-
-            return this;
-        }
-
-        /*
-         * Set events on buttons.
-         * @param {Array} buttons
-         * @param {Function} callback
-         *
-         * @example
-         * .onbuttons(['green:0', 'red:0'], function() {});
-         */
-
-    }, {
-        key: 'onbuttons',
-        value: function onbuttons(buttons, callback) {
-            buttons.forEach(function (button) {
-                this.onbutton(button, callback);
-            }, this);
-
-            return this;
-        }
-    }]);
-
-    return Gamepad;
-}(CustomEvent);
-
-var Gamepad$1 = new Gamepad();
-
-var _createClass$6 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Field = function () {
     function Field(data) {
-        _classCallCheck$6(this, Field);
+        _classCallCheck$7(this, Field);
 
         this.elem = data.elem;
         this.cages = $('.field__cages', this.elem);
@@ -1150,7 +1382,7 @@ var Field = function () {
         this.setControl(data.control);
     }
 
-    _createClass$6(Field, [{
+    _createClass$7(Field, [{
         key: 'setEvents',
         value: function setEvents() {
             this.setKeyboardEvents();
@@ -1509,7 +1741,7 @@ function format(num, separator) {
     return num[0] == separator ? num.substr(1) : num;
 }
 
-function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn$2(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
@@ -1519,7 +1751,7 @@ var EmptyComponent = function (_CustomEvent) {
     _inherits$2(EmptyComponent, _CustomEvent);
 
     function EmptyComponent() {
-        _classCallCheck$7(this, EmptyComponent);
+        _classCallCheck$8(this, EmptyComponent);
 
         return _possibleConstructorReturn$2(this, (EmptyComponent.__proto__ || Object.getPrototypeOf(EmptyComponent)).call(this));
     }
@@ -1684,13 +1916,13 @@ var GamePage = {
     }
 };
 
-var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$8 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var MainBg = function () {
     function MainBg() {
-        _classCallCheck$8(this, MainBg);
+        _classCallCheck$9(this, MainBg);
 
         this.elem = $('.main-bg');
         this.elem.innerHTML = this.getBackground();
@@ -1698,7 +1930,7 @@ var MainBg = function () {
         this.resize();
     }
 
-    _createClass$7(MainBg, [{
+    _createClass$8(MainBg, [{
         key: 'getBackground',
         value: function getBackground() {
             var symbols = [];
@@ -1915,13 +2147,13 @@ function escapeHTML(text) {
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-var _createClass$8 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$9 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$10(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var UserPanel = function () {
     function UserPanel(container, data) {
-        _classCallCheck$9(this, UserPanel);
+        _classCallCheck$10(this, UserPanel);
 
         this.container = container;
 
@@ -1932,7 +2164,7 @@ var UserPanel = function () {
         this.init();
     }
 
-    _createClass$8(UserPanel, [{
+    _createClass$9(UserPanel, [{
         key: 'init',
         value: function init() {
             this.elem = $.js2dom({
@@ -2049,15 +2281,15 @@ var MultiplayerPage = {
     }
 };
 
-var _createClass$9 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass$10 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck$10(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$11(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SelectLevel = function () {
     function SelectLevel() {
         var _this = this;
 
-        _classCallCheck$10(this, SelectLevel);
+        _classCallCheck$11(this, SelectLevel);
 
         this.elem = $('.select-level__list', this.elem);
         this.elem.innerHTML = this.getList();
@@ -2079,7 +2311,7 @@ var SelectLevel = function () {
         });
     }
 
-    _createClass$9(SelectLevel, [{
+    _createClass$10(SelectLevel, [{
         key: 'getList',
         value: function getList() {
             var html = [],
@@ -2095,7 +2327,7 @@ var SelectLevel = function () {
                     cl: 'select-level__item',
                     c: {
                         t: 'span',
-                        cl: ['btn btn_red btn_middle' + (i < maxLevel ? '' : ' btn_disabled')],
+                        cl: ['btn btn_red btn_middle' + (i <= maxLevel ? '' : ' btn_disabled')],
                         'data-level': i,
                         c: [{
                             t: 'span',
@@ -2114,9 +2346,9 @@ var SelectLevel = function () {
             this.elem.innerHTML = this.getList();
 
             var maxLevel = Settings.get('maxLevel'),
-                btns = $$('.select-level__list .btn', this.elem);
+                btns = $$('.select-level__list .btn', this.elem),
+                maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
 
-            var maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
             window.scrollTo(0, $.offset(maxBtn).top - 10);
         }
     }]);
