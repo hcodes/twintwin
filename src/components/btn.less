@@ -20,34 +20,34 @@
         transform: translate(3px, 3px);
     }
 
-    &&_red:active {
-        box-shadow: 0 4px 0 0 #ce3323;
-    }
-
-    &&_green:active {
-        box-shadow: 0 4px 0 0 #33be23;
-    }
-
-    &&_blue:active {
-        box-shadow: 0 4px 0 0 #3323ce;
-    }
-
     &_red
     {
         background-color: #e74c3c;
         box-shadow: 0 5px 0 0 #CE3323;
+
+        &:active {
+            box-shadow: 0 4px 0 0 #ce3323;
+        }
     }
 
     &_green
     {
         background-color: #4cb73c;
         box-shadow: 0 5px 0 0 #33ae23;
+
+        &:active {
+            box-shadow: 0 4px 0 0 #33be23;
+        }
     }
 
     &_blue
     {
         background-color: #4c3ce7;
         box-shadow: 0 5px 0 0 #3323CE;
+
+        &:active {
+            box-shadow: 0 4px 0 0 #3323ce;
+        }
     }
 
     &_small
@@ -67,7 +67,7 @@
     &_middle
     {
         border-radius: 3px;
-        padding: 10px 10px;
+        padding: 10px 15px 4px 15px;
         font-size: 26px;
         line-height: 33px;
         color: #fff;

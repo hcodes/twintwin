@@ -62,21 +62,30 @@ class Gamepad extends CustomEvent {
     }
 
     checkButtons() {
-        this.get().forEach(function(pad) {
+        const list = this.get();
+
+        for (let i = 0; i < list.length; i++) {
+            const pad = list[i];
+            if (!pad) {
+                continue;
+            }
+
             const padIndex = pad.index;
             this._pressedBuffer[padIndex] = this._pressedBuffer[padIndex] || {};
 
             pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
+                  console.log(this._pressedBuffer[padIndex][buttonIndex], button.pressed);
                     if (this._pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
+                        console.log(buttonIndex);
                         this.trigger(this.getButtonEventName(buttonIndex));
                         this.trigger(this.getButtonEventName(buttonIndex, pad.index));
                     }
 
-                    this._pressedBuffer[padIndex][buttonIndex] = button.pressed;
+                    this._pressedBuffer[padIndex][buttonIndex] = button.pressed;                    
                 }
             }, this);
-        }, this);
+        }
 
         this._rafId = window.requestAnimationFrame(this.checkButtons.bind(this));
     }

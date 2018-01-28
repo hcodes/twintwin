@@ -44,7 +44,7 @@ class SelectLevel {
                 c: {
                     t: 'span',
                     cl: [
-                        'btn btn_red btn_middle' + (i < maxLevel ? '' : ' btn_disabled')
+                        'btn btn_red btn_middle' + (i <= maxLevel ? '' : ' btn_disabled')
                     ],
                     'data-level': i,
                     c: [
@@ -67,9 +67,9 @@ class SelectLevel {
 
         const
             maxLevel = Settings.get('maxLevel'),
-            btns = $$('.select-level__list .btn', this.elem);
+            btns = $$('.select-level__list .btn', this.elem),
+            maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
 
-        const maxBtn = btns[maxLevel - 1] || btns[btns.length - 1];
         window.scrollTo(0, $.offset(maxBtn).top - 10);
     }
 }

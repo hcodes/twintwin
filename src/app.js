@@ -3,6 +3,7 @@ import isMobile from './lib/is-mobile';
 
 import './components/metrika';
 import Page from './components/page';
+import './components/gamepad-notice';
 import './pages/pages';
 
 let inputType;
