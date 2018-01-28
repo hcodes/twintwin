@@ -1,17 +1,3 @@
-Array.prototype.shuffle = function() {
-    var input = this;
-    for (var i = input.length - 1; i > 0; i--) {
-        var
-            randomIndex = Math.floor(Math.random() * (i + 1)),
-            itemAtIndex = input[randomIndex];
-
-        input[randomIndex] = input[i];
-        input[i] = itemAtIndex;
-    }
-
-    return input;
-};
-
 // for iPad 1
 if (!Function.prototype.bind) {
     Function.prototype.bind = function(oThis) {

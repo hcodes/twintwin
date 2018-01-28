@@ -4,6 +4,8 @@ import FieldCursor from './field-cursor';
 import InfoPanel from './info-panel';
 import Gamepad from './gamepad';
 
+import {shuffle} from '../lib/utils';
+
 export default class Field {
     constructor(data) {
         this.elem = data.elem;
@@ -196,7 +198,7 @@ export default class Field {
 
         buf = buf.slice(0, halfSize);
 
-        return buf.concat(buf).shuffle();
+        return shuffle(buf.concat(buf));
     }
 
     getSize() {

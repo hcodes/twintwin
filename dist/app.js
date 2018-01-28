@@ -1348,6 +1348,18 @@ var InfoPanel = function () {
     return InfoPanel;
 }();
 
+function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+        var randomIndex = Math.floor(Math.random() * (i + 1)),
+            itemAtIndex = arr[randomIndex];
+
+        arr[randomIndex] = arr[i];
+        arr[i] = itemAtIndex;
+    }
+
+    return arr;
+}
+
 var _createClass$7 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1549,7 +1561,7 @@ var Field = function () {
 
             buf = buf.slice(0, halfSize);
 
-            return buf.concat(buf).shuffle();
+            return shuffle(buf.concat(buf));
         }
     }, {
         key: 'getSize',
@@ -1940,7 +1952,7 @@ var MainBg = function () {
                 }
             });
 
-            symbols.shuffle();
+            shuffle(symbols);
 
             return jstohtml(symbols.map(function (sym) {
                 return {

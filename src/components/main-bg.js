@@ -1,6 +1,7 @@
 import jstohtml from 'jstohtml';
 
 import {$, $$} from '../lib/dom';
+import {shuffle} from '../lib/utils';
 
 import Levels from '../components/levels';
 
@@ -20,7 +21,7 @@ class MainBg {
             }
         });
 
-        symbols.shuffle();
+        shuffle(symbols);
 
         return jstohtml(symbols.map(function(sym) {
             return {
