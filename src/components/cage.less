@@ -49,15 +49,14 @@ body.support_transform3d_true
     .cage
     {
         transform-style: preserve-3d;
-        transform: rotateY(180deg);
+        transform: rotateY(0deg);
 
         &_opened
         {
-            transform: rotateY(0deg);
+            transform: rotateY(180deg);
         }
 
-        &__front,
-        &__back
+        &__front
         {
             backface-visibility: hidden;
         }
@@ -69,17 +68,17 @@ body.support_transform3d_true
 
         &__back
         {
-            transform: rotateY(180deg);
+            transform: rotateY(0deg);
         }
 
         &_opened .cage__back
         {
-            transform: rotateY(0deg);
+            transform: rotateY(180deg);
         }
 
         &_opened .cage__front
         {
-            transform: rotateY(180deg);
+            transform: rotateY(0deg);
         }
 
         &_removed

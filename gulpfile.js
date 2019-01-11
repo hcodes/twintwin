@@ -2,10 +2,10 @@
 
 const
     gulp = require('gulp'),
+    path = require('path'),
     $ = require('gulp-load-plugins')(),
     babel = require('rollup-plugin-babel'),
-    commonjs = require('rollup-plugin-commonjs'),
-    nodeResolve = require('rollup-plugin-node-resolve');
+    alias = require('rollup-plugin-alias');
 
 const
     browsers = ['ie >= 9', 'Firefox >= 24', 'Chrome >= 26', 'iOS >= 5', 'Safari >= 6', 'Android > 2.3'],
@@ -28,20 +28,14 @@ const
     };
 
 gulp.task('js', function() {
-    return gulp.src(paths.mainJs)
+    return gulp.src(['./src/**/*.js', './node_modules/jstohtml/dist/jstohtml.esm.js'])
         .pipe($.rollup({
-            allowRealFiles: true,
             input: paths.mainJs,
             output: { format: 'iife' },
             plugins: [
-                nodeResolve({
-                    jsnext: true,
-                    main: true
-                }),
-                commonjs({
-                    include: 'node_modules/**',  // Default: undefined
-                    sourceMap: false,  // Default: true
-                    ignore: [ 'conditional-runtime-dependency' ]
+                alias({
+                    resolve: ['.js'],
+                    jstohtml: path.resolve('./node_modules/jstohtml/dist/jstohtml.esm.js')
                 }),
                 babel()
             ]
@@ -69,7 +63,7 @@ gulp.task('css', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch('src/**/*', ['css', 'js', 'polyfill']);
+    gulp.watch('src/**/*', gulp.series('css', 'js', 'polyfill'));
 });
 
-gulp.task('default', ['css', 'js', 'jsError', 'polyfill']);
+gulp.task('default', gulp.series('css', 'js', 'jsError', 'polyfill'));

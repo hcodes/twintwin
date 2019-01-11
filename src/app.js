@@ -1,8 +1,8 @@
 import {$, hasSupportCss} from './lib/dom';
 import isMobile from './lib/is-mobile';
 
-import './components/metrika';
 import Page from './components/page';
+import './components/metrika';
 import './components/gamepad-notice';
 import './pages/pages';
 
