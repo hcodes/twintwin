@@ -44,7 +44,13 @@
     "build": "gulp",
     "test": "npm run-script gulp && npm run-script eslint",
     "eslint": "eslint .",
-    "start": "gulp && start http-server . && gulp watch"
+    "start": "gulp && start http-server . && gulp watch",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
-  "private": true
+  "private": true,
+  "snyk": true,
+  "dependencies": {
+    "snyk": "^1.189.0"
+  }
 }
