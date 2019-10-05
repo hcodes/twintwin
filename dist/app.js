@@ -713,27 +713,50 @@ function (_CustomEvent) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(Gamepad).call(this));
     _this._pressedBuffer = {};
-    _this._pads = []; // Gamepad: XBox360
-
+    _this._pads = [];
     _this.buttonName = {
-      green: 0,
-      a: 0,
-      red: 1,
-      b: 1,
-      yellow: 3,
-      v: 3,
-      blue: 2,
-      x: 2,
-      left: 14,
-      right: 15,
-      up: 12,
-      down: 13,
-      back: 8,
-      start: 9,
-      lt: 6,
-      lb: 4,
-      rt: 7,
-      rb: 5
+      '54c-5c4-Wireless Controller': {
+        // PS4
+        green: 1,
+        a: 1,
+        red: 2,
+        b: 2,
+        yellow: 3,
+        y: 3,
+        blue: 0,
+        x: 0,
+        left: 16,
+        right: 17,
+        up: 14,
+        down: 15,
+        back: 8,
+        start: 9,
+        lt: 6,
+        lb: 4,
+        rt: 7,
+        rb: 5
+      },
+      'xbox': {
+        // XBox360
+        green: 0,
+        a: 0,
+        red: 1,
+        b: 1,
+        yellow: 3,
+        v: 3,
+        blue: 2,
+        x: 2,
+        left: 14,
+        right: 15,
+        up: 12,
+        down: 13,
+        back: 8,
+        start: 9,
+        lt: 6,
+        lb: 4,
+        rt: 7,
+        rb: 5
+      }
     };
 
     if (!_this.supported()) {
@@ -779,12 +802,10 @@ function (_CustomEvent) {
         _this2._pressedBuffer[padIndex] = _this2._pressedBuffer[padIndex] || {};
         pad.buttons.forEach(function (button, buttonIndex) {
           if (_typeof(button) === 'object') {
-            console.log(this._pressedBuffer[padIndex][buttonIndex], button.pressed);
-
             if (this._pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
-              console.log(buttonIndex);
               this.trigger(this.getButtonEventName(buttonIndex));
               this.trigger(this.getButtonEventName(buttonIndex, pad.index));
+              console.log('name', this.getButtonEventName(buttonIndex));
             }
 
             this._pressedBuffer[padIndex][buttonIndex] = button.pressed;
@@ -827,8 +848,10 @@ function (_CustomEvent) {
     }
   }, {
     key: "getButtonId",
-    value: function getButtonId(name) {
-      return this.buttonName[name];
+    value: function getButtonId(name, index) {
+      var id = this._pads[index] && this._pads[index].id;
+      console.log(this._pads[index], this.buttonName[id], id);
+      return this.buttonName[id] && this.buttonName[id][name];
     }
   }, {
     key: "getButtonEventName",
@@ -860,8 +883,10 @@ function (_CustomEvent) {
         }
       }
 
+      console.log('bbbb', button, self.getButtonId(button, gamepadIndex));
+
       function setEvent(b) {
-        var buttonId = typeof b === 'number' ? b : self.getButtonId(b);
+        var buttonId = typeof b === 'number' ? b : self.getButtonId(b, gamepadIndex);
         self.on(self.getButtonEventName(buttonId, gamepadIndex), callback);
       }
 
@@ -1404,14 +1429,16 @@ function () {
   _createClass(Field, [{
     key: "setEvents",
     value: function setEvents() {
+      var _this = this;
+
       this.setKeyboardEvents();
       this.setMouseEvents();
       this.setGamepadEvents();
       $.on(window, 'resize', function () {
-        if (!this.isHidden) {
-          this.resizeCages();
+        if (!_this.isHidden) {
+          _this.resizeCages();
         }
-      }.bind(this));
+      });
     }
   }, {
     key: "setControl",
@@ -1427,75 +1454,75 @@ function () {
   }, {
     key: "setMouseEvents",
     value: function setMouseEvents() {
-      var _this = this;
+      var _this2 = this;
 
       $.delegate(this.cages, '.cage__front', 'mousedown', function (e) {
-        if (!_this.isControl('mouse')) {
+        if (!_this2.isControl('mouse')) {
           return;
         }
 
-        _this.fieldCursor.hide();
+        _this2.fieldCursor.hide();
 
         var cage = e.target.parentNode,
             ds = cage.dataset;
 
-        _this.openCage(ds.x, ds.y);
+        _this2.openCage(ds.x, ds.y);
       });
     }
   }, {
     key: "setKeyboardEvents",
     value: function setKeyboardEvents() {
-      var _this2 = this;
+      var _this3 = this;
 
       $.on(document, 'keydown', function (e) {
-        if (_this2.isControl('keyboard1')) {
+        if (_this3.isControl('keyboard1')) {
           switch (e.key) {
             case 'ArrowUp':
-              _this2.fieldCursor.up();
+              _this3.fieldCursor.up();
 
               break;
 
             case 'ArrowLeft':
-              _this2.fieldCursor.left();
+              _this3.fieldCursor.left();
 
               break;
 
             case 'ArrowRight':
-              _this2.fieldCursor.right();
+              _this3.fieldCursor.right();
 
               break;
 
             case 'ArrowDown':
-              _this2.fieldCursor.down();
+              _this3.fieldCursor.down();
 
               break;
 
             case 'Enter':
-              _this2.openCageWithCursor();
+              _this3.openCageWithCursor();
 
               break;
           }
         }
 
-        if (_this2.isControl('keyboard2')) {
+        if (_this3.isControl('keyboard2')) {
           switch (e.key) {
             case 'W':
-              _this2.fieldCursor.up();
+              _this3.fieldCursor.up();
 
               break;
 
             case 'A':
-              _this2.fieldCursor.left();
+              _this3.fieldCursor.left();
 
               break;
 
             case 'D':
-              _this2.fieldCursor.right();
+              _this3.fieldCursor.right();
 
               break;
 
             case 'S':
-              _this2.fieldCursor.down();
+              _this3.fieldCursor.down();
 
               break;
 
@@ -1507,29 +1534,29 @@ function () {
   }, {
     key: "setGamepadEvents",
     value: function setGamepadEvents() {
-      var _this3 = this;
+      var _this4 = this;
 
       Gamepad$1.onbutton('left', function () {
-        if (_this3.isControl('gamepad')) {
-          _this3.fieldCursor.left();
+        if (_this4.isControl('gamepad')) {
+          _this4.fieldCursor.left();
         }
       }).onbutton('right', function () {
-        if (_this3.isControl('gamepad')) {
-          _this3.fieldCursor.right();
+        if (_this4.isControl('gamepad')) {
+          _this4.fieldCursor.right();
         }
       }).onbutton('up', function () {
-        if (_this3.isControl('gamepad')) {
-          _this3.fieldCursor.up();
+        if (_this4.isControl('gamepad')) {
+          _this4.fieldCursor.up();
         }
       }).onbutton('down', function () {
-        if (_this3.isControl('gamepad')) {
-          _this3.fieldCursor.down();
+        if (_this4.isControl('gamepad')) {
+          _this4.fieldCursor.down();
         }
       }).onbuttons(['yellow', 'blue', 'green'], function () {
-        if (this.isControl('gamepad')) {
-          this.openCageWithCursor();
+        if (_this4.isControl('gamepad')) {
+          _this4.openCageWithCursor();
         }
-      }.bind(this));
+      });
     }
   }, {
     key: "createCages",
@@ -1624,6 +1651,8 @@ function () {
   }, {
     key: "openCage",
     value: function openCage(x, y) {
+      var _this5 = this;
+
       var cage = this.findCage(x, y),
           len = this._openedCages.length,
           xy = {
@@ -1654,8 +1683,8 @@ function () {
             var openedCages = [xy].concat(this._openedCages);
             this._openedCages = [];
             setTimeout(function () {
-              this.closeOpenedCages(openedCages);
-            }.bind(this), 700);
+              _this5.closeOpenedCages(openedCages);
+            }, 700);
           }
 
           xy = null;
@@ -1689,7 +1718,7 @@ function () {
   }, {
     key: "removeCage",
     value: function removeCage(x, y) {
-      var _this4 = this;
+      var _this6 = this;
 
       var cage = this.findCage(x, y);
 
@@ -1698,7 +1727,7 @@ function () {
         this.cagesCount--;
         this.infoPanel.update();
         setTimeout(function () {
-          _this4.cages.removeChild(cage);
+          _this6.cages.removeChild(cage);
         }, 200);
 
         if (!this.cagesCount) {
@@ -2062,12 +2091,14 @@ var SelectControls = Component.create({
     var events = [];
     this.elems = Array.from($$('.select-controls'));
     this.elems.forEach(function (el, i) {
+      var _this = this;
+
       var value = defaultValues[i];
       this.values.push(value);
       this.updateElem(i);
       events.push([el, 'click', function () {
-        this.selectNext(i);
-      }.bind(this)]);
+        _this.selectNext(i);
+      }]);
     }, this);
     this.setDomEvents(events);
   },
