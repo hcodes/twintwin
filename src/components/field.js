@@ -39,11 +39,11 @@ export default class Field {
         this.setMouseEvents();
         this.setGamepadEvents();
 
-        $.on(window, 'resize', function() {
+        $.on(window, 'resize', () => {
             if (!this.isHidden) {
                 this.resizeCages();
             }
-        }.bind(this));
+        });
     }
 
     setControl(type) {
@@ -137,11 +137,11 @@ export default class Field {
             })
             .onbuttons(
                 ['yellow', 'blue', 'green'],
-                function() {
+                () => {
                     if (this.isControl('gamepad')) {
                         this.openCageWithCursor();
                     }
-                }.bind(this)
+                }
             );
     }
 
@@ -258,9 +258,9 @@ export default class Field {
 
                     var openedCages = [ xy ].concat(this._openedCages);
                     this._openedCages = [];
-                    setTimeout(function() {
+                    setTimeout(() => {
                         this.closeOpenedCages(openedCages);
-                    }.bind(this), 700);
+                    }, 700);
                 }
 
                 xy = null;

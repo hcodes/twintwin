@@ -9,10 +9,10 @@ import Page from '../pages/page';
 export default class TrophyNotice {
     constructor(data) {
         this._data = data;
-        this._onclick = function() {
+        this._onclick = () => {
             this.close();
             Page.show('trophies');
-        }.bind(this);
+        };
     }
 
     open() {

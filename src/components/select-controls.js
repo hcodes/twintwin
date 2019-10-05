@@ -28,9 +28,7 @@ const SelectControls = Component.create({
             this.updateElem(i);
 
             events.push([
-                el, 'click', function() {
-                    this.selectNext(i);
-                }.bind(this)
+                el, 'click', () => { this.selectNext(i); }
             ]);
         }, this);
 

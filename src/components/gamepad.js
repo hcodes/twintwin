@@ -8,33 +8,61 @@ class Gamepad extends CustomEvent {
         this._pressedBuffer = {};
         this._pads = [];
 
-        // Gamepad: XBox360
         this.buttonName = {
-            green: 0,
-            a: 0,
+            '54c-5c4-Wireless Controller': { // PS4
+                green: 1,
+                a: 1,
 
-            red: 1,
-            b: 1,
+                red: 2,
+                b: 2,
 
-            yellow: 3,
-            v: 3,
+                yellow: 3,
+                y: 3,
 
-            blue: 2,
-            x: 2,
+                blue: 0,
+                x: 0,
 
-            left: 14,
-            right: 15,
-            up: 12,
-            down: 13,
+                left: 16,
+                right: 17,
+                up: 14,
+                down: 15,
 
-            back: 8,
-            start: 9,
+                back: 8,
+                start: 9,
 
-            lt: 6,
-            lb: 4,
+                lt: 6,
+                lb: 4,
 
-            rt: 7,
-            rb: 5
+                rt: 7,
+                rb: 5
+            },
+            'xbox': { // XBox360
+                green: 0,
+                a: 0,
+
+                red: 1,
+                b: 1,
+
+                yellow: 3,
+                v: 3,
+
+                blue: 2,
+                x: 2,
+
+                left: 14,
+                right: 15,
+                up: 12,
+                down: 13,
+
+                back: 8,
+                start: 9,
+
+                lt: 6,
+                lb: 4,
+
+                rt: 7,
+                rb: 5
+            }
         };
 
         if (!this.supported()) {
@@ -75,11 +103,11 @@ class Gamepad extends CustomEvent {
 
             pad.buttons.forEach(function(button, buttonIndex) {
                 if (typeof button === 'object') {
-                  console.log(this._pressedBuffer[padIndex][buttonIndex], button.pressed);
                     if (this._pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
-                        console.log(buttonIndex);
                         this.trigger(this.getButtonEventName(buttonIndex));
                         this.trigger(this.getButtonEventName(buttonIndex, pad.index));
+
+                        console.log('name', this.getButtonEventName(buttonIndex));
                     }
 
                     this._pressedBuffer[padIndex][buttonIndex] = button.pressed;                    
@@ -110,8 +138,10 @@ class Gamepad extends CustomEvent {
         this._pads = this.supported() ? navigator.getGamepads() : [];
     }
 
-    getButtonId(name) {
-        return this.buttonName[name];
+    getButtonId(name, index) {
+        const id = this._pads[index] && this._pads[index].id;
+        console.log(this._pads[index], this.buttonName[id], id);
+        return this.buttonName[id] && this.buttonName[id][name];
     }
 
     getButtonEventName(button, gamepadIndex) {
@@ -140,8 +170,10 @@ class Gamepad extends CustomEvent {
             }
         }
 
+        console.log('bbbb', button, self.getButtonId(button, gamepadIndex));
+
         function setEvent(b) {
-            var buttonId = typeof b === 'number' ? b : self.getButtonId(b);
+            var buttonId = typeof b === 'number' ? b : self.getButtonId(b, gamepadIndex);
             self.on(self.getButtonEventName(buttonId, gamepadIndex), callback);
         }
 
