@@ -1,0 +1,60 @@
+.select-level
+{
+    margin: 0;
+    padding: 0;
+
+    &__list
+    {
+        padding: 0;
+        margin: 20px 0 20px 0;
+
+        list-style-type: none;
+    }
+
+
+    @media (max-width: 600px)
+    {
+        .select-level__item
+        {
+            width: 290px;
+        }
+
+        .button
+        {
+            font-size: 21px !important;
+        }
+    }
+
+    &__item
+    {
+        margin: 0 auto;
+        padding: 0;
+        width: 350px;
+
+        .button
+        {
+            margin: 5px 0;
+            white-space: nowrap;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .button_disabled .emoji
+        {
+            opacity: 0.4;
+        }
+    }
+
+    .emoji
+    {
+        margin-right: 10px;
+        padding: 2px;
+        background: rgba(0, 0, 0, 0.5);
+        width: 40px;
+        height: 40px;
+        display: inline-block;
+        text-align: center;
+        border-radius: 100%;
+    }
+}
