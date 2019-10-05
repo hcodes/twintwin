@@ -2,10 +2,11 @@
 
 const
     gulp = require('gulp'),
+    del = require('del'),
     path = require('path'),
     $ = require('gulp-load-plugins')(),
-    babel = require('rollup-plugin-babel'),
-    alias = require('rollup-plugin-alias');
+    alias = require('rollup-plugin-alias'),
+    babel = require('rollup-plugin-babel');
 
 const
     browsers = ['ie >= 9', 'Firefox >= 24', 'Chrome >= 26', 'iOS >= 5', 'Safari >= 6', 'Android > 2.3'],
@@ -66,4 +67,8 @@ gulp.task('watch', function() {
     gulp.watch('src/**/*', gulp.series('css', 'js', 'polyfill'));
 });
 
-gulp.task('default', gulp.series('css', 'js', 'jsError', 'polyfill'));
+gulp.task('clean', function() {
+    return del([ `${destDir}/*` ]);
+});
+
+gulp.task('default', gulp.series('clean', 'css', 'js', 'jsError', 'polyfill'));
