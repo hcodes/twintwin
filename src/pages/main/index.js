@@ -1,3 +1,5 @@
+import './index.less';
+
 import { $ } from '../../helpers/dom';
 
 import Page from '../../components/page';

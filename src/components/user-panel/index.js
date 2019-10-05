@@ -1,3 +1,5 @@
+import './index.less';
+
 import { $ } from '../../helpers/dom';
 import { escapeHTML } from '../../helpers/string';
 

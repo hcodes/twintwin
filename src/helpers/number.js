@@ -1,5 +1,5 @@
 export function format(num, separator) {
-    separator = separator || '\u202F';
+    separator = separator || '\u202F'; // &thinsp;
 
     num = num.toString()
         .split('').reverse().join('')
