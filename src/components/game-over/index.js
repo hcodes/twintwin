@@ -34,7 +34,7 @@ export default Component.create({
             let score = Math.floor(value * i / 10);
             setTimeout(() => {
                 this.updateScore(score);
-            }, i * 100);
+            }, i * 75);
         }
     }
 });

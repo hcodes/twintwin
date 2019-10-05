@@ -1,5 +1,3 @@
-import './index.less';
-
 import '../../components/select-level';
 
 const SelectLevelPage = {
