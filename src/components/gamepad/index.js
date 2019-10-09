@@ -106,11 +106,9 @@ class Gamepad extends CustomEvent {
                     if (this._pressedBuffer[padIndex][buttonIndex] && !button.pressed) {
                         this.trigger(this.getButtonEventName(buttonIndex));
                         this.trigger(this.getButtonEventName(buttonIndex, pad.index));
-
-                        console.log('name', this.getButtonEventName(buttonIndex));
                     }
 
-                    this._pressedBuffer[padIndex][buttonIndex] = button.pressed;                    
+                    this._pressedBuffer[padIndex][buttonIndex] = button.pressed;
                 }
             }, this);
         }
@@ -140,7 +138,6 @@ class Gamepad extends CustomEvent {
 
     getButtonId(name, index) {
         const id = this._pads[index] && this._pads[index].id;
-        console.log(this._pads[index], this.buttonName[id], id);
         return this.buttonName[id] && this.buttonName[id][name];
     }
 
@@ -169,8 +166,6 @@ class Gamepad extends CustomEvent {
                 gamepadIndex = +gamepadIndex;
             }
         }
-
-        console.log('bbbb', button, self.getButtonId(button, gamepadIndex));
 
         function setEvent(b) {
             var buttonId = typeof b === 'number' ? b : self.getButtonId(b, gamepadIndex);
