@@ -26,9 +26,11 @@
     "jstohtml": "^2.1.4",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
+    "lyam": "^1.2.2",
     "mini-css-extract-plugin": "^0.8.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "postcss-loader": "^3.0.0",
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.5",
     "webpack-md5-hash": "0.0.6"
