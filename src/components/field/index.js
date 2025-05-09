@@ -252,12 +252,16 @@ export default class Field {
                 break;
             case 1:
                 var sym1 = this.field[y][x],
-                    sym2 = this.field[this._openedCages[0].y][this._openedCages[0].x];
+                    x2 = this._openedCages[0].x,
+                    y2 = this._openedCages[0].y,
+                    sym2 = this.field[y2][x2];
+
                 if (sym1 === sym2) {
+                    this._openedCages = [];
                     setTimeout(() => {
-                        this.removeOpenedCages();
                         this.removeCage(x, y);
-                    }, 2000);
+                        this.removeCage(x2, y2);
+                    }, 1000);
                 } else {
                     this.infoPanel.errors++;
 
