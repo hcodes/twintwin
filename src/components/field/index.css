@@ -21,7 +21,7 @@ body.page_field .page_field {
     left: calc(50% + 10px);
 }
 
-.field___cages {
+.field__cages {
     position: absolute;
     z-index: 10;
     top: 0;
