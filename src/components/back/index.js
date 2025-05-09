@@ -1,11 +1,9 @@
 import { $ } from '../../helpers/dom';
 
-import Page from '../page';
-
 import './index.css';
 
 export default class Back {
-    constructor(container) {
+    constructor(container, onclick) {
         this.elem = $.js2dom({
             cl: 'back',
             c: '&times;'
@@ -13,7 +11,7 @@ export default class Back {
 
         container.appendChild(this.elem);
 
-        $.on(this.elem, 'click', this.onclick.bind(this));
+        $.on(this.elem, 'click', onclick.bind(this));
     }
 
     show() {
@@ -22,9 +20,5 @@ export default class Back {
 
     hide() {
         this.elem.classList.remove('back_visible');
-    }
-
-    onclick() {
-        Page.back();
     }
 }

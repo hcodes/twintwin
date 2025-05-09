@@ -1,5 +1,3 @@
-import './index.less';
-
 import { $, $$ } from '../../helpers/dom';
 
 import FieldCursor from '../field-cursor';
@@ -8,6 +6,8 @@ import Gamepad from '../gamepad';
 import '../cage';
 
 import { shuffle } from '../../helpers/array';
+
+import './index.css';
 
 export default class Field {
     constructor(data) {

@@ -1,4 +1,4 @@
-import './app.css';
+import './index.css';
 
 import { hit } from 'lyam';
 

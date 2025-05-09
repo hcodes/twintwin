@@ -20,15 +20,21 @@
     "@babel/preset-env": "^7.27.2",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.26.0",
-    "html-webpack-plugin": "^5.6.3",
     "jstohtml": "^2.2.0",
-    "lyam": "^3.2.1"
+    "lyam": "^3.2.1",
+    "@eslint/js": "9.24.0",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "0.4.4",
+    "rollup": "^4.39.0",
+    "rollup-plugin-postcss": "^4.0.2"      
   },
   "scripts": {
     "test": "npm run build && npm run eslint",
     "clear": "rm -rf ./dist",
-    "build:dev": "npm run clear && webpack --mode=development",
-    "build:prod": "npm run clear && webpack --mode=production",
+    "build": "rollup -c .config/rollup.config.mjs",
+    "dist": "NODE_ENV=production npm run build",
     "eslint": "eslint .",
     "start": "npm run build && start http-server"
   },

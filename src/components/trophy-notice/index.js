@@ -1,7 +1,7 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
 import Page from '../pages/page';
+
+import './index.css';
 
 /*var tp = new TrophyNotice({
     title: 'Hello world!',

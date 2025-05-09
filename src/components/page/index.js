@@ -12,7 +12,9 @@ class Page extends CustomEvent {
         this._current = null;
         this._buffer = {};
 
-        this._back = new Back(document.body);
+        this._back = new Back(document.body, () => {
+            this.back();
+        });
 
         this.on('show', (e, page) => {
             if (page.name === 'main') {
