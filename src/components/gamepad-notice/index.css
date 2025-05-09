@@ -1,5 +1,5 @@
-.gamepad-notice .gamepad-notice-disconnected,
-.gamepad-notice .gamepad-notice-connected {
+.gamepad-notice-disconnected,
+.gamepad-notice-connected {
     position: fixed;
     left: 0;
     top: 30px;
