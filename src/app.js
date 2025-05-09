@@ -1,6 +1,6 @@
-import { hit } from 'lyam';
+import './app.css';
 
-import './app.less';
+import { hit } from 'lyam';
 
 import './components/gamepad-notice';
 import './components/input-type';

@@ -1,9 +1,9 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
 import { escapeHTML } from '../../helpers/string';
 
 import Settings from '../settings';
+
+import './index.css';
 
 export default class UserPanel {
     constructor(container, data) {

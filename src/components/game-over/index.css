@@ -1,0 +1,35 @@
+.game-over {
+    display: none;
+}
+
+.game-over__controls {
+    position: absolute;
+    top: 60%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.game-over__controls .button {
+    margin-right: 15px;
+}
+
+.game-over__score {
+    position: absolute;
+    top: 50%;
+    margin-top: -100px;
+    margin-left: -150px;
+    font-size: 16px;
+    left: 50%;
+    width: 300px;
+    text-align: center;
+    color: white;
+}
+
+.game-over__score-i {
+    margin-top: 10px;
+    position: absolute;
+    font-size: 35px;
+    width: 100%;
+    text-align: center;
+}

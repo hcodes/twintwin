@@ -1,5 +1,3 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
 
 import Page from '../../components/page';
@@ -10,6 +8,8 @@ import '../../components/main-emoji';
 import '../../components/main-logo';
 import '../../components/main-menu';
 import '../../components/qr-code';
+
+import './index.css';
 
 const MainPage = {
     name: 'main',

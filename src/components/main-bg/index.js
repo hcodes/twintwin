@@ -1,11 +1,11 @@
-import './index.less';
-
 import jstohtml from 'jstohtml';
 
 import { $, $$ } from '../../helpers/dom';
 import { shuffle } from '../../helpers/array';
 
 import Levels from '../../helpers/levels';
+
+import './index.css';
 
 class MainBg {
     constructor() {

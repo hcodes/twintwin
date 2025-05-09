@@ -1,0 +1,22 @@
+.main-menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    margin: 0;
+    padding: 0;
+
+    transform: translate(-50%, -50%);
+}
+
+.main-menu li {
+    margin: 5px 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.main-menu .button {
+    width: 220px;
+    margin: 5px 0;
+}

@@ -1,10 +1,11 @@
-import './index.less';
 import '../dialog';
 
 import { $ } from '../../helpers/dom';
 import {format} from '../../helpers/number';
 
 import Component from '../component';
+
+import './index.css';
 
 export default Component.create({
     init() {

@@ -1,9 +1,9 @@
-import './index.less';
-
 import CustomEvent from '../../helpers/custom-event';
 import { $ } from '../../helpers/dom';
 
 import Back from '../back';
+
+import './index.css';
 
 class Page extends CustomEvent {
     constructor() {

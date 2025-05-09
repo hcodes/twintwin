@@ -1,5 +1,4 @@
-.back
-{
+.back {
     font-size: 40px;
     line-height: 20px;
 
@@ -26,19 +25,16 @@
     display: none;
 
     z-index: 20;
-
-    &_visible
-    {
-        display: block;
-    }
 }
 
-body.device_mobile .back
-{
+.back_visible {
+    display: block;
+}
+
+body.device_mobile .back {
     display: none;
 }
 
-body.input_mouse .back:hover
-{
+body.input_mouse .back:hover {
     opacity: .8;
 }

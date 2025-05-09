@@ -1,11 +1,11 @@
-// For debug
-import './index.less';
-
 import jstohtml from 'jstohtml';
 
 import { $ } from '../../helpers/dom';
 
 import Levels from '../../helpers/levels';
+
+// For debug
+import './index.css';
 
 const ShowLevelsPage = {
     name: 'show-levels',

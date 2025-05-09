@@ -8,40 +8,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hcodes/double.git"
+    "url": "git://github.com/hcodes/twintwin.git"
   },
   "homepage": "https://hcodes.github.io/twintwin/",
   "license": "MIT",
   "engines": {
-    "node": ">= 4"
+    "node": ">= 21"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.2",
-    "@babel/preset-env": "^7.6.2",
-    "autoprefixer": "^9.6.1",
-    "babel-loader": "^8.0.6",
-    "css-loader": "^3.0.0",
-    "eslint": "^6.5.1",
-    "html-webpack-plugin": "^3.2.0",
-    "jstohtml": "^2.1.4",
-    "less": "^3.10.3",
-    "less-loader": "^5.0.0",
-    "lyam": "^1.2.2",
-    "mini-css-extract-plugin": "^0.8.0",
-    "optimize-css-assets-webpack-plugin": "^5.0.3",
-    "postcss-loader": "^3.0.0",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.35.2",
-    "webpack-cli": "^3.3.5",
-    "webpack-md5-hash": "0.0.6"
+    "@babel/core": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.26.0",
+    "html-webpack-plugin": "^5.6.3",
+    "jstohtml": "^2.2.0",
+    "lyam": "^3.2.1"
   },
   "scripts": {
-    "test": "npm run-script build && npm run-script eslint",
+    "test": "npm run build && npm run eslint",
     "clear": "rm -rf ./dist",
     "build:dev": "npm run clear && webpack --mode=development",
     "build:prod": "npm run clear && webpack --mode=production",
     "eslint": "eslint .",
-    "start": "npm run-script build && start http-server"
+    "start": "npm run build && start http-server"
   },
   "private": true
 }

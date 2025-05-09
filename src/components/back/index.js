@@ -1,8 +1,8 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
 
 import Page from '../page';
+
+import './index.css';
 
 export default class Back {
     constructor(container) {

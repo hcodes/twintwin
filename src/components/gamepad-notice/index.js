@@ -1,7 +1,7 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
 import Gamepad from '../gamepad';
+
+import './index.css';
 
 class GamepadNotice {
     constructor() {

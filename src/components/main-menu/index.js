@@ -1,2 +1,2 @@
-import './index.less';
+import './index.css';
 import '../button';

@@ -1,9 +1,9 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
 import { formatTime } from '../../helpers/time';
 
 import Levels from '../../helpers/levels';
+
+import './index.css';
 
 export default class InfoPanel {
     constructor(container) {

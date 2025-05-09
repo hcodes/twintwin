@@ -1,0 +1,36 @@
+body.page_field .page_field {
+    display: block;
+}
+
+.field {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    -moz-user-select: none;
+         user-select: none;
+}
+
+.field_one {
+    right: calc(50% + 10px);
+}
+
+.field__two {
+    left: calc(50% + 10px);
+}
+
+.field___cages {
+    position: absolute;
+    z-index: 10;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    -moz-user-select: none;
+        user-select: none;
+
+    -webkit-tap-highlight-color: transparent;
+}

@@ -1,9 +1,9 @@
-﻿import './index.less';
-
-import { $$ } from '../../helpers/dom';
+﻿import { $$ } from '../../helpers/dom';
 
 import Component from '../component';
 import Settings from '../settings';
+
+import './index.css';
 
 const SelectControls = Component.create({
     init() {

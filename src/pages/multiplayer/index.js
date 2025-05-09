@@ -1,12 +1,12 @@
-import './index.less';
-
-import {$} from '../../helpers/dom';
+import { $ } from '../../helpers/dom';
 
 import Field from '../../components/field';
 import Levels from '../../helpers/levels';
 import SelectControls from '../../components/select-controls';
 import Settings from '../../components/settings';
 import UserPanel from '../../components/user-panel';
+
+import './index.css';
 
 const MultiplayerPage = {
     name: 'multiplayer',

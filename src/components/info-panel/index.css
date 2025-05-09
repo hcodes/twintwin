@@ -1,14 +1,12 @@
-.info-panel
-{
+.info-panel {
     position: absolute;
     left: 0;
     bottom: -1.5em;
     color: #fff;
     font-size: 12px;
     white-space: nowrap;
+}
 
-    &__errors
-    {
-        margin-left: 1em;
-    }
+.info-panel__errors {
+    margin-left: 1em;
 }

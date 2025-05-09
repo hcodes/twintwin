@@ -1,5 +1,3 @@
-import './index.less';
-
 import jstohtml from 'jstohtml';
 
 import { $, $$ } from '../../helpers/dom';
@@ -7,6 +5,8 @@ import { $, $$ } from '../../helpers/dom';
 import Levels from '../../helpers/levels';
 import Settings from '../settings';
 import Page from '../page';
+
+import './index.css';
 
 class SelectLevel {
     constructor() {

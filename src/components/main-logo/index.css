@@ -1,5 +1,4 @@
-.main-logo
-{
+.main-logo {
     font-size: 35px;
     line-height: 1;
 
@@ -22,9 +21,8 @@
     border-radius: 5px;
     background: #5194a4;
     text-shadow: 0 0 1px #115464;
+}
 
-    &_visible
-    {
-        opacity: 1;
-    }
+.main-logo_visible {
+    opacity: 1;
 }

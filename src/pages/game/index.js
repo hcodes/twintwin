@@ -1,5 +1,3 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
 
 import Page from '../../components/page';
@@ -7,6 +5,8 @@ import Settings from '../../components/settings';
 import Field from '../../components/field';
 import Levels from '../../helpers/levels';
 import gameOver from '../../components/game-over';
+
+import './index.css';
 
 const GamePage = {
     name: 'game',

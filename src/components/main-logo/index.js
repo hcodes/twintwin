@@ -1,6 +1,6 @@
-import './index.less';
-
 import { $ } from '../../helpers/dom';
+
+import './index.css';
 
 const elem = $('.main-logo');
 
