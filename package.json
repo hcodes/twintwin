@@ -37,7 +37,7 @@
     "build": "rollup -c .config/rollup.config.mjs && npm run update-template",
     "dist": "NODE_ENV=production npm run build",
     "eslint": "eslint .",
-    "start": "npm run build && start http-server"
+    "start": "npm run build && http-server"
   },
   "private": true
 }

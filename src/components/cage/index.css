@@ -66,6 +66,7 @@ body.support_transform3d_true .cage_opened .cage__front {
 
 body.support_transform3d_true .cage_removed {
     transform: rotateY(180deg) scale(0.01);
+    transition-duration: 1s;
 }
 
 body.support_transform3d_false .cage_opened .cage__front {

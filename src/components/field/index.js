@@ -307,7 +307,7 @@ export default class Field {
 
             setTimeout(() => {
                 this.cages.removeChild(cage);
-            }, 200);
+            }, 1000);
 
             if (!this.cagesCount) {
                 this.infoPanel.stop();
