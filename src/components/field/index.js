@@ -254,7 +254,7 @@ export default class Field {
                 var sym1 = this.field[y][x],
                     sym2 = this.field[this._openedCages[0].y][this._openedCages[0].x];
                 if (sym1 === sym2) {
-                    setTimeout(function() {
+                    setTimeout(() => {
                         this.removeOpenedCages();
                         this.removeCage(x, y);
                     }, 2000);
