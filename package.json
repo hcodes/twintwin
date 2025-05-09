@@ -33,7 +33,8 @@
   "scripts": {
     "test": "npm run build && npm run eslint",
     "clear": "rm -rf ./dist",
-    "build": "rollup -c .config/rollup.config.mjs",
+    "update-template": "node ./tools/index.mjs",
+    "build": "rollup -c .config/rollup.config.mjs && npm run update-template",
     "dist": "NODE_ENV=production npm run build",
     "eslint": "eslint .",
     "start": "npm run build && start http-server"
